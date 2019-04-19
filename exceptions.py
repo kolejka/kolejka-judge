@@ -1,0 +1,3 @@
+class PrerequisiteException(Exception):
+    pass
+
