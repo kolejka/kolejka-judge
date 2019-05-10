@@ -7,12 +7,14 @@ from commands.compile.csharp import CompileCSharp
 from commands.compile.go import CompileGo
 from commands.compile.haskell import CompileHaskell
 from commands.compile.java import CompileJava
+from validators import FileExistsPrerequisite
 
 
 class AutoCompile(CommandBase):
     def __init__(self, file, **kwargs):
         limits = kwargs.pop('limits', None)
         super().__init__(limits=limits)
+        self.file = file
         compiler_cls = self.detect_compiler(file)
         self.compiler = compiler_cls(file, **kwargs) if compiler_cls else None
 
@@ -40,7 +42,7 @@ class AutoCompile(CommandBase):
         return self.compiler.get_command()
 
     def prerequisites(self):
-        return self.compiler.prerequisites()
+        return self.compiler.prerequisites() + [FileExistsPrerequisite(self.file)]
 
     def postconditions(self):
         return self.compiler.postconditions()

@@ -1,4 +1,5 @@
 from commands.base import CommandBase
+from commands.run.base import Run
 from validators import ExitCodePostcondition, FileExistsPrerequisite
 
 
@@ -27,3 +28,10 @@ class Diff(CommandBase):
 
     def output_files(self):
         return []
+
+
+class RunChecker(Run):
+    def postconditions(self):
+        return [
+            (ExitCodePostcondition(), 'ANS')
+        ]
