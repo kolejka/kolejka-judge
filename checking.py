@@ -39,9 +39,9 @@ class Checking:
     def run(self):
         result = {}
         for name, step in self.steps.items():
-            result[name] = self._run_step(name)
-            if hasattr(result[name], 'exit_status'):
-                return result[name].exit_status, result
+            exit_status, result[name] = self._run_step(name)
+            if exit_status is not None:
+                return exit_status, result
 
         return 'OK', result
 

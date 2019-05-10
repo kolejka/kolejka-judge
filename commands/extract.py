@@ -10,13 +10,13 @@ class ExtractArchive(CommandBase):
     def __init__(self, archive, archive_type=None, directory='sources'):
         super().__init__()
         self.archive = archive
-        self.directory = os.path.join(directory, '')  # TODO: possibly default to archive file name
+        self.directory = os.path.join(directory, '')
         self.archive_type = archive_type
         if archive_type is None:
             self.detect_archive_type()
 
-        if self.archive_type not in self.extensions:
-            raise TypeError("Unrecognized archive type")  # TODO: return EXT?
+    def get_configuration_status(self):
+        return (True, None) if self.archive_type in self.extensions else (False, 'EXT')
 
     def detect_archive_type(self):
         for extension in self.extensions:

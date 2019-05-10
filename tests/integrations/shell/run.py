@@ -1,10 +1,11 @@
+import json
+
 from checking import Checking
-from environments import *
 from commands.diff import Diff
 from commands.run.shell import RunShellSolution
+from utils import detect_environment
 
-checking = Checking(environment=LocalComputer())
-checking = Checking(environment=KolejkaObserver())
+checking = Checking(environment=detect_environment())
 checking.add_steps(
     run=RunShellSolution('./solution.sh', stdout='out'),
     diff=Diff(),

@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from pathlib import Path
 from typing import Optional, List
 
 from exceptions import PrerequisiteException
@@ -13,8 +14,7 @@ class CommandBase:
         self.limits = limits or {}
 
     def _get_file_name(self, suffix):
-        # TODO: Rethink this
-        return 'outs/{}_{}.txt'.format(self.name, suffix)
+        return Path('logs/{}_{}.txt'.format(self.name, suffix))
 
     def get_env(self):
         return deepcopy(os.environ)
@@ -40,8 +40,7 @@ class CommandBase:
     def verify_postconditions(self, result):
         for postcondition, status in self.postconditions():
             if not postcondition(result):
-                result.exit_status = status
-                break
+                return status
 
     def prerequisites(self):
         return []
@@ -53,3 +52,9 @@ class CommandBase:
 
     def set_name(self, name):
         self.name = name
+
+    def get_configuration_status(self):
+        """
+        :return: 2-tuple - (is the command configured correctly to be run (e.g. file extension is known), exit status)
+        """
+        return True, None

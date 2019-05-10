@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from commands.base import CommandBase
 from validators import ProgramExistsPrerequisite, FileExistsPrerequisite, ExitCodePostcondition
 
@@ -7,9 +9,9 @@ class Run(CommandBase):
         super().__init__(**kwargs)
         self.executable = executable
         self.cmdline_options = cmdline_options or []
-        self.stdin = stdin
-        self.stdout = stdout
-        self.stderr = stderr
+        self.stdin = stdin and Path(stdin)
+        self.stdout = stdout and Path(stdout)
+        self.stderr = stderr and Path(stderr)
 
     def get_stdin_file(self):
         return self.stdin

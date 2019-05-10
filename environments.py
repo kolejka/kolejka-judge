@@ -5,6 +5,7 @@ import sys
 import tempfile
 from contextlib import ExitStack
 from json import JSONEncoder
+from pathlib import Path
 
 from commands.base import CommandBase
 from tasks.base import Task
@@ -29,32 +30,38 @@ class ExecutionEnvironment:
 
     def run_step(self, step: CommandBase, name: str):
         step.set_name(name)
-        step.verify_prerequisites()
 
-        old_limits = self.limits.copy()
-        self.set_limits(**step.get_limits())
+        result = None
+        configured_correctly, exit_status = step.get_configuration_status()
 
-        command = step.get_command()
-        for i, part in enumerate(command):
-            if isinstance(part, DependentExpr):
-                arguments = map(lambda x: self.variables.get(x), part.names)
-                command[i] = part.evaluate(*arguments)
+        if configured_correctly:
+            step.verify_prerequisites()
 
-        result = self.run_command(
-            command,
-            step.get_stdin_file(),
-            step.get_stdout_file(),
-            step.get_stderr_file(),
-            step.get_env(),
-            name,
-        )
-        step.verify_postconditions(result)
+            old_limits = self.limits.copy()
+            self.set_limits(**step.get_limits())
 
-        self.limits = old_limits
-        return result
+            command = step.get_command()
+            for i, part in enumerate(command):
+                if isinstance(part, DependentExpr):
+                    arguments = map(lambda x: self.variables.get(x), part.names)
+                    command[i] = part.evaluate(*arguments)
+
+            result = self.run_command(
+                command,
+                step.get_stdin_file(),
+                step.get_stdout_file(),
+                step.get_stderr_file(),
+                step.get_env(),
+                name,
+            )
+            exit_status = step.verify_postconditions(result)
+
+            self.set_limits(**old_limits)
+
+        return exit_status, result
 
     def run_task(self, task: Task, name: str):
-        return task.execute(self)
+        return None, task.execute(self)
 
     def set_variable(self, variable_name, files):
         self.variables[variable_name] = files
@@ -62,6 +69,11 @@ class ExecutionEnvironment:
     @classmethod
     def format_execution_status(cls, status):
         raise NotImplementedError
+
+    @staticmethod
+    def _get_file_handle(file: Path, mode: str):
+        file.parent.mkdir(exist_ok=True, parents=True)
+        return file.open(mode)
 
 
 class LocalComputer(ExecutionEnvironment):
@@ -82,13 +94,13 @@ class LocalComputer(ExecutionEnvironment):
             self.memory = self.MemoryStats()
             self.cpus = {'*': self.CpusStats()}
 
-    def run_command(self, command, stdin, stdout, stderr, env, name):
+    def run_command(self, command, stdin: Path, stdout: Path, stderr: Path, env, name):
         with ExitStack() as stack:
             stats_file = tempfile.NamedTemporaryFile(mode='r', delete=False)
             stats_file.close()
-            stdin_file = stdin and stack.enter_context(open(stdin, 'r'))
-            stdout_file = stdout and stack.enter_context(open(stdout, 'w'))
-            stderr_file = stderr and stack.enter_context(open(stderr, 'w'))
+            stdin_file = stdin and stack.enter_context(self._get_file_handle(stdin, 'r'))
+            stdout_file = stdout and stack.enter_context(self._get_file_handle(stdout, 'w'))
+            stderr_file = stderr and stack.enter_context(self._get_file_handle(stderr, 'w'))
 
             command = ['/usr/bin/time', '-f', 'mem=%M\nreal=%e\nsys=%S\nuser=%U', '-o', stats_file.name] + command
             execution_status = subprocess.run(
@@ -126,7 +138,7 @@ class LocalComputer(ExecutionEnvironment):
                 if line.startswith('real='):
                     time['real'] = '{time}s'.format(time=line.strip().split('=')[1])
                 if line.startswith('user='):
-                    time['user'] = '{time}s'.format(time= line.strip().split('=')[1])
+                    time['user'] = '{time}s'.format(time=line.strip().split('=')[1])
                 if line.startswith('sys='):
                     time['sys'] = '{time}s'.format(time=line.strip().split('=')[1])
 
@@ -134,6 +146,8 @@ class LocalComputer(ExecutionEnvironment):
 
     class ExecutionStatusEncoder(JSONEncoder):
         def default(self, o):
+            if isinstance(o, Path):
+                return str(o)
             return o.__dict__
 
     @classmethod
@@ -149,9 +163,9 @@ class KolejkaObserver(ExecutionEnvironment):
         from kolejka.common import KolejkaLimits
 
         with ExitStack() as stack:
-            stdin_file = stdin and stack.enter_context(open(stdin, 'r'))
-            stdout_file = stdout and stack.enter_context(open(stdout, 'w'))
-            stderr_file = stderr and stack.enter_context(open(stderr, 'w'))
+            stdin_file = stdin and stack.enter_context(self._get_file_handle(stdin, 'r'))
+            stdout_file = stdout and stack.enter_context(self._get_file_handle(stdout, 'w'))
+            stderr_file = stderr and stack.enter_context(self._get_file_handle(stderr, 'w'))
             execution_status = observer.run(
                 command,
                 stdin=stdin_file,
@@ -170,6 +184,8 @@ class KolejkaObserver(ExecutionEnvironment):
             from kolejka.common import KolejkaStats
             if isinstance(o, KolejkaStats):
                 return o.dump()
+            if isinstance(o, Path):
+                return str(o)
             return o.__dict__
 
     @classmethod

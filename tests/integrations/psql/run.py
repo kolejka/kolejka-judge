@@ -1,10 +1,11 @@
+import json
+
 from checking import Checking
-from environments import *
 from commands.diff import Diff
 from commands.run.db import RunPSQLSolution
+from utils import detect_environment
 
-checking = Checking(environment=LocalComputer())
-checking = Checking(environment=KolejkaObserver())
+checking = Checking(environment=detect_environment())
 checking.add_steps(
     run=RunPSQLSolution('solution.sql', stdout='out', cmdline_options=['-qAt'],
                         user='test', host='localhost', password='test', database='test'),

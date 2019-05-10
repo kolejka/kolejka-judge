@@ -1,11 +1,12 @@
+import json
+
 from checking import Checking
-from environments import *
 from commands.compile.csharp import CompileCSharp
 from commands.diff import Diff
 from commands.run.csharp import RunCSharpSolution
+from utils import detect_environment
 
-checking = Checking(environment=LocalComputer())
-checking = Checking(environment=KolejkaObserver())
+checking = Checking(environment=detect_environment())
 checking.add_steps(
     compile=CompileCSharp('**/*.cs'),
     solution=RunCSharpSolution('main.exe', stdout='out'),

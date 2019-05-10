@@ -1,12 +1,12 @@
+import json
+
 from checking import Checking
-from environments import *
 from commands.compile.make import CMake, Make
 from commands.diff import Diff
 from commands.run.base import RunSolution
+from utils import detect_environment
 
-
-checking = Checking(environment=LocalComputer())
-checking = Checking(environment=KolejkaObserver())
+checking = Checking(environment=detect_environment())
 checking.add_steps(
     cmake=CMake(),
     make=Make(build_dir='build'),
