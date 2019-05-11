@@ -13,7 +13,7 @@ class CommandBase:
     def __init__(self, limits=None):
         self.limits = limits or {}
 
-    def _get_file_name(self, suffix):
+    def _get_file_name(self, suffix) -> Path:
         return Path('logs/{}_{}.txt'.format(self.name, suffix))
 
     def get_env(self):
@@ -25,13 +25,13 @@ class CommandBase:
     def get_command(self) -> List[object]:
         raise NotImplementedError
 
-    def get_stdin_file(self) -> Optional[str]:
+    def get_stdin_file(self) -> Optional[Path]:
         return None
 
-    def get_stdout_file(self) -> Optional[str]:
+    def get_stdout_file(self) -> Optional[Path]:
         return self._get_file_name('stdout')
 
-    def get_stderr_file(self) -> Optional[str]:
+    def get_stderr_file(self) -> Optional[Path]:
         return self._get_file_name('stderr')
 
     def postconditions(self):

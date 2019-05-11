@@ -6,6 +6,7 @@ import tempfile
 from contextlib import ExitStack
 from json import JSONEncoder
 from pathlib import Path
+from typing import Optional
 
 from commands.base import CommandBase
 from tasks.base import Task
@@ -25,7 +26,7 @@ class ExecutionEnvironment:
 
             self.limits[key] = value
 
-    def run_command(self, command, stdin, stdout, stderr, env, name):
+    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], env):
         raise NotImplementedError
 
     def run_step(self, step: CommandBase, name: str):
@@ -52,7 +53,6 @@ class ExecutionEnvironment:
                 step.get_stdout_file(),
                 step.get_stderr_file(),
                 step.get_env(),
-                name,
             )
             exit_status = step.verify_postconditions(result)
 
@@ -94,7 +94,7 @@ class LocalComputer(ExecutionEnvironment):
             self.memory = self.MemoryStats()
             self.cpus = {'*': self.CpusStats()}
 
-    def run_command(self, command, stdin: Path, stdout: Path, stderr: Path, env, name):
+    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], env):
         with ExitStack() as stack:
             stats_file = tempfile.NamedTemporaryFile(mode='r', delete=False)
             stats_file.close()
@@ -158,7 +158,7 @@ class LocalComputer(ExecutionEnvironment):
 class KolejkaObserver(ExecutionEnvironment):
     recognized_limits = ['cpus', 'cpus_offset', 'pids', 'memory']
 
-    def run_command(self, command, stdin, stdout, stderr, env, name):
+    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], env):
         from kolejka import observer
         from kolejka.common import KolejkaLimits
 
