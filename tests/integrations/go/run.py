@@ -2,7 +2,7 @@ import json
 
 from checking import Checking
 from commands.compile.go import CompileGo
-from commands.diff import Diff
+from commands.check import Diff
 from commands.run.base import RunSolution
 from utils import detect_environment
 

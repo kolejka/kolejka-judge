@@ -2,7 +2,7 @@ import json
 
 from checking import Checking
 from commands.compile.csharp import CompileCSharp
-from commands.diff import Diff
+from commands.check import Diff
 from commands.run.csharp import RunCSharpSolution
 from utils import detect_environment
 

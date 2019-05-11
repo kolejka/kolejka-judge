@@ -1,7 +1,7 @@
 import json
 
 from checking import Checking
-from commands.diff import Diff
+from commands.check import Diff
 from commands.run.db import RunPSQLSolution
 from utils import detect_environment
 

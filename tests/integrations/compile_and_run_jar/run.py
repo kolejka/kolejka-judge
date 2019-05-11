@@ -2,7 +2,7 @@ import json
 
 from checking import Checking
 from commands.compile.java import CompileJava, CreateJar
-from commands.diff import Diff
+from commands.check import Diff
 from commands.run.java import RunJarSolution
 from environments import DependentExpr
 from tasks.java import RenameJavaFileTask
