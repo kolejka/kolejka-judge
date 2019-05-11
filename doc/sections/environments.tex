@@ -1,0 +1,80 @@
+\section{Environments}\label{sec:environments}
+
+    There are two environments, \hyperref[sec:LocalComputer]{\python{LocalComputer}} and
+    \hyperref[sec:KolejkaObserver]{\python{KolejkaObserver}}.
+    The first one is supposed to provide a minimal support for running the judge without installing and launching
+    kolejka-observer.
+    It doesn't support any limits, and should be used solely for debugging purposes.
+    \hyperref[sec:KolejkaObserver]{\python{KolejkaObserver}} should be used in the real situations instead.
+    The utility function \hyperref[sec:detect_environment]{\python{detect_environment()}} can be used to
+    automatically select the environment,
+    based on the command line arguments.
+
+\section*{\python{ExecutionEnvironment}}
+
+% TODO: in doc.tex?
+\renewcommand\labelitemiii{\textbullet}
+
+\begin{itemize}[label={}]
+    \item This is the base class, defining common methods for the environments.
+    \item \docfunc{set_limits(self, **kwargs)}
+        \docfuncdesc{
+            Filters out the unrecognized limits passed as the arguments, based on the \\
+            \python{self.recognized_limits} variable.
+            Warning about the unknown limits is then printed on the \python{stderr}.
+            Finally the identified limits are saved to be used during the following \python{run_command()} calls,
+            until the next \python{set_limits()} invocation.
+        }
+
+    \item \docfunc{run_command(self, command, stdin, stdout, stderr, env)}
+        \docfuncdesc{
+            Abstract method.
+            Responsible for running the specified command within the appropriate launch configuration, consisting of
+            standard input/output files (handles opened from \python{stdin}, \python{stdout}, \python{stderr} arguments,
+            all of type \python{pathlib.Path}),
+            environment variables (\python{env}), and limits (from previous \python{set_limits()} call).
+            Returns the execution statistics object, details of which are left up to the particular environment -
+            some attributes are, however, required for all of the environments (see TODO \python{CompletedProcess}).
+        }
+
+    \item \docfunc{run_step(self, step, name)}
+        \docfuncdesc{
+            Responsible for running the step, which consists of the following parts:
+            \begin{itemize}
+                \item verifying that step is configured correctly
+                \item verifying the prerequisites are met
+                \item setting the limits requested by the step (see \python{CommandBase.get_limits()})
+                \item evaluating the \python{DependentExpr} expressions
+                \item calling the \python{run_command()} method
+                \item checking the postconditions
+                \item restoring the old limits
+            \end{itemize}
+        }
+
+\end{itemize}
+
+\section*{\python{LocalComputer}}\label{sec:LocalComputer}
+
+\begin{itemize}[label={}]
+    \item \python{recognized_limits = []}
+
+    \item \docfunc{run_command(self, command, stdin, stdout, stderr, env)}
+        \docfuncdesc{
+            Runs the command using the \mintinline{shell}{/usr/bin/time} tool to measure the time and memory used.
+            Returns the TODO \python{LocalComputer.LocalStats} object containing execution statistics.
+        }
+\end{itemize}
+
+\section*{\python{KolejkaObserver}}\label{sec:KolejkaObserver}
+
+\begin{itemize}[label={}]
+    \item \python{recognized_limits = ['cpus', 'cpus_offset', 'pids', 'memory']}
+\end{itemize}
+
+\section*{\docfunc{detect_environment()}}\label{sec:detect_environment}
+
+\begin{itemize}[label={}]
+    \item Returns the environment based on the command line arguments.
+    \item \mintinline{shell}{--local} (\textit{default}) -- \hyperref[sec:LocalComputer]{\python{LocalComputer}}
+    \item \mintinline{shell}{--kolejka} -- \hyperref[sec:KolejkaObserver]{\python{KolejkaObserver}}
+\end{itemize}

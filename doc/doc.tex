@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{ulem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+}
+\let\oldhyperref=\hyperref
+\renewcommand\hyperref[2][]{\dotuline{\oldhyperref[#1]{#2}}}
+\usepackage{geometry}
+\geometry{legalpaper, margin=1in}
+\usepackage{enumitem}
+\usepackage{minted}
+\usepackage{tcolorbox}
+\usepackage{etoolbox}
+\BeforeBeginEnvironment{minted}{\begin{tcolorbox}[boxsep=10pt, arc=0mm, colframe=white, boxrule=0mm, top=0mm, bottom=0mm]}
+\AfterEndEnvironment{minted}{\end{tcolorbox}}
+
+\setlength{\parindent}{0pt}
+
+\newcommand{\python}[1]{{\mintinline{python}{#1}}}
+\newcommand{\docfunc}[1]{{\python{#1}}}
+\newcommand{\docfuncdesc}[1]{
+    \begin{itemize}[label={}]
+        \item #1
+    \end{itemize}
+}
+
+\begin{document}
+
+    \input{sections/basic_example}
+    \input{sections/environments}
+    \input{sections/steps}
+
+\end{document}
