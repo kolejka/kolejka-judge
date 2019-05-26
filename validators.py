@@ -1,6 +1,5 @@
-import os
 import re
-import shutil
+from environments import ExecutionEnvironment
 
 
 class ExitCodePostcondition:
@@ -39,12 +38,23 @@ class PSQLErrorPostcondition:
         return True
 
 
+class NonEmptyFilesListPrerequisite:
+    def __init__(self, files):
+        self.files = files
+
+    def __call__(self, *args, **kwargs):
+        return len(self.files) > 0
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.files))
+
+
 class FileExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, *args, **kwargs):
-        return os.path.exists(self.file)
+    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+        return environment.validators.file_exists(self.file)
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, repr(self.file))
@@ -54,8 +64,19 @@ class ProgramExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, *args, **kwargs):
-        return shutil.which(self.file) is not None
+    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+        return environment.validators.program_exists(self.file)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.file))
+
+
+class FileOnARequiredListPrerequisite:
+    def __init__(self, file):
+        self.file = file
+
+    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+        return environment.validators.file_on_a_required_list(self.file)
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, repr(self.file))

@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 from pathlib import Path
+from typing import Tuple, Optional
 
 from tasks.base import Task
 
@@ -15,7 +16,7 @@ class RenameJavaFileTask(Task):
         self.source_file = Path(source_file)
         self.target_directory = Path(target_directory)
 
-    def execute(self, environment):
+    def execute(self, name, environment) -> Tuple[Optional[str], Optional[object]]:
         test_class = ''
         with self.source_file.open() as file:
             for line in file.readlines():
@@ -31,4 +32,4 @@ class RenameJavaFileTask(Task):
         self.target_directory.mkdir(parents=True, exist_ok=True)
         shutil.move(self.source_file, self.target_directory / file)
 
-        return {}
+        return None, None

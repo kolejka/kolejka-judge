@@ -30,20 +30,8 @@ class Checking:
         for name, func in steps.items():
             self.steps[name] = func
 
-    def _run_step(self, name):
-        if isinstance(self.steps[name], CommandBase):
-            return self.environment.run_step(self.steps[name], name=name)
-        if isinstance(self.steps[name], Task):
-            return self.environment.run_task(self.steps[name], name=name)
-
     def run(self):
-        result = {}
-        for name, step in self.steps.items():
-            exit_status, result[name] = self._run_step(name)
-            if exit_status is not None:
-                return exit_status, result
-
-        return 'OK', result
+        return self.environment.run_steps(self.steps)
 
     def format_result(self, result):
         formatted_result = {}

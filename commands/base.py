@@ -1,5 +1,3 @@
-import os
-from copy import deepcopy
 from pathlib import Path
 from typing import Optional, List
 
@@ -17,7 +15,7 @@ class CommandBase:
         return Path('logs/{}_{}.txt'.format(self.name, suffix))
 
     def get_env(self):
-        return deepcopy(os.environ)
+        return {}
 
     def get_limits(self):
         return self.limits or {}
@@ -45,9 +43,9 @@ class CommandBase:
     def prerequisites(self):
         return []
 
-    def verify_prerequisites(self):
+    def verify_prerequisites(self, environment):
         for prerequisite in self.prerequisites():
-            if not prerequisite():
+            if not prerequisite(environment):
                 raise PrerequisiteException("Prerequisite `{}` not satisfied".format(prerequisite))
 
     def set_name(self, name):
