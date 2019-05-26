@@ -260,9 +260,9 @@ class PsutilEnvironment(ExecutionEnvironment):
                     memory_max_usage = max(memory_max_usage, process.memory_info().vms)
 
                 if 'time' in self.limits and usage.total_seconds() > self.limits['time']:
-                    process.kill()  # TODO how to mark step as TLE?
+                    process.kill()
                 if 'memory' in self.limits and memory_max_usage > self.limits['memory']:
-                    process.kill()  # TODO how to mark step as MEM?
+                    process.kill()
 
                 time.sleep(0.1)
 

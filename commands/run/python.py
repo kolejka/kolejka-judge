@@ -1,3 +1,4 @@
+from commands.mixins import SolutionMixin
 from commands.run.base import Run
 from validators import FileExistsPrerequisite, ExitCodePostcondition
 
@@ -29,9 +30,9 @@ class RunPython3(RunPython):
     python_interpreter = 'python3'
 
 
-class RunPythonSolution(RunPython):
+class RunPythonSolution(SolutionMixin, RunPython):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]
 

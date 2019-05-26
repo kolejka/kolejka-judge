@@ -1,3 +1,4 @@
+from commands.mixins import SolutionMixin
 from commands.run.base import Run
 from validators import ExitCodePostcondition, FileExistsPrerequisite
 
@@ -19,8 +20,8 @@ class RunCSharp(Run):
         return [self.executable] + self.interpreter_options + [self.file] + self.cmdline_options
 
 
-class RunCSharpSolution(RunCSharp):
+class RunCSharpSolution(SolutionMixin, RunCSharp):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]

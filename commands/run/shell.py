@@ -1,3 +1,4 @@
+from commands.mixins import SolutionMixin
 from commands.run.base import Run
 from validators import ExitCodePostcondition
 
@@ -6,8 +7,8 @@ class RunShell(Run):
     pass
 
 
-class RunShellSolution(RunShell):
+class RunShellSolution(SolutionMixin, RunShell):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]

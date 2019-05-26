@@ -1,3 +1,4 @@
+from commands.mixins import SolutionMixin
 from commands.run.base import Run
 from validators import ExitCodePostcondition, PSQLErrorPostcondition
 
@@ -29,9 +30,9 @@ class RunPSQL(Run):
         return [self.executable] + self.cmdline_options + ['--file', self.sql_file]
 
 
-class RunPSQLSolution(RunPSQL):
+class RunPSQLSolution(SolutionMixin, RunPSQL):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE'),
             (PSQLErrorPostcondition(), 'ERROR')
         ]

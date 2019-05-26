@@ -1,5 +1,6 @@
+from commands.mixins import SolutionMixin
 from commands.run.base import Run
-from validators import ExitCodePostcondition, FileExistsPrerequisite
+from validators import ExitCodePostcondition, FileExistsPrerequisite, UsedTimePostcondition, UsedMemoryPostcondition
 
 
 class RunJavaClass(Run):
@@ -36,16 +37,16 @@ class RunJar(Run):
         return [self.executable] + self.interpreter_options + ['-jar', self.jar_file] + self.cmdline_options
 
 
-class RunJavaClassSolution(RunJavaClass):
+class RunJavaClassSolution(SolutionMixin, RunJavaClass):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]
 
 
-class RunJarSolution(RunJar):
+class RunJarSolution(SolutionMixin, RunJar):
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]
 

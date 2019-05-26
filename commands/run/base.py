@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from commands.base import CommandBase
+from commands.mixins import SolutionMixin
 from validators import ProgramExistsPrerequisite, FileExistsPrerequisite, ExitCodePostcondition
 
 
@@ -32,12 +33,12 @@ class Run(CommandBase):
         return prerequisites
 
 
-class RunSolution(Run):
+class RunSolution(SolutionMixin, Run):
     def __init__(self, executable='./a.out', cmdline_options=None, stdin=None, stdout=None, stderr=None, **kwargs):
         super().__init__(executable=executable, cmdline_options=cmdline_options,
                          stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
 
     def postconditions(self):
-        return [
+        return super().postconditions() + [
             (ExitCodePostcondition(), 'RTE')
         ]
