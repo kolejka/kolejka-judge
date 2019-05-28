@@ -1,9 +1,9 @@
 import json
 
-from checking import Checking
-from commands.check import Diff
-from commands.run.shell import RunShellSolution
-from utils import detect_environment
+from kolejka.judge.checking import Checking
+from kolejka.judge.commands.check import Diff
+from kolejka.judge.commands.run.shell import RunShellSolution
+from kolejka.judge.utils import detect_environment
 
 checking = Checking(environment=detect_environment())
 checking.add_steps(

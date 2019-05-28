@@ -1,10 +1,10 @@
 import json
 
-from checking import Checking
-from commands.compile.go import CompileGo
-from commands.check import Diff
-from commands.run.base import RunSolution
-from utils import detect_environment
+from kolejka.judge.checking import Checking
+from kolejka.judge.commands.compile.go import CompileGo
+from kolejka.judge.commands.check import Diff
+from kolejka.judge.commands.run.base import RunSolution
+from kolejka.judge.utils import detect_environment
 
 checking = Checking(environment=detect_environment())
 checking.add_steps(

@@ -1,13 +1,13 @@
 import json
 
-from checking import Checking
-from commands.compile.java import CompileJava, CreateJar
-from commands.check import Diff
-from commands.run.java import RunJarSolution
-from environments import DependentExpr
-from tasks.java import RenameJavaFileTask
-from tasks.list import ListFilesTask
-from utils import detect_environment
+from kolejka.judge.checking import Checking
+from kolejka.judge.commands.compile.java import CompileJava, CreateJar
+from kolejka.judge.commands.check import Diff
+from kolejka.judge.commands.run.java import RunJarSolution
+from kolejka.judge.environments import DependentExpr
+from kolejka.judge.tasks.java import RenameJavaFileTask
+from kolejka.judge.tasks.list import ListFilesTask
+from kolejka.judge.utils import detect_environment
 
 checking = Checking(environment=detect_environment())
 checking.add_steps(

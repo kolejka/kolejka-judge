@@ -1,11 +1,11 @@
 import json
 
-from checking import Checking
-from commands.check import RunChecker
-from commands.compile.java import CompileJava
-from commands.run.java import RunJavaClassSolution
-from tasks.autocompile import AutoCompileTask
-from utils import detect_environment
+from kolejka.judge.checking import Checking
+from kolejka.judge.commands.check import RunChecker
+from kolejka.judge.commands.compile.java import CompileJava
+from kolejka.judge.commands.run.java import RunJavaClassSolution
+from kolejka.judge.tasks.autocompile import AutoCompileTask
+from kolejka.judge.utils import detect_environment
 
 checking = Checking(environment=detect_environment())
 checking.add_steps(
