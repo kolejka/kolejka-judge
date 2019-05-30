@@ -81,7 +81,7 @@ class ExecutionEnvironment:
             env_vars.update(step.get_env())
             result = self.run_command(
                 command,
-                step.get_stdin_file(),
+                self.get_path(step.get_stdin_file()),
                 self.get_path(step.get_stdout_file()),
                 self.get_path(step.get_stderr_file()),
                 env_vars,
@@ -198,6 +198,7 @@ class LocalComputer(ExecutionEnvironment):
                 stderr=stderr_file,
                 env=env,
                 preexec_fn=self.get_change_user_function(user=user, group=group),
+                cwd=self.output_directory,
             )
 
             stats = self._get_execution_stats(stats_file.name)
@@ -358,6 +359,7 @@ class KolejkaObserver(ExecutionEnvironment):
                 env=env,
                 limits=KolejkaLimits(**self.limits),
                 preexec_fn=self.get_change_user_function(user=user, group=group)
+                cwd=self.output_directory,
             )
             execution_status.stdout = stdout
             execution_status.stderr = stderr

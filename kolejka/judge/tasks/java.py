@@ -18,7 +18,7 @@ class RenameJavaFile(TaskBase):
 
     def execute(self, environment) -> Tuple[Optional[str], Optional[object]]:
         test_class = ''
-        with self.source_file.open() as file:
+        with environment.get_path(self.source_file).open() as file:
             for line in file.readlines():
                 for p in re.findall(r'^\s*package\s+([^;]+)', line):
                     test_class = p.strip() + '.'
