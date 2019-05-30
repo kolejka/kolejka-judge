@@ -1,0 +1,13 @@
+0:
+  !include : test.yaml
+  input:     !file test-0.in
+  time:      1s
+1:
+  !include : test.yaml
+  input:     !file test-1.in
+  time:      1s
+2:
+  !include : test.yaml
+  input:     !file test-2.gen
+  generator: !file gen.cpp
+  time:      5s
