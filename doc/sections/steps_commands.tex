@@ -1,0 +1,270 @@
+\subsection{Commands}\label{subsec:steps_commands}
+    The base class of every command step is \python{CommandBase}.
+
+\subsection*{\python{CommandBase}}\label{subsec:CommandBase}
+
+\begin{itemize}[label={}]
+    \item \docfunc{__init__(self, limits, user, group)}
+        \docfuncdesc{
+            Constructor.
+            The \python{limits} argument allows the caller to specify the limits for the command execution without
+            having to override \hyperref[sec:get_limits]{\python{get_limits()}} method.
+            The \python{user} and \python{group} arguments perform the same function, for
+            \hyperref[sec:get_user]{\python{get_user()}} and \hyperref[sec:get_group]{\python{get_group()}}
+            methods, respectively.
+        }
+
+    \item \phantomsection \label{sec:command_get_env} \docfunc{get_env(self)}
+        \docfuncdesc{
+            Used to specify step-specific environment variables that should be present during the command execution.
+            Values specified here take precedence over those from the
+            \hyperref[sec:env_get_env]{\python{ExecutionEnvironment.get_env()}} method.
+        }
+
+    \item \phantomsection \label{sec:get_limits} \docfunc{get_limits(self)}
+        \docfuncdesc{
+            Defines the dictionary containing the limits active during the command execution.
+            It will by called by the
+            \hyperref[sec:run_command_step]{\python{ExecutionEnvironment.run_command_step()}} method.
+            The default implementation simply returns the limits passed to the constructor.
+        }
+
+    \item \docfunc{get_command(self)}
+        \docfuncdesc{
+            Abstract method.
+            Returns a list consisting of an executable and its arguments that will be run.
+        }
+
+    \item \docfunc{get_stdin_file(self)}
+        \docfuncdesc{
+            Returns a path to the file that will be redirected as the \shell{stdin} stream to the program.
+            Default: \python{None}.
+        }
+
+    \item \docfunc{get_stdout_file(self)}
+        \docfuncdesc{
+            Returns a path to the file to which the \shell{stdout} of the program will be redirected to.
+            Default: \code{logs/<step_name>_stdout.txt}.
+        }
+
+    \item \docfunc{get_stderr_file(self)}
+        \docfuncdesc{
+            Returns a path to the file to which the \shell{stderr} of the program will be redirected to.
+            Default: \code{logs/<step_name>_stderr.txt}.
+        }
+
+    \item \phantomsection \label{sec:postconditions} \docfunc{postconditions(self)}
+        \docfuncdesc{
+            Returns a list of validators, consisting of the 2-tuples: \python{(validator, exit_status)}.
+            Each of the validators will be called after the command execution.
+            Refer to the \hyperref[sec:postconditions_desc]{postconditions description} for more information about their
+            interaction.\\
+            Default: \python{[]}
+        }
+
+    \item \phantomsection \label{sec:verify_postconditions} \docfunc{verify_postconditions(self, result)}
+        \docfuncdesc{
+            Iterates over the list returned from the \hyperref[sec:postconditions]{postconditions()} method,
+            calls each one of them with the execution statistics as an argument, and returns the appropriate
+            exit status if they return \python{False}.
+        }
+
+    \item \phantomsection \label{sec:prerequisites} \docfunc{prerequisites(self)}
+        \docfuncdesc{
+            Returns a list of validators, that will be called before the command execution.
+            See \hyperref[sec:prerequisites_desc]{prerequisites description} for more information.\\
+            Default: \python{[]}
+        }
+
+    \item \phantomsection \label{sec:verify_prerequisites} \docfunc{verify_prerequisites(self, environment)}
+        \docfuncdesc{
+            Iterates over the list returned from the \hyperref[sec:prerequisites]{prerequisites()} method,
+            calls each one of them with the environment as an argument, and raises the \python{PrerequisiteException}
+            if they return \python{False}.
+        }
+
+    \item \docfunc{set_name(self, name)}
+        \docfuncdesc{
+            Allows the step to store the name that it was assigned at
+            \hyperref[sec:add_steps]{\python{Checking.add_steps()}} call.
+            It can then be used to better identify the outputs of the command execution (e.g. prefixing filenames).
+        }
+
+    \item \docfunc{get_configuration_status(self)}
+        \docfuncdesc{
+            Returns a 2-tuple containing the information if the command can be run, and an exit status if it cannot.
+            Useful for the aggregate steps, where the command that needs to be run happens to be undefined
+            (e.g. because the file type passed as an argument is not recognized).\\
+            Default: \python{(True, None)}
+        }
+
+    \item \phantomsection \label{sec:get_user} \docfunc{get_user(self)}
+        \docfuncdesc{
+            Returns the name of the user that the command should be run as.
+        }
+
+    \item \phantomsection \label{sec:get_group} \docfunc{get_group(self)}
+        \docfuncdesc{
+            Returns the name of the group that the command should be run as.
+        }
+\end{itemize}
+
+\subsubsection{Pre-defined commands}\label{subsec:predefined_steps}
+
+\subsubsection*{\python{CompileBase}}\label{subsec:CompileBase}
+
+\begin{itemize}[label={}]
+    \item Base class of every compilation command.
+          Receives the compiler, files to be compiled, and compilation options as the constructor arguments, and prepares
+          appropriate prerequisites (
+          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
+          \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
+          ), postconditions (
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          ), and a command to be called.
+\end{itemize}
+
+\subsubsection*{\python{CompileNasm}}\label{subsec:CompileNasm}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{nasm} compiler and
+          \code{-felf64} as default compilation options.
+\end{itemize}
+
+\subsubsection*{\python{CompileC}}\label{subsec:CompileC}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{gcc} compiler.
+\end{itemize}
+
+\subsubsection*{\python{CompileCpp}}\label{subsec:CompileCpp}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{g++} compiler.
+\end{itemize}
+
+\subsubsection*{\python{CompileCSharp}}\label{subsec:CompileCSharp}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{mcs} compiler and
+          \code{-t:exe -out:main.exe} as default compilation options.
+\end{itemize}
+
+\subsubsection*{\python{CompileGo}}\label{subsec:CompileGo}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{gccgo} compiler.
+\end{itemize}
+
+\subsubsection*{\python{CompileHaskell}}\label{subsec:CompileHaskell}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{ghc} compiler.
+\end{itemize}
+
+\subsubsection*{\python{CompileJava}}\label{subsec:CompileJava}
+
+\begin{itemize}[label={}]
+    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{javac} compiler.
+\end{itemize}
+
+\subsubsection*{\python{CreateJar}}\label{subsec:CreateJar}
+
+\begin{itemize}[label={}]
+    \item Takes the files that will be packed into a JAR archive, output file, manifest and an entrypoint as the
+          constructor arguments.
+          Prepares the standard prerequisites (
+          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
+          \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
+          ), postconditions (
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          ), and uses the \code{jar} program in the returned command.
+\end{itemize}
+
+\subsubsection*{\python{Link}}\label{subsec:Link}
+
+\begin{itemize}[label={}]
+    \item Takes the object files that will be linked together (using the \code{ld} program) and the output file as the
+          constructor arguments.
+          Specifies the standard prerequisites (
+          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
+          \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
+          ), and postconditions (
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          ).
+\end{itemize}
+
+\subsubsection*{\python{Make}}\label{subsec:Make}
+
+\begin{itemize}[label={}]
+    \item Takes the target and the build directory as the constructor arguments.
+          Specifies only the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}}
+          prerequisite, and sets the
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          postcondition.
+\end{itemize}
+
+\subsubsection*{\python{CMake}}\label{subsec:CMake}
+
+\begin{itemize}[label={}]
+    \item Takes the source and the build directories as the constructor arguments.
+          Specifies only the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}}
+          prerequisite, and sets the
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          postcondition.
+\end{itemize}
+
+\subsubsection*{\python{Run}}\label{subsec:Run}
+
+\begin{itemize}[label={}]
+    \item Base class for all of the commands that are running a program.
+          Receives the executable, its command line arguments, and paths to files representing the standard I/O streams.
+          Sets the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}} prerequisite on the
+          executable, and \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on \shell{stdin}.
+          No postconditions are set.
+\end{itemize}
+
+\subsubsection*{\python{RunSolution}}\label{subsec:RunSolution}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunCSharp}}\label{subsec:RunCSharp}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunPSQL}}\label{subsec:RunPSQL}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunJavaClass}}\label{subsec:RunJavaClass}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunJar}}\label{subsec:RunJar}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunPython}}\label{subsec:RunPython}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}
+
+\subsubsection*{\python{RunShell}}\label{subsec:RunShell}
+
+\begin{itemize}[label={}]
+    \item
+\end{itemize}

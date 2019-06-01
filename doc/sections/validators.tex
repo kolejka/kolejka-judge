@@ -1,0 +1,70 @@
+\section{Validators}\label{sec:validators}
+
+    Validators provide a way to verify that the state of an environment is as expected.
+    There are two types of validators: those executed before a step (\textit{prerequisites}), and those executed after
+    (\textit{postconditions}). \\
+
+    \phantomsection \label{sec:prerequisites_desc} Prerequisites are called with an environment as the only argument.
+    They return \python{True} when they find the state of this environment acceptable, and \python{False} otherwise.
+    If any of the prerequisites is not met, \python{PrerequisiteException} is raised from the
+    \hyperref[sec:verify_prerequisites]{\python{verify_prerequisites()}} method, and the checking terminates.
+    Implementation of a prerequisite can be either a function, or a class implementing the \python{__call__()} method.
+    Classes are preferred because of their ability to be passed arguments in their constructors, and the possibility of
+    overriding the \python{__repr__()} behaviour, resulting in a better exception message in case the requirement is not
+    satisfied.\\
+
+    \phantomsection \label{sec:postconditions_desc} Postconditions are given the step's execution statistics as their
+    argument, and return \python{True} if they find them acceptable, and \python{False} otherwise.
+    When first from the list of assigned to the step postconditions (consisting of the 2-tuples in the form
+    \python{(postcondition, exit_status)}) fails to meet its criteria, \python{exit_status} is returned from the
+    \hyperref[sec:verify_postconditions]{\python{verify_postconditions()}} method, and consequently as the final step's
+    exit status.
+    This in turn will cause the checking to halt immediately, and no following steps will be run.
+    Similarly to the prerequisites, their implementation can be either a function, or a class implementing the
+    \python{__call__()} method - with the same advantages of the class approach as previously, except of the
+    \python{__repr__()} method, which is not used, due to the lack of raised exceptions.\\
+
+    The following validators have been implemented:
+
+\subsection*{\python{FileExistsPrerequisite(file)}}\label{subsec:FileExistsPrerequisite}
+\begin{itemize}[label={}]
+    \item Calls the \python{file_exists()} validator from
+          \hyperref[sec:Validators]{\python{ExecutionEnvironment.Validators}}.
+\end{itemize}
+
+\subsection*{\python{ProgramExistsPrerequisite(file)}}\label{subsec:ProgramExistsPrerequisite}
+\begin{itemize}[label={}]
+    \item Calls the \python{program_exists()} validator from
+          \hyperref[sec:Validators]{\python{ExecutionEnvironment.Validators}}.
+\end{itemize}
+
+\subsection*{\code{NonEmptyListPrerequisite(list)}}\label{subsec:NonEmptyListPrerequisite}
+\begin{itemize}[label={}]
+    \item Makes sure that the given list is not empty.
+          This is especially useful when dealing with source files using glob patterns, which tend to expand to an empty
+          list in case of a mistake - even when there are no wildcard characters.
+          Adopting this validator can result in an earlier detection of the problem.
+\end{itemize}
+
+\subsection*{\code{ExitCodePostcondition(allowed_codes)}}\label{subsec:ExitCodePostcondition}
+\begin{itemize}[label={}]
+    \item Checks whether the command have terminated with a code that is present in the \python{allowed_codes}.
+          The argument defaults to \python{[0]}, i.e. all non-zero exit codes are forbidden.
+\end{itemize}
+
+\subsection*{\code{UsedTimePostcondition(time)}}\label{subsec:UsedTimePostcondition}
+\begin{itemize}[label={}]
+    \item Checks whether the command took less than \python{time} seconds to execute.
+\end{itemize}
+
+\subsection*{\code{UsedMemoryPostcondition(memory)}}\label{subsec:UsedMemoryPostcondition}
+\begin{itemize}[label={}]
+    \item Checks whether the command allocated less than \python{memory} bytes during the execution.
+\end{itemize}
+
+\subsection*{\code{PSQLErrorPostcondition()}}\label{subsec:PSQLErrorPostcondition}
+\begin{itemize}[label={}]
+    \item Opens the \shell{stderr} file from execution statistics, if it exists, and ensures that the
+          \python{'^.*ERROR:'} expression is not matched.
+          Implementation was based on one of the existing judges.
+\end{itemize}

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.commands.mixins import SolutionMixin
-from kolejka.judge.validators import ProgramExistsPrerequisite, FileExistsPrerequisite, ExitCodePostcondition
+from kolejka.judge.validators import ProgramExistsPrerequisite, FileExistsPrerequisite
 
 
 class Run(CommandBase):
@@ -38,7 +38,3 @@ class RunSolution(SolutionMixin, Run):
         super().__init__(executable=executable, cmdline_options=cmdline_options,
                          stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
 
-    def postconditions(self):
-        return super().postconditions() + [
-            (ExitCodePostcondition(), 'RTE')
-        ]

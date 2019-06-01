@@ -1,4 +1,4 @@
-from kolejka.judge.validators import UsedTimePostcondition, UsedMemoryPostcondition
+from kolejka.judge.validators import UsedTimePostcondition, UsedMemoryPostcondition, ExitCodePostcondition
 
 
 class SolutionMixin:
@@ -12,4 +12,5 @@ class SolutionMixin:
             conditions.append((UsedTimePostcondition(self.limits['time']), 'TLE'))
         if 'memory' in self.limits:
             conditions.append((UsedMemoryPostcondition(self.limits['memory']), 'MEM'))
+        conditions.append((ExitCodePostcondition(), 'RTE'))
         return conditions

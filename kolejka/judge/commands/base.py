@@ -8,8 +8,10 @@ class CommandBase:
     name = ''
     result = None
 
-    def __init__(self, limits=None):
+    def __init__(self, limits=None, user=None, group=None):
         self.limits = limits or {}
+        self.user = user
+        self.group = group
 
     def _get_file_name(self, suffix) -> Path:
         return Path('logs/{}_{}.txt'.format(self.name, suffix))
@@ -46,7 +48,7 @@ class CommandBase:
     def verify_prerequisites(self, environment):
         for prerequisite in self.prerequisites():
             if not prerequisite(environment):
-                raise PrerequisiteException("Prerequisite `{}` not satisfied".format(prerequisite))
+                raise PrerequisiteException("Prerequisite `{}` not satisfied for {}".format(prerequisite, self.name))
 
     def set_name(self, name):
         self.name = name
@@ -56,3 +58,9 @@ class CommandBase:
         :return: 2-tuple - (is the command configured correctly to be run (e.g. file extension is known), exit status)
         """
         return True, None
+
+    def get_user(self):
+        return self.user
+
+    def get_group(self):
+        return self.group

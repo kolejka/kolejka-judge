@@ -20,8 +20,14 @@
 \AfterEndEnvironment{minted}{\end{tcolorbox}}
 
 \setlength{\parindent}{0pt}
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
 
 \newcommand{\python}[1]{{\mintinline{python}{#1}}}
+\newcommand{\shell}[1]{{\mintinline{shell}{#1}}}
+\newcommand{\code}[1]{{\mintinline{text}{#1}}}
 \newcommand{\docfunc}[1]{{\python{#1}}}
 \newcommand{\docfuncdesc}[1]{
     \begin{itemize}[label={}]
@@ -32,7 +38,10 @@
 \begin{document}
 
     \input{sections/basic_example}
+    \input{sections/checking}
     \input{sections/environments}
     \input{sections/steps}
+    \input{sections/validators}
+    \input{sections/examples}
 
 \end{document}

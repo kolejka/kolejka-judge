@@ -38,22 +38,22 @@ class PSQLErrorPostcondition:
         return True
 
 
-class NonEmptyFilesListPrerequisite:
-    def __init__(self, files):
-        self.files = files
+class NonEmptyListPrerequisite:
+    def __init__(self, lst):
+        self.list = lst
 
-    def __call__(self, *args, **kwargs):
-        return len(self.files) > 0
+    def __call__(self, environment: ExecutionEnvironment):
+        return len(self.list) > 0
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.files))
+        return '{}({})'.format(self.__class__.__name__, repr(self.list))
 
 
 class FileExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+    def __call__(self, environment: ExecutionEnvironment):
         return environment.validators.file_exists(self.file)
 
     def __repr__(self):
@@ -64,7 +64,7 @@ class ProgramExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+    def __call__(self, environment: ExecutionEnvironment):
         return environment.validators.program_exists(self.file)
 
     def __repr__(self):
@@ -75,7 +75,7 @@ class FileOnARequiredListPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment, *args, **kwargs):
+    def __call__(self, environment: ExecutionEnvironment):
         return environment.validators.file_on_a_required_list(self.file)
 
     def __repr__(self):

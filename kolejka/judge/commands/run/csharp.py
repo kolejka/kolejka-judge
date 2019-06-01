@@ -1,6 +1,6 @@
 from kolejka.judge.commands.mixins import SolutionMixin
 from kolejka.judge.commands.run.base import Run
-from kolejka.judge.validators import ExitCodePostcondition, FileExistsPrerequisite
+from kolejka.judge.validators import FileExistsPrerequisite
 
 
 class RunCSharp(Run):
@@ -21,7 +21,4 @@ class RunCSharp(Run):
 
 
 class RunCSharpSolution(SolutionMixin, RunCSharp):
-    def postconditions(self):
-        return super().postconditions() + [
-            (ExitCodePostcondition(), 'RTE')
-        ]
+    pass

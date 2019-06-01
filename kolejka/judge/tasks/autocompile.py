@@ -8,10 +8,10 @@ from kolejka.judge.commands.compile.go import CompileGo
 from kolejka.judge.commands.compile.haskell import CompileHaskell
 from kolejka.judge.commands.compile.java import CompileJava
 from kolejka.judge.environments import ExecutionEnvironment
-from kolejka.judge.tasks.base import Task
+from kolejka.judge.tasks.base import TaskBase
 
 
-class AutoCompileTask(Task):
+class AutoCompileTask(TaskBase):
     def __init__(self, file, **kwargs):
         self.file = file
         self.kwargs = kwargs
@@ -48,13 +48,13 @@ class AutoCompileTask(Task):
         ext = Path(file).suffix[1:]
         return commands[ext]
 
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
         step_cls = self.detect_step(self.file)
         if step_cls is None:
             return 'EXT', None
 
         step = step_cls(self.file, **self.kwargs)
-        result = environment.run_command_step(step, name='autocompile_{}'.format(name))
+        result = environment.run_command_step(step, name='autocompile_{}'.format(self.name))
 
         shell_file_path = environment.get_path(Path('autocompile/run.sh'))
         shell_file = environment.get_file_handle(shell_file_path, 'w')

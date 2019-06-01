@@ -1,6 +1,6 @@
 from kolejka.judge.commands.mixins import SolutionMixin
 from kolejka.judge.commands.run.base import Run
-from kolejka.judge.validators import FileExistsPrerequisite, ExitCodePostcondition
+from kolejka.judge.validators import FileExistsPrerequisite
 
 
 class RunPython(Run):
@@ -31,10 +31,7 @@ class RunPython3(RunPython):
 
 
 class RunPythonSolution(SolutionMixin, RunPython):
-    def postconditions(self):
-        return super().postconditions() + [
-            (ExitCodePostcondition(), 'RTE')
-        ]
+    pass
 
 
 class RunPython2Solution(RunPython2, RunPythonSolution):

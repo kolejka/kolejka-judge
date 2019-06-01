@@ -3,25 +3,23 @@ from typing import Dict
 
 from kolejka.judge.environments import ExecutionEnvironment
 from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.tasks.java import Task
+from kolejka.judge.tasks.java import TaskBase
 
 
 class Checking:
     def __init__(self, environment: ExecutionEnvironment):
-        self.steps: Dict[str, CommandBase or Task] = {}
+        self.steps: Dict[str, CommandBase or TaskBase] = {}
         self.environment = environment
 
     # requires python3.6 for kwargs order preservation
     def add_steps(self, *args, **kwargs):
-        if len(args) > 0 and len(kwargs) > 0:
-            raise TypeError("It is impossible to detect the order of the steps when using both args and kwargs.")
-
         steps = {}
-        if len(args) > 0:
-            for i, arg in enumerate(args):
-                steps[str(i)] = arg
-        else:
-            steps = kwargs
+
+        existing_indices = [k for k in self.steps.keys() if k.isdecimal()]
+        max_index = max(list(map(int, existing_indices)) + [0])
+        for i, arg in enumerate(args):
+            steps[str(i + max_index + 1)] = arg
+        steps.update(kwargs)
 
         for name, func in steps.items():
             if name in self.steps:

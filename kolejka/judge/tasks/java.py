@@ -4,10 +4,10 @@ import shutil
 from pathlib import Path
 from typing import Tuple, Optional
 
-from kolejka.judge.tasks.base import Task
+from kolejka.judge.tasks.base import TaskBase
 
 
-class RenameJavaFileTask(Task):
+class RenameJavaFileTask(TaskBase):
     """
     Taken and adapted from 0ccb87c2bca477080337d9918af853e8.py judge
     """
@@ -16,7 +16,7 @@ class RenameJavaFileTask(Task):
         self.source_file = Path(source_file)
         self.target_directory = Path(target_directory)
 
-    def execute(self, name, environment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment) -> Tuple[Optional[str], Optional[object]]:
         test_class = ''
         with self.source_file.open() as file:
             for line in file.readlines():
