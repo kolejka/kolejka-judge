@@ -121,52 +121,57 @@
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), postconditions (
-          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{CME}
           ), and a command to be called.
 \end{itemize}
 
 \subsubsection*{\python{CompileNasm}}\label{subsec:CompileNasm}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{nasm} compiler and
-          \code{-felf64} as default compilation options.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{nasm}
+          compiler and \code{-felf64} as default compilation options.
 \end{itemize}
 
 \subsubsection*{\python{CompileC}}\label{subsec:CompileC}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{gcc} compiler.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{gcc}
+          compiler.
 \end{itemize}
 
 \subsubsection*{\python{CompileCpp}}\label{subsec:CompileCpp}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{g++} compiler.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{g++}
+          compiler.
 \end{itemize}
 
 \subsubsection*{\python{CompileCSharp}}\label{subsec:CompileCSharp}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{mcs} compiler and
-          \code{-t:exe -out:main.exe} as default compilation options.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{mcs}
+          compiler and \code{-t:exe -out:main.exe} as default compilation options.
 \end{itemize}
 
 \subsubsection*{\python{CompileGo}}\label{subsec:CompileGo}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{gccgo} compiler.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{gccgo}
+          compiler.
 \end{itemize}
 
 \subsubsection*{\python{CompileHaskell}}\label{subsec:CompileHaskell}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{ghc} compiler.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{ghc}
+          compiler.
 \end{itemize}
 
 \subsubsection*{\python{CompileJava}}\label{subsec:CompileJava}
 
 \begin{itemize}[label={}]
-    \item Inherits from \hyperref[subsec:CompileBase]{\python{CompileBase}}, specifies the \code{javac} compiler.
+    \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{javac}
+          compiler.
 \end{itemize}
 
 \subsubsection*{\python{CreateJar}}\label{subsec:CreateJar}
@@ -179,7 +184,7 @@
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), postconditions (
-          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{CME}
           ), and uses the \code{jar} program in the returned command.
 \end{itemize}
 
@@ -193,7 +198,7 @@
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), and postconditions (
-          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{CME}
           ).
 \end{itemize}
 
@@ -203,7 +208,7 @@
     \item Takes the target and the build directory as the constructor arguments.
           Specifies only the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}}
           prerequisite, and sets the
-          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{CME}
           postcondition.
 \end{itemize}
 
@@ -213,7 +218,7 @@
     \item Takes the source and the build directories as the constructor arguments.
           Specifies only the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}}
           prerequisite, and sets the
-          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition} $\rightarrow$ \code{CME}}
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{CME}
           postcondition.
 \end{itemize}
 
@@ -221,50 +226,102 @@
 
 \begin{itemize}[label={}]
     \item Base class for all of the commands that are running a program.
-          Receives the executable, its command line arguments, and paths to files representing the standard I/O streams.
-          Sets the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}} prerequisite on the
-          executable, and \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on \shell{stdin}.
+          Receives the executable, its command line arguments, and paths to the files representing the standard I/O
+          streams.
+          Sets the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}} on the
+          executable, and \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on the
+          \shell{stdin}.
           No postconditions are set.
 \end{itemize}
 
 \subsubsection*{\python{RunSolution}}\label{subsec:RunSolution}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{./a.out} as the default
+          executable.
+          This class, and also all other following the \code{*Solution} convention define three postconditions:
+          \hyperref[subsec:UsedTimePostcondition]{\python{UsedTimePostcondition}} $\rightarrow$ \code{TLE},
+          \hyperref[subsec:UsedMemoryPostcondition]{\python{UsedMemoryPostcondition}} $\rightarrow$ \code{MEM}, and
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{RTE}.
 \end{itemize}
 
 \subsubsection*{\python{RunCSharp}}\label{subsec:RunCSharp}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{mono} as the default
+          executable.
+          Takes an EXE file to be run and the interpreter options as the arguments, and sets the
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on that EXE file.
 \end{itemize}
 
 \subsubsection*{\python{RunPSQL}}\label{subsec:RunPSQL}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{psql} as the default
+          executable.
+          Receives a SQL file and the connection configuration: user, password, host and database name as the
+          arguments.
 \end{itemize}
 
 \subsubsection*{\python{RunJavaClass}}\label{subsec:RunJavaClass}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{java} as the default
+          executable.
+          Takes a class file to be run and the interpreter options as the arguments, and sets the
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on that class file.
 \end{itemize}
 
 \subsubsection*{\python{RunJar}}\label{subsec:RunJar}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{java} as the default
+          executable.
+          Takes a JAR file to be run and the interpreter options as the arguments, and sets the
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on that JAR file.
 \end{itemize}
 
 \subsubsection*{\python{RunPython}}\label{subsec:RunPython}
 
 \begin{itemize}[label={}]
-    \item
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets \code{python} as the default
+          executable.
+          Takes a Python script to be run and the interpreter options as the arguments, and sets the
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on that Python script.
 \end{itemize}
 
 \subsubsection*{\python{RunShell}}\label{subsec:RunShell}
 
 \begin{itemize}[label={}]
-    \item
+    \item This class is synonymous to the \hyperref[subsec:Run]{\python{Run}} class.
+\end{itemize}
+
+\subsubsection*{\python{Diff}}\label{subsec:Diff}
+
+\begin{itemize}[label={}]
+    \item Command to compare two files while ignoring trailing spaces.
+          Takes these two files as the arguments, sets the
+          \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}} on them, and defines the
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{ANS}
+          postcondition.
+\end{itemize}
+
+\subsubsection*{\python{RunChecker}}\label{subsec:RunChecker}
+
+\begin{itemize}[label={}]
+    \item Inherits from the \hyperref[subsec:Run]{\python{Run}} class and sets the
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{ANS}
+          postcondition.
+\end{itemize}
+
+\subsubsection*{\python{ExtractArchive}}\label{subsec:ExtractArchive}
+
+\begin{itemize}[label={}]
+    \item Command to extract various types of archives.
+          Receives the archive, optionally its type and a directory to extract to as the arguments.
+          Declares the \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}} on the
+          appropriate executable (e.g. \code{unzip} or \code{tar}), and the
+          \hyperref[subsec:ExitCodePostcondition]{\python{ExitCodePostcondition}} $\rightarrow$ \code{EXT}
+          postcondition.
+          Return the \code{EXT} exit status if the archive type is not recognized.
 \end{itemize}
