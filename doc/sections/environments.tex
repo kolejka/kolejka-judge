@@ -69,7 +69,7 @@
                 \item verifying the prerequisites are met
                 \item setting the limits requested by the step (see
                       \hyperref[sec:get_limits]{\python{CommandBase.get_limits()}})
-                \item evaluating the TODO \python{DependentExpr} expressions
+                \item evaluating the \hyperref[sec:DependentExpr]{\python{DependentExpr}} expressions
                 \item calling the \hyperref[sec:run_command]{\python{run_command()}} method
                 \item checking the postconditions
                 \item restoring the old limits
@@ -89,12 +89,12 @@
             some attributes are, however, required for all of the environments (see TODO \python{CompletedProcess}).
         }
 
-    \item \docfunc{run_task_step(self, step, name)}
+    \item \phantomsection \label{sec:run_task_step} \docfunc{run_task_step(self, step, name)}
         \docfuncdesc{
             Responsible for running the task step, which consists of the following parts:
             \begin{itemize}
                 \item verifying the prerequisites are met
-                \item calling the TODO \python{execute()} method
+                \item calling the \hyperref[sec:execute]{\python{execute()}} method
             \end{itemize}
         }
 
@@ -105,9 +105,9 @@
             \hyperref[sec:command_get_env]{\python{CommandBase.get_env()}} method.
         }
 
-    \item \docfunc{set_variable(self, variable_name, value)}
+    \item \phantomsection \label{sec:set_variable} \docfunc{set_variable(self, variable_name, value)}
         \docfuncdesc{
-            Used by the tasks to store any value that should be accessible by the command steps, while being
+            Used by the tasks to store any value that should be accessible by the command steps, but is
             undetermined before run-time.
         }
 

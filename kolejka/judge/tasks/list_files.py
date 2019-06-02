@@ -6,7 +6,7 @@ from typing import Tuple, Optional
 from kolejka.judge.tasks.base import TaskBase
 
 
-class ListFilesTask(TaskBase):
+class ListFiles(TaskBase):
     def __init__(self, *args, variable_name):
         self.files = list(args)
         self.variable_name = variable_name

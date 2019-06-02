@@ -7,7 +7,7 @@ from typing import Tuple, Optional
 from kolejka.judge.tasks.base import TaskBase
 
 
-class RenameJavaFileTask(TaskBase):
+class RenameJavaFile(TaskBase):
     """
     Taken and adapted from 0ccb87c2bca477080337d9918af853e8.py judge
     """
@@ -20,9 +20,9 @@ class RenameJavaFileTask(TaskBase):
         test_class = ''
         with self.source_file.open() as file:
             for line in file.readlines():
-                for p in re.findall('^\s*package\s+([^;]+)', line):
+                for p in re.findall(r'^\s*package\s+([^;]+)', line):
                     test_class = p.strip() + '.'
-                for c in re.findall('^\s*public.+class\s+(\w+)', line):
+                for c in re.findall(r'^\s*public.+class\s+(\w+)', line):
                     test_class = test_class + c
         parts = test_class.split('.')
         dir = os.path.join('.', *parts[:-1])

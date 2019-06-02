@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Optional
 
 from kolejka.judge.commands.base import CommandBase
+from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
 
 
@@ -366,71 +367,3 @@ class KolejkaObserver(ExecutionEnvironment):
     @classmethod
     def format_execution_status(cls, status):
         return json.loads(json.dumps(status, cls=cls.ExecutionStatusEncoder))
-
-
-class KolejkaTask(ExecutionEnvironment):
-    recognized_limits = ['cpus', 'cpus_offset', 'memory', 'network', 'pids', 'storage', 'image', 'workspace', 'time']
-
-    class Validators(ExecutionEnvironment.Validators):
-        def file_on_a_required_list(self, file):
-            return file in self.environment.files
-
-    def __init__(self, image, files, environment, requires, exclusive, limits, collect, config, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.image = image
-        self.files = files
-        self.environment = environment
-        self.requires = requires
-        self.exclusive = exclusive
-        self.limits = limits
-        self.collect = collect
-        self.config = config
-
-    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], env):
-        raise NotImplementedError
-
-    def run(self, steps):
-        for name, step in steps.items():
-            step.verify_prerequisites(self)
-
-        files = {name: {'path': name} for name in self.files}
-        files['run.py'] = {'path': str(Path(sys.argv[0]).absolute())}
-        task_spec = {
-            'image': self.image,
-            'files': files,
-            'args': ['python', 'run.py', '--local'],
-            'environment': self.environment,
-            'requires': self.requires,
-            'exclusive': self.exclusive,
-            'limits': self.limits,
-            'collect': self.collect,
-            'stdout': str(self.get_path(Path('judge_stdout'))),
-            'stderr': str(self.get_path(Path('judge_stderr'))),
-        }
-
-        f = self.get_file_handle(self.get_path('task/kolejka_task.json'), 'w')
-        json.dump(task_spec, f, indent=4)
-        f.close()
-
-        subprocess.run(
-            ['kolejka-client', '--config-file', self.config, 'execute', 'task', 'task-result'],
-        )
-
-    @classmethod
-    def format_execution_status(cls, status):
-        return status
-
-
-class DependentExpr:
-    def __init__(self, *args, func=None):
-        if len(args) > 1 and func is None:
-            raise ValueError('Multiple arguments, but no evaluation function given')
-        self.names = args
-        self.func = func or self.__default_func
-
-    @staticmethod
-    def __default_func(x):
-        return x
-
-    def evaluate(self, *args):
-        return self.func(*args)

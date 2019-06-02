@@ -1,5 +1,14 @@
 \subsection{Commands}\label{subsec:steps_commands}
-    The base class of every command step is \python{CommandBase}.
+    Commands' arguments support a special mechanism, called
+    \phantomsection \label{sec:DependentExpr} \python{DependentExpr}.
+    It represents a lazy object, that takes an unknown number of variable names, and a function which is used to
+    reduce the contents stored (via \hyperref[sec:set_variable]{\python{ExecutionEnvironment.set_variable()}} method)
+    under those names to a single object.
+    For the most common use case, where only one variable name is given and no reduction is needed, the function
+    argument can be omitted.
+    \python{DependentExpr} will be evaluated only just before the command execution.
+
+The base class of every command step is \python{CommandBase}.
 
 \subsection*{\python{CommandBase}}\label{subsec:CommandBase}
 
@@ -62,25 +71,25 @@
             Default: \python{[]}
         }
 
-    \item \phantomsection \label{sec:verify_postconditions} \docfunc{verify_postconditions(self, result)}
+    \item \docfunc{verify_postconditions(self, result)}
         \docfuncdesc{
-            Iterates over the list returned from the \hyperref[sec:postconditions]{postconditions()} method,
+            Iterates over the list returned from the \hyperref[sec:postconditions]{\python{postconditions()}} method,
             calls each one of them with the execution statistics as an argument, and returns the appropriate
             exit status if they return \python{False}.
         }
 
-    \item \phantomsection \label{sec:prerequisites} \docfunc{prerequisites(self)}
+    \item \phantomsection \label{sec:prerequisites_command} \docfunc{prerequisites(self)}
         \docfuncdesc{
             Returns a list of validators, that will be called before the command execution.
             See \hyperref[sec:prerequisites_desc]{prerequisites description} for more information.\\
             Default: \python{[]}
         }
 
-    \item \phantomsection \label{sec:verify_prerequisites} \docfunc{verify_prerequisites(self, environment)}
+    \item \docfunc{verify_prerequisites(self, environment)}
         \docfuncdesc{
-            Iterates over the list returned from the \hyperref[sec:prerequisites]{prerequisites()} method,
-            calls each one of them with the environment as an argument, and raises the \python{PrerequisiteException}
-            if they return \python{False}.
+            Iterates over the list returned from the \hyperref[sec:prerequisites_command]{\python{prerequisites()}}
+            method, calls each one of them with the environment as an argument, and raises the
+            \python{PrerequisiteException} if they return \python{False}.
         }
 
     \item \docfunc{set_name(self, name)}
@@ -93,7 +102,7 @@
     \item \docfunc{get_configuration_status(self)}
         \docfuncdesc{
             Returns a 2-tuple containing the information if the command can be run, and an exit status if it cannot.
-            Useful for the aggregate steps, where the command that needs to be run happens to be undefined
+            Useful for the aggregate steps, where the command that needs to be run occurs to be undefined
             (e.g. because the file type passed as an argument is not recognized).\\
             Default: \python{(True, None)}
         }
@@ -109,7 +118,7 @@
         }
 \end{itemize}
 
-\subsubsection{Pre-defined commands}\label{subsec:predefined_steps}
+\subsubsection{Pre-defined commands}\label{subsec:predefined_commands}
 
 \subsubsection*{\python{CompileBase}}\label{subsec:CompileBase}
 

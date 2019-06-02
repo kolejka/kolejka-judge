@@ -7,7 +7,7 @@
     \phantomsection \label{sec:prerequisites_desc} Prerequisites are called with an environment as the only argument.
     They return \python{True} when they find the state of this environment acceptable, and \python{False} otherwise.
     If any of the prerequisites is not met, \python{PrerequisiteException} is raised from the
-    \hyperref[sec:verify_prerequisites]{\python{verify_prerequisites()}} method, and the checking terminates.
+    \python{verify_prerequisites()} method, and the checking terminates.
     Implementation of a prerequisite can be either a function, or a class implementing the \python{__call__()} method.
     Classes are preferred because of their ability to be passed arguments in their constructors, and the possibility of
     overriding the \python{__repr__()} behaviour, resulting in a better exception message in case the requirement is not
@@ -17,14 +17,14 @@
     argument, and return \python{True} if they find them acceptable, and \python{False} otherwise.
     When first from the list of assigned to the step postconditions (consisting of the 2-tuples in the form
     \python{(postcondition, exit_status)}) fails to meet its criteria, \python{exit_status} is returned from the
-    \hyperref[sec:verify_postconditions]{\python{verify_postconditions()}} method, and consequently as the final step's
+    \python{verify_postconditions()} method, and consequently as the final step's
     exit status.
     This in turn will cause the checking to halt immediately, and no following steps will be run.
     Similarly to the prerequisites, their implementation can be either a function, or a class implementing the
     \python{__call__()} method - with the same advantages of the class approach as previously, except of the
     \python{__repr__()} method, which is not used, due to the lack of raised exceptions.\\
 
-    The following validators have been implemented:
+    The following validators are implemented:
 
 \subsection*{\python{FileExistsPrerequisite(file)}}\label{subsec:FileExistsPrerequisite}
 \begin{itemize}[label={}]

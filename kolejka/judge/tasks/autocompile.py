@@ -11,7 +11,7 @@ from kolejka.judge.environments import ExecutionEnvironment
 from kolejka.judge.tasks.base import TaskBase
 
 
-class AutoCompileTask(TaskBase):
+class AutoCompile(TaskBase):
     def __init__(self, file, **kwargs):
         self.file = file
         self.kwargs = kwargs
