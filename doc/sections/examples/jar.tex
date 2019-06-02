@@ -1,0 +1,39 @@
+\subsection{JAR files}
+
+\begin{minted}[linenos]{python}
+checking.add_steps(
+    rename=RenameJavaFile('solution.java'),
+    list_jars=ListFiles('**/*.jar', variable_name='jars'),
+    compile=CompileJava('**/*.java', compilation_options=[
+        '-cp',
+        DependentExpr('jars', func=lambda x: '.:' + ':'.join(x))
+    ]),
+    create_jar=CreateJar('**/*.class', entrypoint='Main'),
+    run_jar=RunJarSolution(interpreter_options=[
+        DependentExpr(
+            'jars',
+            func=lambda x: '-Xbootclasspath/a:' + ':'.join(x)
+        )
+    ], stdout='out'),
+    diff=Diff(),
+)
+status_code, detailed_result = checking.run()
+\end{minted}
+
+\code{RenameJavaFile} takes the file submitted to the judge -- whose name might have been mangled in the process -- and
+renames it to correspond to the class name that it contains.
+\code{ListFiles} takes the glob matching all \code{*.jar} files recursively, and stores all of them in the environment's
+variable called \code{jars}.
+\code{CompileJava} compiles all matching \code{*.java} files, while overriding the classpath with a
+\code{DependentExpr}.
+This expression is evaluated just before compilation, using a lambda function that takes only one argument -- since
+there's only one variable being evaluated, \code{jars} -- and produces an output of the form
+\shell{.:<jar_1>:<jar_2>[...]}.
+Therefore the executed command will be \shell{javac -cp .:<jar_1>:<jar_2>[...]}.
+\code{CreateJar} takes all compiled \code{*.class} files, and creates a JAR file named \shell{archive.jar}
+containing a manifest with the entrypoint set to \shell{Main}.
+\code{RunJarSolution} runs the JAR archive with the \shell{-Xbootclasspath/a} option generated in a very similar way as
+previously, and redirects the output to the \shell{out} file, which is then compared with \shell{wzo} file using the
+\code{Diff} class.
+This test case assumes the existence of the \shell{solution.java}, \shell{Main.java}, \shell{wzo}, and any supporting
+\code{*.jar} files.
