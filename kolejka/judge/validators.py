@@ -1,5 +1,5 @@
 import re
-from kolejka.judge.environments import ExecutionEnvironment
+from kolejka.judge.environments import ExecutionEnvironmentBase
 
 
 class ExitCodePostcondition:
@@ -42,7 +42,7 @@ class NonEmptyListPrerequisite:
     def __init__(self, lst):
         self.list = lst
 
-    def __call__(self, environment: ExecutionEnvironment):
+    def __call__(self, environment: ExecutionEnvironmentBase):
         return len(self.list) > 0
 
     def __repr__(self):
@@ -53,7 +53,7 @@ class FileExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment):
+    def __call__(self, environment: ExecutionEnvironmentBase):
         return environment.validators.file_exists(self.file)
 
     def __repr__(self):
@@ -64,7 +64,7 @@ class ProgramExistsPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment):
+    def __call__(self, environment: ExecutionEnvironmentBase):
         return environment.validators.program_exists(self.file)
 
     def __repr__(self):
@@ -75,7 +75,7 @@ class FileOnARequiredListPrerequisite:
     def __init__(self, file):
         self.file = file
 
-    def __call__(self, environment: ExecutionEnvironment):
+    def __call__(self, environment: ExecutionEnvironmentBase):
         return environment.validators.file_on_a_required_list(self.file)
 
     def __repr__(self):

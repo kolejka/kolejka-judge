@@ -1,10 +1,10 @@
 import argparse
 
-from kolejka.judge.environments import LocalComputer, KolejkaObserver, PsutilEnvironment
+from kolejka.judge.environments import LocalEnvironment, ObserverEnvironment, PsutilEnvironment
 
 KNOWN_ENVIRONMENTS = {
-    'local': LocalComputer,
-    'kolejkaobserver': KolejkaObserver,
+    'local': LocalEnvironment,
+    'kolejkaobserver': ObserverEnvironment,
     'psutil': PsutilEnvironment,
 }
 

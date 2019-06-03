@@ -18,7 +18,7 @@ from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
 
 
-class ExecutionEnvironment:
+class ExecutionEnvironmentBase:
     recognized_limits = []
     variables = {}
 

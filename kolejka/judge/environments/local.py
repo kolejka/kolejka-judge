@@ -16,7 +16,7 @@ from typing import Optional
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments.base import ExecutionEnvironment
+from kolejka.judge.environments.base import ExecutionEnvironmentBase
 
 
 class LocalExecutionEnvironmentValidatorsMixin:
@@ -27,7 +27,7 @@ class LocalExecutionEnvironmentValidatorsMixin:
         return shutil.which(file) is not None
 
 
-class LocalComputer(ExecutionEnvironment):
+class LocalEnvironment(ExecutionEnvironmentBase):
     recognized_limits = []
 
     class LocalStats:
@@ -45,7 +45,7 @@ class LocalComputer(ExecutionEnvironment):
             self.memory = self.MemoryStats()
             self.cpus = {'*': self.CpusStats()}
 
-    class Validators(ExecutionEnvironment.Validators, LocalExecutionEnvironmentValidatorsMixin):
+    class Validators(ExecutionEnvironmentBase.Validators, LocalExecutionEnvironmentValidatorsMixin):
         pass
 
     class ExecutionStatusEncoder(JSONEncoder):
@@ -76,9 +76,9 @@ class LocalComputer(ExecutionEnvironment):
             )
 
             stats = self._get_execution_stats(stats_file.name)
-            execution_status.stats = LocalComputer.LocalStats()
-            execution_status.stats.memory = LocalComputer.LocalStats.MemoryStats(stats['mem'])
-            execution_status.stats.cpus['*'] = LocalComputer.LocalStats.CpusStats(
+            execution_status.stats = LocalEnvironment.LocalStats()
+            execution_status.stats.memory = LocalEnvironment.LocalStats.MemoryStats(stats['mem'])
+            execution_status.stats.cpus['*'] = LocalEnvironment.LocalStats.CpusStats(
                 stats['time']['sys'],
                 stats['time']['user'],
                 stats['time']['real'],

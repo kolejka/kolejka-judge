@@ -16,14 +16,14 @@ from typing import Optional
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments.base import ExecutionEnvironment
+from kolejka.judge.environments.base import ExecutionEnvironmentBase
 from kolejka.judge.environments.local import LocalExecutionEnvironmentValidatorsMixin
 
 
-class KolejkaObserver(ExecutionEnvironment):
+class ObserverEnvironment(ExecutionEnvironmentBase):
     recognized_limits = ['cpus', 'cpus_offset', 'pids', 'memory', 'time']
 
-    class Validators(ExecutionEnvironment.Validators, LocalExecutionEnvironmentValidatorsMixin):
+    class Validators(ExecutionEnvironmentBase.Validators, LocalExecutionEnvironmentValidatorsMixin):
         pass
 
     class ExecutionStatusEncoder(JSONEncoder):

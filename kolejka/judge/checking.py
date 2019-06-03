@@ -1,13 +1,13 @@
 # coding=utf-8
 from typing import Dict
 
-from kolejka.judge.environments import ExecutionEnvironment
+from kolejka.judge.environments import ExecutionEnvironmentBase
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.tasks.java import TaskBase
 
 
 class Checking:
-    def __init__(self, environment: ExecutionEnvironment):
+    def __init__(self, environment: ExecutionEnvironmentBase):
         self.steps: Dict[str, CommandBase or TaskBase] = {}
         self.environment = environment
 

@@ -16,10 +16,11 @@ def reset_dirs():
 
 
 def known_environments():
-    from kolejka.judge.environments import LocalComputer, KolejkaObserver
+    from kolejka.judge.environments import LocalEnvironment, PsutilEnvironment, ObserverEnvironment
     known_environments = {
-        'local': LocalComputer,
-        'observer': KolejkaObserver,
+        'local': LocalEnvironment,
+        'psutil': PsutilEnvironment,
+        'observer': ObserverEnvironment,
         #'kolejka' : KolejkaTask,
     }
     return known_environments
@@ -181,7 +182,7 @@ from typing import Optional, Tuple
 
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments import ExecutionEnvironment
+from kolejka.judge.environments import ExecutionEnvironmentBase
 from kolejka.judge.validators import ProgramExistsPrerequisite, FileExistsPrerequisite, ExitCodePostcondition
 
 class RunCommand(CommandBase):
@@ -408,7 +409,7 @@ class SatoriSystemPrepareTask(TaskBase):
             if kwargs.get('group', None) is not None:
                 self.add_group(kwargs['group'])
 
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         for group in self.groups.values():
             add_group = GroupAddCommand(**group)
             try:
@@ -444,7 +445,7 @@ class SatoriSourcePrepareTask(TaskBase):
         self.group = group
         self.mode = mode
 
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.destination).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(self.name))
 
         source_command = InstallCommand(environment.get_path(self.source).resolve(), (environment.get_path(self.destination)/(self.basename+'.cpp')).resolve(), user=self.user, group=self.group, mode=self.mode)
@@ -490,7 +491,7 @@ class SatoriBuildTask(TaskBase):
         self.user = user
         self.group = group
 
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.build_dir).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(self.name))
 
         call_script = '#!/bin/sh\nexec true\n'
@@ -532,7 +533,7 @@ class SatoriRunTask(TaskBase):
         else:
             self.stderr = None
 
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         environment.run_command_step(RunCommand(executable=environment.get_path(self.executable).resolve(), cmdline_options=self.cmdline_options, stdin=self.stdin and environment.get_path(self.stdin).resolve(), stdout=self.stdout and environment.get_path(self.stdout).resolve(), stderr=self.stderr and environment.get_path(self.stderr).resolve()), name='{}_source_dir'.format(self.name))
         return None, None
 
@@ -541,7 +542,7 @@ class SatoriDiff(TaskBase):
         super().__init__()
         self.file1 = Path(file1)
         self.file2 = Path(file2)
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         environment.run_command_step(DiffCommand(file1=environment.get_path(self.file1).resolve(), file2=environment.get_path(self.file2).resolve()), name='{}_source_dir'.format(self.name))
         return None, None
 

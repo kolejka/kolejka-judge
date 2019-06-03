@@ -16,11 +16,11 @@ from typing import Optional
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments.base import ExecutionEnvironment
+from kolejka.judge.environments.base import ExecutionEnvironmentBase
 from kolejka.judge.environments.local import LocalExecutionEnvironmentValidatorsMixin
 
 
-class PsutilEnvironment(ExecutionEnvironment):
+class PsutilEnvironment(ExecutionEnvironmentBase):
     recognized_limits = ['cpu_affinity', 'time', 'memory']
 
     class LocalStats:
@@ -38,7 +38,7 @@ class PsutilEnvironment(ExecutionEnvironment):
             self.memory = self.MemoryStats()
             self.cpus = {'*': self.CpusStats()}
 
-    class Validators(ExecutionEnvironment.Validators, LocalExecutionEnvironmentValidatorsMixin):
+    class Validators(ExecutionEnvironmentBase.Validators, LocalExecutionEnvironmentValidatorsMixin):
         pass
 
     class ExecutionStatusEncoder(JSONEncoder):

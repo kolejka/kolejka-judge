@@ -7,7 +7,7 @@ from kolejka.judge.commands.compile.csharp import CompileCSharp
 from kolejka.judge.commands.compile.go import CompileGo
 from kolejka.judge.commands.compile.haskell import CompileHaskell
 from kolejka.judge.commands.compile.java import CompileJava
-from kolejka.judge.environments import ExecutionEnvironment
+from kolejka.judge.environments import ExecutionEnvironmentBase
 from kolejka.judge.tasks.base import TaskBase
 
 
@@ -48,7 +48,7 @@ class AutoCompile(TaskBase):
         ext = Path(file).suffix[1:]
         return commands[ext]
 
-    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironmentBase) -> Tuple[Optional[str], Optional[object]]:
         step_cls = self.detect_step(self.file)
         if step_cls is None:
             return 'EXT', None
