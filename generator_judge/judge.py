@@ -180,7 +180,7 @@ import pwd
 from typing import Optional, Tuple
 
 from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.tasks.base import Task
+from kolejka.judge.tasks.base import TaskBase
 from kolejka.judge.environments import ExecutionEnvironment
 from kolejka.judge.validators import ProgramExistsPrerequisite, FileExistsPrerequisite, ExitCodePostcondition
 
@@ -355,7 +355,7 @@ class InstallCommand(SystemCommand):
         comm += [ '--no-target-directory', str(self.source), str(self.destination) ]
         return comm
 
-class SatoriSystemPrepareTask(Task):
+class SatoriSystemPrepareTask(TaskBase):
     def __init__(self, add_users = DEFAULT_USERS, add_groups = DEFAULT_GROUPS, add_directories = DEFAULT_DIRECTORIES, **kwargs):
         super().__init__()
         self.groups = OrderedDict()
@@ -408,13 +408,13 @@ class SatoriSystemPrepareTask(Task):
             if kwargs.get('group', None) is not None:
                 self.add_group(kwargs['group'])
 
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
         for group in self.groups.values():
             add_group = GroupAddCommand(**group)
             try:
                 grp.getgrnam(add_group.group)
             except:
-                environment.run_command_step(add_group, name='{}_groupadd_{}'.format(name, add_group.group))
+                environment.run_command_step(add_group, name='{}_groupadd_{}'.format(self.name, add_group.group))
         for user in self.users.values():
             if 'home' in user and user['home'] is not None:
                 user['home'] = environment.get_path(user['home']).resolve()
@@ -422,14 +422,14 @@ class SatoriSystemPrepareTask(Task):
             try:
                 pwd.getpwnam(add_user.user)
             except:
-                environment.run_command_step(add_user, name='{}_useradd_{}'.format(name, add_user.user))
+                environment.run_command_step(add_user, name='{}_useradd_{}'.format(self.name, add_user.user))
         for directory in self.directories.values():
             directory['path'] = environment.get_path(directory['path']).resolve()
             add_directory = DirectoryAddCommand(**directory)
-            environment.run_command_step(add_directory, name='{}_directoryadd_{}'.format(name, str(add_directory.path).replace('/','_')))
+            environment.run_command_step(add_directory, name='{}_directoryadd_{}'.format(self.name, str(add_directory.path).replace('/','_')))
         return None, None
 
-class SatoriSourcePrepareTask(Task):
+class SatoriSourcePrepareTask(TaskBase):
     def __init__(self, source, destination, basename, override=None, user=None, group=None, mode=None, **kwargs):
         super().__init__()
         self.source = Path(source)
@@ -444,14 +444,14 @@ class SatoriSourcePrepareTask(Task):
         self.group = group
         self.mode = mode
 
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
-        environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.destination).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(name))
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+        environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.destination).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(self.name))
 
         source_command = InstallCommand(environment.get_path(self.source).resolve(), (environment.get_path(self.destination)/(self.basename+'.cpp')).resolve(), user=self.user, group=self.group, mode=self.mode)
         #TODO: Add other languages
         #TODO: Add zip extraction
         #TODO: Add java folders structure
-        environment.run_command_step(source_command, name='{}_source'.format(name))
+        environment.run_command_step(source_command, name='{}_source'.format(self.name))
         if self.override:
             #TODO: Add override handling
             pass
@@ -477,7 +477,7 @@ class CompileCPPCommand(CommandBase):
     def get_executable_script(self):
         return '#!/bin/sh\nexec {}\n'.format(self.build_dir/'a.out')
         
-class SatoriBuildTask(Task):
+class SatoriBuildTask(TaskBase):
     def __init__(self, source_dir, build_dir, executable_script, basename=None, user=None, group=None, **kwargs):
         super().__init__()
         self.source_dir = Path(source_dir)
@@ -490,8 +490,8 @@ class SatoriBuildTask(Task):
         self.user = user
         self.group = group
 
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
-        environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.build_dir).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(name))
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+        environment.run_command_step(DirectoryAddCommand(path=environment.get_path(self.build_dir).resolve(), user=self.user, group=self.group, mode=0o750), name='{}_source_dir'.format(self.name))
 
         call_script = '#!/bin/sh\nexec true\n'
         build_commands = list()
@@ -505,13 +505,13 @@ class SatoriBuildTask(Task):
 
 
         for num, command in zip(range(1,len(build_commands)+1), build_commands):
-            environment.run_command_step(command, name='{}_{}'.format(name, num))
+            environment.run_command_step(command, name='{}_{}'.format(self.name, num))
         with environment.get_path(self.executable_script).open('w') as script:
             script.write(call_script)
         environment.get_path(self.executable_script).chmod(0o750)
         return None, None
 
-class SatoriRunTask(Task):
+class SatoriRunTask(TaskBase):
     def __init__(self, executable, cmdline_options = None, stdin=None, stdout=None, stderr=None):
         super().__init__()
         self.executable = Path(executable)
@@ -532,17 +532,17 @@ class SatoriRunTask(Task):
         else:
             self.stderr = None
 
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
-        environment.run_command_step(RunCommand(executable=environment.get_path(self.executable).resolve(), cmdline_options=self.cmdline_options, stdin=self.stdin and environment.get_path(self.stdin).resolve(), stdout=self.stdout and environment.get_path(self.stdout).resolve(), stderr=self.stderr and environment.get_path(self.stderr).resolve()), name='{}_source_dir'.format(name))
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+        environment.run_command_step(RunCommand(executable=environment.get_path(self.executable).resolve(), cmdline_options=self.cmdline_options, stdin=self.stdin and environment.get_path(self.stdin).resolve(), stdout=self.stdout and environment.get_path(self.stdout).resolve(), stderr=self.stderr and environment.get_path(self.stderr).resolve()), name='{}_source_dir'.format(self.name))
         return None, None
 
-class SatoriDiff(Task):
+class SatoriDiff(TaskBase):
     def __init__(self, file1, file2):
         super().__init__()
         self.file1 = Path(file1)
         self.file2 = Path(file2)
-    def execute(self, name, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
-        environment.run_command_step(DiffCommand(file1=environment.get_path(self.file1).resolve(), file2=environment.get_path(self.file2).resolve()), name='{}_source_dir'.format(name))
+    def execute(self, environment: ExecutionEnvironment) -> Tuple[Optional[str], Optional[object]]:
+        environment.run_command_step(DiffCommand(file1=environment.get_path(self.file1).resolve(), file2=environment.get_path(self.file2).resolve()), name='{}_source_dir'.format(self.name))
         return None, None
 
 class SatoriSolutionPrepareTask(SatoriSourcePrepareTask):

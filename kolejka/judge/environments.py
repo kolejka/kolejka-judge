@@ -123,6 +123,8 @@ class ExecutionEnvironment:
 
     @staticmethod
     def get_change_user_function(user=None, group=None):
+        if os.getuid() != 0:
+            return None
         if user is None and group is None:
             return None
 
@@ -358,7 +360,7 @@ class KolejkaObserver(ExecutionEnvironment):
                 stderr=stderr_file,
                 env=env,
                 limits=KolejkaLimits(**self.limits),
-                preexec_fn=self.get_change_user_function(user=user, group=group)
+                preexec_fn=self.get_change_user_function(user=user, group=group),
                 cwd=self.output_directory,
             )
             execution_status.stdout = stdout
