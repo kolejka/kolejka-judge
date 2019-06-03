@@ -1,4 +1,8 @@
 \subsection{Commands}\label{subsec:steps_commands}
+    Commands are wrappers for the programs normally used in the pipeline: \shell{g++}, \shell{diff}, etc.
+    They take care of making sure that every dependency is properly set up, and reporting the execution status back to
+    the \hyperref[sec:environments]{environment}.\\
+
     Commands' arguments support a special mechanism, called
     \phantomsection \label{sec:DependentExpr} \python{DependentExpr}.
     It represents a lazy object, that takes an unknown number of variable names, and a function which is used to
@@ -6,9 +10,9 @@
     under those names to a single object.
     For the most common use case, where only one variable name is given and no reduction is needed, the function
     argument can be omitted.
-    \python{DependentExpr} will be evaluated only just before the command execution.
+    \python{DependentExpr} will be evaluated only just before the command execution.\\
 
-The base class of every command step is \python{CommandBase}.
+    The base class of every command step is \python{CommandBase}.
 
 \subsection*{\python{CommandBase}}\label{subsec:CommandBase}
 
@@ -18,7 +22,7 @@ The base class of every command step is \python{CommandBase}.
             Constructor.
             The \python{limits} argument allows the caller to specify the limits for the command execution without
             having to override \hyperref[sec:get_limits]{\python{get_limits()}} method.
-            The \python{user} and \python{group} arguments perform the same function, for
+            The \python{user} and \python{group} arguments perform the same function, as per
             \hyperref[sec:get_user]{\python{get_user()}} and \hyperref[sec:get_group]{\python{get_group()}}
             methods, respectively.
         }
@@ -59,7 +63,7 @@ The base class of every command step is \python{CommandBase}.
     \item \docfunc{get_stderr_file(self)}
         \docfuncdesc{
             Returns a path to the file to which the \shell{stderr} of the program will be redirected to.
-            Default: \code{logs/<step_name>_stderr.txt}.
+            Default: \code{logs/<step_name>_stderr.txt}.\clearpage
         }
 
     \item \phantomsection \label{sec:postconditions} \docfunc{postconditions(self)}

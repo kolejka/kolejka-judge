@@ -1,4 +1,9 @@
 \subsection{Tasks}\label{subsec:steps_tasks}
+    Tasks are supposed to perform the work that can't be easily done using shell commands, like renaming \code{*.java}
+    files.
+    They also make passing unknown (before runtime) arguments to the commands possible, using the
+    \hyperref[sec:DependentExpr]{\python{DependentExpr}} syntax.\\
+
     The base class of every task step is \python{TaskBase}.
 
 \subsection*{\python{TaskBase}}\label{subsec:TaskBase}
@@ -24,7 +29,7 @@
         \docfuncdesc{
             Returns a list of validators, that will be called before the command execution.
             See \hyperref[sec:prerequisites_desc]{prerequisites description} for more information.\\
-            Default: \python{[]}
+            Default: \python{[]}\clearpage
         }
 
     \item \docfunc{verify_prerequisites(self, environment)}

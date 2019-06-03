@@ -15,8 +15,9 @@
 
     \phantomsection \label{sec:postconditions_desc} Postconditions are given the step's execution statistics as their
     argument, and return \python{True} if they find them acceptable, and \python{False} otherwise.
-    When first from the list of assigned to the step postconditions (consisting of the 2-tuples in the form
-    \python{(postcondition, exit_status)}) fails to meet its criteria, \python{exit_status} is returned from the
+    Each step declares a list of applicable postconditions, consisting of the 2-tuples in the form
+    \python{(postcondition, exit_status)}.
+    When first from them fails to meet its criteria, \python{exit_status} is returned from the
     \python{verify_postconditions()} method, and consequently as the final step's
     exit status.
     This in turn will cause the checking to halt immediately, and no following steps will be run.

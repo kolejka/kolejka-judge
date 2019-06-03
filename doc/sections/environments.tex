@@ -1,5 +1,5 @@
 \section{Environments}\label{sec:environments}
-    Environments define how the commands are run, what limits are applied to them, and how the processed are monitored.
+    Environments define how the steps are run, what limits are applied to them, and how the processes are monitored.
     They are also responsible for implementing various checks that validators might want to use, but their exact
     implementation would depend on the environment's specification.\\
 
@@ -27,7 +27,6 @@
 
 \subsection*{\python{ExecutionEnvironment}}
 
-% TODO: in doc.tex?
 \renewcommand\labelitemiii{\textbullet}
 
 \begin{itemize}[label={}]
@@ -58,7 +57,7 @@
             Executes the received steps one by one, halting immediately when any of the steps returns an exit status
             (e.g. \shell{CME}).
             Returns a 2-tuple containing the final status (either one of the exit statuses, or \shell{OK}),
-            and a dictionary with execution statistics for each ran step. TODO CompletedProcess
+            and a dictionary with execution statistics for each ran step.
         }
 
     \item \phantomsection \label{sec:run_command_step} \docfunc{run_command_step(self, step, name)}
@@ -85,8 +84,7 @@
             all of type \python{pathlib.Path}),
             environment variables (\python{env}), process permissions (\python{user} and \python{group}) and limits
             (from previous \python{set_limits()} call).
-            Returns the execution statistics object, details of which are left up to the particular environment -
-            some attributes are, however, required for all of the environments (see TODO \python{CompletedProcess}).
+            Returns the optional \hyperref[sec:ExecutionStatistics]{execution statistics} object.
         }
 
     \item \phantomsection \label{sec:run_task_step} \docfunc{run_task_step(self, step, name)}
@@ -128,7 +126,7 @@
     \item \docfunc{get_file_handle(file, mode)}
         \docfuncdesc{
             Creates all required parent directories of \python{file}, if they don't exist.
-            Returns a file handle opened with the specified mode.
+            Returns a file handle opened with the specified mode.\clearpage
         }
 
     \item \phantomsection \label{sec:Validators} \docfunc{Validators}
@@ -162,7 +160,8 @@
 
     \item \phantomsection \label{sec:LocalComputer.LocalStats} \docfunc{LocalStats}
         \docfuncdesc{
-            TODO
+            Object representing the execution statistics.
+            Contains three properties: \code{time}, \code{memory} and \code{cpus}.
         }
 
     \item \docfunc{Validators}
@@ -175,7 +174,7 @@
 \subsection*{\python{PsutilEnvironment}}\label{sec:PsutilEnvironment}
 
 \begin{itemize}[label={}]
-    \item \python{recognized_limits = ['cpu_affinity', 'time', 'memory']}
+    \item \python{recognized_limits = ['cpus', 'cpus_offset', 'time', 'memory']}
 
     \item \docfunc{run_command(self, command, stdin, stdout, stderr, env, user, group)}
         \docfuncdesc{
@@ -202,7 +201,8 @@
 
     \item \phantomsection \label{sec:PsutilEnvironment.LocalStats} \docfunc{LocalStats}
         \docfuncdesc{
-            TODO
+            Object representing the execution statistics.
+            Contains three properties: \code{time}, \code{memory} and \code{cpus}.
         }
 
     \item \docfunc{Validators}

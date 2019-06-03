@@ -162,13 +162,13 @@ class LocalComputer(ExecutionEnvironment):
                 self.max_usage = max_usage
 
         class CpusStats:
-            def __init__(self, usage=None, system=None, user=None):
-                self.usage = usage
+            def __init__(self, system=None, user=None):
                 self.system = system
                 self.user = user
 
         def __init__(self):
             self.memory = self.MemoryStats()
+            self.time = None
             self.cpus = {'*': self.CpusStats()}
 
     class Validators(ExecutionEnvironment.Validators, LocalExecutionEnvironmentValidatorsMixin):
@@ -203,10 +203,10 @@ class LocalComputer(ExecutionEnvironment):
             stats = self._get_execution_stats(stats_file.name)
             execution_status.stats = LocalComputer.LocalStats()
             execution_status.stats.memory = LocalComputer.LocalStats.MemoryStats(stats['mem'])
+            execution_status.stats.time = stats['time']['real']
             execution_status.stats.cpus['*'] = LocalComputer.LocalStats.CpusStats(
                 stats['time']['sys'],
                 stats['time']['user'],
-                stats['time']['real'],
             )
             os.remove(stats_file.name)
 
@@ -239,7 +239,7 @@ class LocalComputer(ExecutionEnvironment):
 
 
 class PsutilEnvironment(ExecutionEnvironment):
-    recognized_limits = ['cpu_affinity', 'time', 'memory']
+    recognized_limits = ['cpus', 'cpus_offset', 'time', 'memory']
 
     class LocalStats:
         class MemoryStats:
@@ -247,13 +247,13 @@ class PsutilEnvironment(ExecutionEnvironment):
                 self.max_usage = max_usage
 
         class CpusStats:
-            def __init__(self, usage=None, system=None, user=None):
-                self.usage = usage
+            def __init__(self, system=None, user=None):
                 self.system = system
                 self.user = user
 
         def __init__(self):
             self.memory = self.MemoryStats()
+            self.time = None
             self.cpus = {'*': self.CpusStats()}
 
     class Validators(ExecutionEnvironment.Validators, LocalExecutionEnvironmentValidatorsMixin):
@@ -268,20 +268,23 @@ class PsutilEnvironment(ExecutionEnvironment):
     def monitor_process(self, process, execution_status):
         import psutil
         try:
-            usage = timedelta(0)
+            real = timedelta(0)
             system = timedelta(0)
             user = timedelta(0)
             memory_max_usage = 0
 
-            process.cpu_affinity(self.limits.get('cpu_affinity', []))
+            if 'cpus' in self.limits:
+                cpus_offset = self.limits.get('cpus_offset', 0)
+                process.cpu_affinity(list(range(cpus_offset, cpus_offset + self.limits['cpus'])))
+
             while True:
                 with process.oneshot():
-                    usage = max(usage, timedelta(seconds=time.time() - process.create_time()))
+                    real = max(real, timedelta(seconds=time.time() - process.create_time()))
                     system = max(system, timedelta(seconds=process.cpu_times().system))
                     user = max(user, timedelta(seconds=process.cpu_times().user))
                     memory_max_usage = max(memory_max_usage, process.memory_info().vms)
 
-                if 'time' in self.limits and usage.total_seconds() > self.limits['time']:
+                if 'time' in self.limits and real.total_seconds() > self.limits['time']:
                     process.kill()
                 if 'memory' in self.limits and memory_max_usage > self.limits['memory']:
                     process.kill()
@@ -289,7 +292,7 @@ class PsutilEnvironment(ExecutionEnvironment):
                 time.sleep(0.1)
 
         except psutil.NoSuchProcess:
-            execution_status.stats.cpus['*'].usage = usage
+            execution_status.stats.time = real
             execution_status.stats.cpus['*'].system = system
             execution_status.stats.cpus['*'].user = user
             execution_status.stats.memory.max_usage = memory_max_usage

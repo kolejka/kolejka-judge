@@ -15,7 +15,7 @@ class UsedTimePostcondition:
         self.time = time
 
     def __call__(self, result):
-        return result.stats.cpus['*'].usage.total_seconds() < self.time
+        return result.stats.time.total_seconds() < self.time
 
 
 class UsedMemoryPostcondition:

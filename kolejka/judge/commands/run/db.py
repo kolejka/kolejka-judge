@@ -4,14 +4,14 @@ from kolejka.judge.validators import PSQLErrorPostcondition
 
 
 class RunPSQL(Run):
-    def __init__(self, sql_file, user=None, password=None, host=None, database=None, cmdline_options=None,
+    def __init__(self, sql_file, db_user=None, db_password=None, host=None, database=None, cmdline_options=None,
                  stdin=None, stdout=None, stderr=None, **kwargs):
 
         cmdline_options = cmdline_options or []
         if host is not None:
             cmdline_options += ['-h', host]
-        if user is not None:
-            cmdline_options += ['-U', user]
+        if db_user is not None:
+            cmdline_options += ['-U', db_user]
         if database is not None:
             cmdline_options += ['-d', database]
 
@@ -19,7 +19,7 @@ class RunPSQL(Run):
                          stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
 
         self.sql_file = sql_file
-        self.password = password
+        self.password = db_password
 
     def get_env(self):
         env = super().get_env()

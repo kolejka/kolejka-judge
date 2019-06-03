@@ -8,7 +8,7 @@ from kolejka.judge.utils import detect_environment
 checking = Checking(environment=detect_environment())
 checking.add_steps(
     run=RunPSQLSolution('solution.sql', stdout='out', cmdline_options=['-qAt'],
-                        user='test', host='localhost', password='test', database='test'),
+                        db_user='test', host='localhost', db_password='test', database='test'),
     diff=Diff(),
 )
 status, res = checking.run()
