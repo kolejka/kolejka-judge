@@ -7,11 +7,11 @@
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
+    urlcolor=black,
 }
 \let\oldhyperref=\hyperref
 \renewcommand\hyperref[2][]{\dotuline{\oldhyperref[#1]{#2}}}
-\usepackage{geometry}
-\geometry{legalpaper, margin=1in}
+\usepackage[a4paper, margin=1in]{geometry}
 \usepackage{enumitem}
 \usepackage{minted}
 \usepackage{tcolorbox}
