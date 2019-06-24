@@ -23,10 +23,11 @@ We can distinguish three key parts:
     \item Configuration (lines 2--6)
 
     This section is responsible for defining the judge pipeline.
-    The usage of keyword over regular arguments in \python{add_steps()} is purely optional, designed to provide an
-    option to specify custom step identifiers.
+    The steps will be executed in the same order as they were specified in the calls' arguments.
+    The usage of keyword over regular arguments in \hyperref[sec:add_steps]{\python{add_steps()}} is purely optional, designed to provide an
+    option to specify the custom step identifiers.
     \item Launching the checker (line 7)
 
-    The \python{run()} method runs the configured pipeline, and returns a 2-tuple, consisting of the final
+    The \hyperref[sec:Checking.run]{\python{run()}} method runs the configured pipeline, and returns a 2-tuple, consisting of the final
     judge verdict code, and a detailed log of the steps ran.
 \end{itemize}

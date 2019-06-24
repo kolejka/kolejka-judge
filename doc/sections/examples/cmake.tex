@@ -10,11 +10,11 @@ checking.add_steps(
 status_code, detailed_result = checking.run()
 \end{minted}
 
-\code{CMake} without arguments sets the source directory to the current directory, and a build directory to
+\code{CMake} without any arguments sets the source directory to the current directory, and a build directory to
 \code{build}.
 \code{Make} receives the build directory name as the argument, since its default is set to the current directory.
-Then, because the project name in \code{CMakeLists.txt} is set to \code{untitled}, the \code{Makefile} generated via the
-\shell{cmake} command builds the executable named \code{untitled}.
+Then, assuming the project name in \code{CMakeLists.txt} is set to \code{untitled}, the \code{Makefile} (generated via the
+\shell{cmake} command) builds the executable named \code{untitled}.
 Path to this executable is then passed to the \code{RunSolution}, and the \shell{stdout} is redirected to the file
 called \shell{out}.
 Finally, the \code{Diff} command -- which defaults to \shell{wzo} and \shell{out} as the file names -- compares the

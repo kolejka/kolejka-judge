@@ -11,7 +11,7 @@
 }
 \let\oldhyperref=\hyperref
 \renewcommand\hyperref[2][]{\dotuline{\oldhyperref[#1]{#2}}}
-\usepackage[a4paper, margin=1in]{geometry}
+\usepackage[a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.50cm]{geometry}
 \usepackage{enumitem}
 \usepackage{minted}
 \usepackage{tcolorbox}
@@ -38,10 +38,10 @@
 \begin{document}
 
     \input{sections/basic_example}
+    \input{sections/examples}
     \input{sections/checking}
     \input{sections/steps}
     \input{sections/validators}
     \input{sections/environments}
-    \input{sections/examples}
 
 \end{document}

@@ -12,11 +12,12 @@ checking.add_steps(
         user='nobody',
     ),
 )
+status_code, detailed_result = checking.run()
 \end{minted}
 
 The \code{RunJavaClassSolution} class declares the \hyperref[subsec:UsedTimePostcondition]{\python{UsedTimePostcondition}}
 and \hyperref[subsec:UsedMemoryPostcondition]{\python{UsedMemoryPostcondition}}, therefore if the real running time will
-exceed 2.5 seconds, \code{TLE} exit status will be returned.
+exceed 2.5 seconds, the exit status returned will be \code{TLE}.
 Similarly, if the total RAM usage exceeds 10 MB, checking will return \code{MEM}.
 If the script is running as a superuser, dropping privileges is often required -- in this case, user called \code{nobody} will
-be assigned as the process owner via the \code{setuid} call.
+be assigned as the process owner via the \code{setuid} call.\\

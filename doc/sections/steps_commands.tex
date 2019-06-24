@@ -3,15 +3,6 @@
     They take care of making sure that every dependency is properly set up, and reporting the execution status back to
     the \hyperref[sec:environments]{environment}.\\
 
-    Commands' arguments support a special mechanism, called
-    \phantomsection \label{sec:DependentExpr} \python{DependentExpr}.
-    It represents a lazy object, that takes an unknown number of variable names, and a function which is used to
-    reduce the contents stored (via \hyperref[sec:set_variable]{\python{ExecutionEnvironment.set_variable()}} method)
-    under those names to a single object.
-    For the most common use case, where only one variable name is given and no reduction is needed, the function
-    argument can be omitted.
-    \python{DependentExpr} will be evaluated only just before the command execution.\\
-
     The base class of every command step is \python{CommandBase}.
 
 \subsection*{\python{CommandBase}}\label{subsec:CommandBase}
@@ -129,8 +120,8 @@
 \begin{itemize}[label={}]
     \item Base class of every compilation command.
           Receives the compiler, files to be compiled, and compilation options as the constructor arguments, and prepares
-          appropriate prerequisites (
-          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          appropriate prerequisites
+          (\hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), postconditions (
@@ -142,7 +133,7 @@
 
 \begin{itemize}[label={}]
     \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{nasm}
-          compiler and \code{-felf64} as default compilation options.
+          compiler and \code{-felf64} as the default compilation options.
 \end{itemize}
 
 \subsubsection*{\python{CompileC}}\label{subsec:CompileC}
@@ -163,7 +154,7 @@
 
 \begin{itemize}[label={}]
     \item Inherits from the \hyperref[subsec:CompileBase]{\python{CompileBase}} class, specifies the \code{mcs}
-          compiler and \code{-t:exe -out:main.exe} as default compilation options.
+          compiler and \code{-t:exe -out:main.exe} as the default compilation options.
 \end{itemize}
 
 \subsubsection*{\python{CompileGo}}\label{subsec:CompileGo}
@@ -192,8 +183,8 @@
 \begin{itemize}[label={}]
     \item Takes the files that will be packed into a JAR archive, output file, manifest and an entrypoint as the
           constructor arguments.
-          Prepares the standard prerequisites (
-          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          Prepares the standard prerequisites
+          (\hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), postconditions (
@@ -206,8 +197,8 @@
 \begin{itemize}[label={}]
     \item Takes the object files that will be linked together (using the \code{ld} program) and the output file as the
           constructor arguments.
-          Specifies the standard prerequisites (
-          \hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
+          Specifies the standard prerequisites
+          (\hyperref[subsec:ProgramExistsPrerequisite]{\python{ProgramExistsPrerequisite}},
           \hyperref[subsec:FileExistsPrerequisite]{\python{FileExistsPrerequisite}},
           \hyperref[subsec:NonEmptyListPrerequisite]{\python{NonEmptyListPrerequisite}}
           ), and postconditions (

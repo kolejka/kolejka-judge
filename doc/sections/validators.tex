@@ -6,7 +6,7 @@
 
     \phantomsection \label{sec:prerequisites_desc} Prerequisites are called with an environment as the only argument.
     They return \python{True} when they find the state of this environment acceptable, and \python{False} otherwise.
-    If any of the prerequisites is not met, \python{PrerequisiteException} is raised from the
+    If any of the conditions is not met, \python{PrerequisiteException} is raised from the
     \python{verify_prerequisites()} method, and the checking terminates.
     Implementation of a prerequisite can be either a function, or a class implementing the \python{__call__()} method.
     Classes are preferred because of their ability to be passed arguments in their constructors, and the possibility of
@@ -18,12 +18,10 @@
     Each step declares a list of applicable postconditions, consisting of the 2-tuples in the form
     \python{(postcondition, exit_status)}.
     When first from them fails to meet its criteria, \python{exit_status} is returned from the
-    \python{verify_postconditions()} method, and consequently as the final step's
-    exit status.
+    \python{verify_postconditions()} method, and consequently as the final exit status of the step.
     This in turn will cause the checking to halt immediately, and no following steps will be run.
     Similarly to the prerequisites, their implementation can be either a function, or a class implementing the
-    \python{__call__()} method - with the same advantages of the class approach as previously, except of the
-    \python{__repr__()} method, which is not used, due to the lack of raised exceptions.\\
+    \python{__call__()} method -- with the same constructor advantages as previously.\\
 
     The following validators are implemented:
 
