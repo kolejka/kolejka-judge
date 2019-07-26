@@ -1,76 +1,70 @@
 #!/usr/bin/env python3
+# vim:ts=4:sts=4:sw=4:expandtab
 
 KOLEJKA_JUDGE_LIBRARY='KolejkaJudge.zip'
-
-import json
-import os
 from pathlib import Path
 import sys
-
-library = Path(__file__).parent/KOLEJKA_JUDGE_LIBRARY
+library = Path(__file__).parent.resolve()/KOLEJKA_JUDGE_LIBRARY
 if library.is_file():
     sys.path.insert(0, str(library))
 
-from kolejka.judge.checking import Checking
+import kolejka.judge
+from kolejka.judge.commands import *
+from kolejka.judge.limits import *
+from kolejka.judge.parse import *
+from kolejka.judge.paths import *
+from kolejka.judge.tasks import *
 
-import judge
-args = judge.parse_args()
-
+args = kolejka.judge.parse_args()
 results = dict()
 
 for test_id, test in args.tests.items():
-    print(test)
-    solution_path = args.solution.resolve()
-    solution_override=None
-    if 'environment' in test:
-        solution_override = Path(test['environment'].path).resolve()
-    test_override=None
-    if 'tools' in test:
-        test_override = Path(test['tools'].path).resolve()
-    checking = Checking(environment=args.environment(args.output_dir / str(test_id)))
-    checking.add_steps(prepare=judge.SatoriSystemPrepareTask())
-    checking.add_steps(source=judge.SatoriSolutionPrepareTask(solution_path, override=solution_override))
-    checking.add_steps(build=judge.SatoriSolutionBuildTask())
-    input_path = '/dev/null'
-    if 'input' in test:
-        input_path = Path(test['input'].path).resolve()
+    checking = kolejka.judge.Checking(system=args.system(args.output_dir / str(test_id)))
+    checking.add_steps(
+        prepare=SystemPrepareTask(default_logs=False),
+        source=SolutionPrepareTask(source=get_input_path(args.solution), allow_extract=True, override=test.get('environment', None), limit_real_time='5s'),
+        source_rules=SolutionSourceRulesTask(max_size='10K'),
+        builder=SolutionBuildAutoTask([
+            [SolutionBuildCMakeTask, [], {}],
+            [SolutionBuildMakeTask, [], {}],
+            [SolutionBuildGXXTask, [], {'version': '7', 'standard': 'c++17', 'static': True}],
+        ], limit_real_time='30s', limit_memory='256M'),
+        build_rules=SolutionBuildRulesTask(max_size='10M'),
+    )
+    input_path = get_input_path(test.get('input', None))
+    hint_path = get_input_path(test.get('hint', None))
+    tool_override = get_input_path(test.get('tools',None))
     if 'generator' in test:
-        generator_path = Path(test['generator'].path).resolve()
-        checking.add_steps(generator_source=judge.SatoriToolPrepareTask('generator', generator_path, override=test_override))
-        checking.add_steps(generator_build=judge.SatoriToolBuildTask('generator'))
-        generator_output = 'test/input'
-        checking.add_steps(generator_run=judge.SatoriToolRunTask('generator', stdin=input_path, stdout=generator_output))
-        input_path = generator_output
+        checking.add_steps(
+            generator=GeneratorTask(source=get_input_path(test['generator']), override=tool_override, input_path=input_path, limit_real_time='10s')
+        )
+        input_path = checking.generator.output_path
     if 'verifier' in test:
-        verifier_path = Path(test['verifier'].path).resolve()
-        checking.add_steps(verifier_source=judge.SatoriToolPrepareTask('verifier', verifier_path, override=test_override))
-        checking.add_steps(verifier_build=judge.SatoriToolBuildTask('verifier'))
-        checking.add_steps(verifier_run=judge.SatoriToolRunTask('verifier', stdin=input_path))
-    output_path = 'test/output'
-    checking.add_steps(run=judge.SatoriSolutionRunTask(stdin=input_path, stdout=output_path))
-    hint_path = input_path
-    if 'hint' in test:
-        hint_path = Path(test['hint'].path).resolve()
+        checking.add_steps(
+            verifier=VerifierTask(source=get_input_path(test['verifier']), override=tool_override, input_path=input_path, limit_real_time='10s')
+        )
+    time_limit = parse_time(test.get('time', '10s'))
+    one_second = parse_time('1s')
+    memory_limit = test.get('memory', '1G')
+    checking.add_steps(
+        executor=SolutionExecutableTask(executable=checking.builder.execution_script, input_path=input_path, limit_cores=1, limit_cpu_time=time_limit, limit_real_time=time_limit+one_second, limit_memory=memory_limit)
+    )
+    answer_path = checking.executor.answer_path
     if 'hinter' in test:
-        hinter_path = Path(test['hinter'].path).resolve()
-        checking.add_steps(hinter_source=judge.SatoriToolPrepareTask('hinter', hinter_path, override=test_override))
-        checking.add_steps(hinter_build=judge.SatoriToolBuildTask('hinter'))
-        hinter_output = 'test/hint'
-        checking.add_steps(hinter_run=judge.SatoriToolRunTask('hinter', stdin=hint_path, stdout=hinter_output))
-        hint_path = hinter_output
+        checking.add_steps(
+            hinter=HinterTask(source=get_input_path(test['hinter']), override=tool_override, input_path=input_path, limit_real_time=max(time_limit+one_second, parse_time('10s')))
+        )
+        hint_path = checking['hinter'].output_path
     if 'checker' in test:
-        checker_path = Path(test['checker'].path).resolve()
-        checking.add_steps(checker_source=judge.SatoriToolPrepareTask('checker', checker_path, override=test_override))
-        checking.add_steps(checker_build=judge.SatoriToolBuildTask('checker'))
-        checking.add_steps(checker_run=judge.SatoriToolRunTask('checker', cmdline_options=[input_path, hint_path, output_path]))
+        checking.add_steps(
+            checker=CheckerTask(source=get_input_path(test['checker']), override=tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path)
+        )
     else:
-        checking.add_steps(checker=judge.SatoriDiff(output_path, hint_path))
-
+        checking.add_steps(
+            checker=AnswerHintDiffTask(hint_path=hint_path, answer_path=answer_path)
+        )
     status, res = checking.run()
-    
-    print(json.dumps(checking.format_result(res), indent=4))
-    print(status)
-    
-    results[test_id] = res
+    results[test_id] = checking.format_result(res)
+    print(test_id, status)
 
-judge.write_results(args, results)
+kolejka.judge.write_results(args, results)
