@@ -69,7 +69,8 @@ class CompileCommand(ProgramCommand):
         return [ self.build_directory / self.build_target ]
 
     def get_program_arguments(self):
-        args = super().get_program_arguments()
+        args = []
+        args += super().get_program_arguments()
         args += self.build_arguments
         for source in self.source_files:
             args += self.get_source_arguments(source)
@@ -119,12 +120,12 @@ class GCCCommand(CompileCommand):
         return program
 
     def get_build_arguments(self):
-        arguments = []
+        args = []
         if self.standard:
-            arguments += [ '-std='+self.standard, ]
+            args += [ '-std='+self.standard, ]
         if self.static:
-            arguments += [ '-static', ]
-        return arguments + super().get_build_arguments()
+            args += [ '-static', ]
+        return args + super().get_build_arguments()
     def get_library_arguments(self, library):
         return [ '-l' + library, ]
     def get_target_arguments(self, target):

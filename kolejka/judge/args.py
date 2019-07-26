@@ -56,13 +56,14 @@ def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
     else:
         parser.add_argument('--solution', required=True, type=str, help='Solution file')
     parser.add_argument('--output-dir', default='results', type=str, help='Output directory')
-    parser.add_argument('--results', default='results/results.yaml', type=str, help='Results file')
+    parser.add_argument('--results', default='results.yaml', type=str, help='Results file')
     return parser
 
 
 def write_results(args, results):
-    args.results.parent.mkdir(parents=True, exist_ok=True)
-    with args.results.open('w') as results_file:
+    results = (args.output_dir / args.results).resolve()
+    results.parent.mkdir(parents=True, exist_ok=True)
+    with results.open('w') as results_file:
         ctxyaml.dump(results, results_file)
 
 

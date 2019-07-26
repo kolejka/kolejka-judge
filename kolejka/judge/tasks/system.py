@@ -17,6 +17,8 @@ def __dir__():
 
 
 class SystemPrepareTask(TaskBase):
+    DEFAULT_SUPERUSER=True
+    @default_kwargs
     def __init__(self, users =config.SYSTEM_USERS, groups =config.SYSTEM_GROUPS, directories =config.SYSTEM_DIRECTORIES, **kwargs):
         super().__init__(**kwargs)
         self.groups = dict()
@@ -73,6 +75,10 @@ class SystemPrepareTask(TaskBase):
 
     def execute(self):
         status = None
+        for name in self.users.keys():
+            self.run_command('usr_del_'+name, UserDelCommand, user_name=name)
+        for name in self.groups.keys():
+            self.run_command('grp_del_'+name, GroupDelCommand, group_name=name)
         for group in self.groups.values():
             name = group['group_name']
             cmd_name = 'grp_'+name

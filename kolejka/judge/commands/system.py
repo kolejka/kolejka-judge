@@ -9,59 +9,85 @@ from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
 
-__all__ = [ 'GroupAddCommand', 'UserAddCommand', 'DirectoryAddCommand', 'InstallCommand', 'ChownDirCommand', 'ChownFileCommand', ]
+__all__ = [ 'GroupAddCommand', 'GroupDelCommand', 'UserAddCommand', 'UserDelCommand', 'DirectoryAddCommand', 'InstallCommand', 'ChownDirCommand', 'ChownFileCommand', ]
 def __dir__():
     return __all__
 
-class GroupAddCommand(CommandBase):
+class GroupAddCommand(ProgramCommand):
+    DEFAULT_PROGRAM='groupadd'
+    @default_kwargs
     def __init__(self, group_name, gid=None, **kwargs):
         super().__init__(**kwargs)
-        self.group_name = group_name
-        self.gid = gid
+        self.group_name = str(group_name)
+        self.gid = gid and int(gid)
     def get_command(self):
-        command = []
-        if not self.superuser:
-            return None
-        command += [ 'groupadd', ]
+        if self.superuser:
+            return super().get_command()
+    def get_program_arguments(self):
+        args = []
         if self.gid is not None:
-            command += [ '--gid', str(self.gid) ]
-        command += [ self.group_name ]
-        return command
-    def get_prerequirements(self):
-        return super().get_prerequirements() + [
-            SystemProgramExistsPrerequirement('groupadd'),
-        ]
+            args += [ '--gid', str(self.gid) ]
+        args += [ self.group_name ]
+        return args
 
-class UserAddCommand(CommandBase):
+
+class GroupDelCommand(ProgramCommand):
+    DEFAULT_PROGRAM='groupdel'
+    @default_kwargs
+    def __init__(self, group_name, **kwargs):
+        super().__init__(**kwargs)
+        self.group_name = group_name
+    def get_command(self):
+        if self.superuser:
+            return super().get_command()
+    def get_program_arguments(self):
+        return [ self.group_name, ]
+
+
+class UserAddCommand(ProgramCommand):
+    DEFAULT_PROGRAM='useradd'
+    @default_kwargs
     def __init__(self, user_name, uid=None, home=None, groups=None, shell=None, comment=None, **kwargs):
         super().__init__(**kwargs)
-        self.user_name = user_name
-        self.uid = uid
+        self.user_name = str(user_name)
+        self.uid = uid and int(uid)
         self.home = home and get_output_path(home)
-        self.groups = groups
-        self.shell = shell
+        self.groups = groups or []
+        self.shell = shell and str(shell)
         self.comment = comment or self.user_name
     def get_command(self):
-        command = []
-        if not self.superuser:
-            return None
-        command += [ 'useradd', '--comment', self.comment, ]
+        if self.superuser:
+            return super().get_command()
+    def get_program_arguments(self):
+        args = []
+        args += [ '--comment', self.comment, ]
         if self.uid is not None:
-            command += [ '--uid', str(self.uid) ]
+            args += [ '--uid', str(self.uid) ]
+        args += [ '--gid', self.user_name ]
         if self.home:
-            command += [ '--create-home', '--home-dir', self.home ]
+            args += [ '--create-home', '--home-dir', self.home ]
         else:
-            command += [ '--no-create-home' ]
+            args += [ '--no-create-home' ]
         if self.shell:
-            command += [ '--shell', str(self.shell) ]
+            args += [ '--shell', str(self.shell) ]
         if self.groups:
-            command += [ '--groups', ','.join([ str(group) for group in self.groups]) ]
-        command += [ '--no-user-group', self.user_name ]
-        return command
-    def get_prerequirements(self):
-        return super().get_prerequirements() + [
-            SystemProgramExistsPrerequirement('useradd'),
-        ]
+            args += [ '--groups', ','.join([ str(group) for group in self.groups]) ]
+        args += [ '--no-user-group', self.user_name ]
+        return args
+
+
+class UserDelCommand(ProgramCommand):
+    DEFAULT_PROGRAM='userdel'
+    @default_kwargs
+    def __init__(self, user_name, **kwargs):
+        super().__init__(**kwargs)
+        self.user_name = user_name
+    def get_command(self):
+        if self.superuser:
+            return super().get_command()
+    def get_program_arguments(self):
+        return [ self.user_name, ]
+
 
 class DirectoryAddCommand(CommandBase):
     def __init__(self, path, user_name=None, group_name=None, mode=None, **kwargs):
@@ -78,9 +104,9 @@ class DirectoryAddCommand(CommandBase):
         return str(self.mode)
     def get_command(self):
         command = [ 'install' ]
-        if self.user is not None:
+        if self.user_name is not None:
             command += [ '--owner', str(self.user_name) ]
-        if self.group is not None:
+        if self.group_name is not None:
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]

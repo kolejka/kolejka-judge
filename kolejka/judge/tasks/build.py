@@ -9,6 +9,7 @@ assert sys.version_info >= (3, 6)
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
+from kolejka.judge.commands.base import *
 from kolejka.judge.commands.compile import *
 from kolejka.judge.commands.make import *
 from kolejka.judge.tasks.base import TaskBase
@@ -31,6 +32,8 @@ class SolutionMixin:
     DEFAULT_SOURCE_DIRECTORY=config.SOLUTION_SOURCE
     DEFAULT_BUILD_DIRECTORY=config.SOLUTION_BUILD
     DEFAULT_EXECUTION_SCRIPT=config.SOLUTION_EXEC
+    DEFAULT_USER=config.USER_BUILD
+    DEFAULT_GROUP=config.USER_BUILD
     DEFAULT_RESULT_ON_ERROR='CME'
     @default_kwargs
     def __init__(self, *args, **kwargs):
@@ -40,6 +43,8 @@ class ToolMixin:
     DEFAULT_SOURCE_DIRECTORY=config.TOOL_SOURCE
     DEFAULT_BUILD_DIRECTORY=config.TOOL_BUILD
     DEFAULT_EXECUTION_SCRIPT=config.TOOL_EXEC
+    DEFAULT_USER=config.USER_TEST
+    DEFAULT_GROUP=config.USER_TEST
     DEFAULT_RESULT_ON_ERROR='INT'
     @default_kwargs
     def __init__(self, *args, tool_name, **kwargs):
@@ -66,7 +71,7 @@ class BuildTask(TaskBase):
                 execution_script_body = '#!/bin/sh\nexec ' + ' '.join([ shlex.quote(self.system.resolve(a)) for a in execution_command ]) + ' "$@" \n'
                 with execution_script_path.open('w') as execution_script_file:
                     execution_script_file.write(execution_script_body)
-                execution_script_path.chmod(0o550)
+                execution_script_path.chmod(0o755)
 
     def find_binary(self, path):
         if self.build_target is not None:
@@ -185,7 +190,7 @@ class BuildCompilerTask(BuildTask):
         self.libraries = libraries
 
     def get_source_files(self):
-        result = list()
+        result = []
         for f in self.find_files(self.source_directory):
             for source_glob in self.source_globs:
                 if f.match(source_glob):

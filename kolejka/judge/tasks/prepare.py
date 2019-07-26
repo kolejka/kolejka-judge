@@ -18,6 +18,8 @@ def __dir__():
 
 
 class PrepareTask(TaskBase):
+    DEFAULT_SUPERUSER=True
+    @default_kwargs
     def __init__(self, source, target, allow_extract=False, user_name=None, group_name=None, override=None, **kwargs):
         super().__init__(**kwargs)
         self.source = get_output_path(source)
@@ -45,7 +47,7 @@ class PrepareTask(TaskBase):
         status = self.prepare_source('source', self.source)
         if self.override:
             status = status or self.prepare_source('override', self.override)
-        if self.user or self.group:
+        if self.user_name or self.group_name:
             cmd_name = 'chown'
             status = status or self.run_command(cmd_name, ChownDirCommand, target=self.target, recursive=True, user_name=self.user_name, group_name=self.group_name)
         return status, self.result
@@ -53,8 +55,8 @@ class PrepareTask(TaskBase):
 
 class SolutionPrepareTask(PrepareTask):
     DEFAULT_TARGET=config.SOLUTION_SOURCE
-    DEFAULT_USER_NAME='satori-judge-test'
-    DEFAULT_GROUP_NAME='satori-judge'
+    DEFAULT_USER_NAME=config.USER_TEST
+    DEFAULT_GROUP_NAME=config.USER_BUILD
     DEFAULT_RESULT_ON_ERROR='CME'
     @default_kwargs
     def __init__(self, **kwargs):
@@ -63,8 +65,8 @@ class SolutionPrepareTask(PrepareTask):
 
 class ToolPrepareTask(PrepareTask):
     DEFAULT_TARGET=config.TOOL_SOURCE
-    DEFAULT_USER_NAME='satori-judge-tool'
-    DEFAULT_GROUP_NAME='satori-judge'
+    DEFAULT_USER_NAME=config.USER_TEST
+    DEFAULT_GROUP_NAME=config.USER_TEST
     DEFAULT_RESULT_ON_ERROR='INT'
     DEFAULT_ALLOW_EXTRACT=True
     @default_kwargs

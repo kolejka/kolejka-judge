@@ -1,5 +1,7 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
+LOG = 'log'
+
 SOLUTION = 'solution'
 SOLUTION_SOURCE = SOLUTION + '/src'
 SOLUTION_BUILD = SOLUTION + '/build'
@@ -15,71 +17,73 @@ TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
 
-GROUP_MAIN = 'satori-judge-main'
-GROUP_ALL  = 'satori-judge'
+GROUP_ALL  = 'kolejkajudgerun'
 
-USER_TEST = 'satori-judge-test'
-USER_COMPILE = 'satori-judge-comp'
-USER_TOOL = 'satori-judge-tool'
-USER_EXEC = 'satori-judge-exec'
+USER_TEST = 'kolejkajudgetest'
+USER_BUILD = 'kolejkajudgebuild'
+USER_EXEC = 'kolejkajudgeexec'
 
 SYSTEM_GROUPS = [
-    GROUP_MAIN,
+    GROUP_ALL,
 ]
 SYSTEM_USERS = [
     {
         'user_name' : USER_TEST,
-        'home' : 'home/'+USER_TEST,
-        'groups' : [ GROUP_MAIN, GROUP_ALL, ],
+        'home' : 'home_'+USER_TEST,
+        'groups' : [ GROUP_ALL, ],
     } , {
-        'user_name' : USER_COMPILE,
-        'home' : 'home/'+USER_COMPILE,
-        'groups' : [ GROUP_MAIN, GROUP_ALL, ],
-    } , {
-        'user_name' : USER_TOOL,
-        'home' : 'home/'+USER_TOOL,
-        'groups' : [ GROUP_MAIN, GROUP_ALL, ],
+        'user_name' : USER_BUILD,
+        'home' : 'home_'+USER_BUILD,
+        'groups' : [ GROUP_ALL, ],
     } , {
         'user_name' : USER_EXEC,
-        'home' : 'home/'+USER_EXEC,
+        'home' : 'home_'+USER_EXEC,
         'groups' : [ GROUP_ALL, ],
     }
 ]
 SYSTEM_DIRECTORIES = [
     {
+        'path' : '.',
+        'user_name' : USER_TEST,
+        'group_name' : GROUP_ALL,
+        'mode' : 0o2750,
+    } , {
+        'path' : LOG,
+        'mode' : 0o2700,
+    } , {
         'path' : TEST,
         'user_name' : USER_TEST,
         'group_name' : USER_TEST,
-        'mode' : 0o750,
+        'mode' : 0o2750,
     } , {
         'path' : SOLUTION,
         'user_name' : USER_TEST,
         'group_name' : GROUP_ALL,
-        'mode' : 0o750,
+        'mode' : 0o2750,
     } , {
         'path' : SOLUTION_SOURCE,
         'user_name' : USER_TEST,
-        'group_name' : GROUP_MAIN,
-        'mode' : 0o750,
+        'group_name' : USER_BUILD,
+        'mode' : 0o2750,
     } , {
         'path' : SOLUTION_BUILD,
-        'user_name' : USER_COMPILE,
+        'user_name' : USER_BUILD,
         'group_name' : GROUP_ALL,
-        'mode' : 0o750,
+        'mode' : 0o2750,
     } , {
         'path' : TOOL,
         'user_name' : USER_TEST,
-        'group_name' : GROUP_MAIN,
-        'mode' : 0o750,
+        'group_name' : USER_TEST,
+        'mode' : 0o2750,
     } , {
-        'path' : TOOL_SOURCE,
+        'path' : TOOL+'/src',
         'user_name' : USER_TEST,
-        'group_name' : GROUP_MAIN,
-        'mode' : 0o750,
+        'group_name' : USER_TEST,
+        'mode' : 0o2750,
     } , {
-        'path' : TOOL_BUILD,
-        'user_name' : USER_TOOL,
-        'group_name' : GROUP_MAIN,
-        'mode' : 0o750,
+        'path' : TOOL+'/build',
+        'user_name' : USER_TEST,
+        'group_name' : USER_TEST,
+        'mode' : 0o2750,
     }
 ]

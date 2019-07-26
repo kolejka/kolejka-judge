@@ -30,13 +30,9 @@ def __dir__():
 
 
 class SystemBase(AbstractSystem):
-    default_environment = {
-        'PATH' : '/usr/local/bin:/usr/bin:/bin',
-    }
-    def __init__(self, output_directory, environment=None, superuser=False):
+    def __init__(self, output_directory, environment=None):
         self._output_directory = pathlib.Path(output_directory).resolve()
-        self._environment = dict(environment or self.default_environment)
-        self._superuser = bool(superuser)
+        self._environment = dict(environment or {})
         self._users = set()
         self._groups = set()
         self._paths = set()
@@ -50,16 +46,27 @@ class SystemBase(AbstractSystem):
         return self._output_directory
 
     @property
+    def program_path(self) -> str:
+        return self.get_program_path()
+    def get_program_path(self):
+        if self.superuser:
+            return '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+        else:
+            return '/usr/local/bin:/usr/bin:/bin'
+
+    @property
     def environment(self) -> Dict[str, Optional[Resolvable]]:
         return self.get_environment()
     def get_environment(self):
-        return self._environment
+        environment = deepcopy(self._environment)
+        environment['PATH'] = self.program_path
+        return environment
 
     @property
     def superuser(self) -> bool:
         return self.get_superuser()
     def get_superuser(self):
-        return self._superuser
+        raise NotImplementedError
 
     @property
     def users(self) -> Set[str]:
@@ -236,9 +243,16 @@ class SystemBase(AbstractSystem):
         import grp
         uid = pwd.getpwnam(user).pw_uid if user is not None else None
         gid = grp.getgrnam(group).gr_gid if group is not None else None
+        groups = [ gid ]
+        if user:
+            groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
+
 
         def change_user():
             try:
+                os.setsid()
+                if groups is not None:
+                    os.setgroups(groups)
                 if gid is not None:
                     os.setgid(gid)
                 if uid is not None:

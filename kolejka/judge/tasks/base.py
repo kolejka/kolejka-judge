@@ -184,7 +184,7 @@ class TaskBase(AbstractTask):
             kwargs['group'] = group
         superuser = self.superuser
         if superuser is not None:
-            kwargs['superuser'] = superuser 
+            kwargs['superuser'] = superuser and self.system.superuser
         limits = self.limits
         if limits is not None:
             kwargs['limits'] = limits

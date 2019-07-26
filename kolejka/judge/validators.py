@@ -65,24 +65,6 @@ class ParsedErrorPostcondition:
         return '{}({})'.format(self.__class__.__name__, repr(self.disallowed_lines))
 
 
-class PSQLErrorPostcondition(ParsedErrorPostcondition):
-    #TODO: Remove from here
-    def __init__(self):
-        return super().__init__(r'.*ERROR:.*')
-
-
-class NonEmptyListPrerequirement:
-    #TODO: What for?
-    def __init__(self, lst):
-        self.list = lst
-
-    def __call__(self, system):
-        return len(self.list) > 0
-
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.list))
-
-
 class FileExistsPrerequirement:
     def __init__(self, path):
         self.path = path

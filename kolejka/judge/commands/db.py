@@ -47,3 +47,8 @@ class PSQLCommand(ProgramCommand):
         return super().get_prerequirements() + [
             FileExistsPrerequirement(self.sql_file),
         ]
+
+
+class PSQLErrorPostcondition(ParsedErrorPostcondition):
+    def __init__(self):
+        return super().__init__(r'.*ERROR:.*')
