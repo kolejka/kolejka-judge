@@ -1,70 +1,61 @@
-import os
+# vim:ts=4:sts=4:sw=4:expandtab
+import sys
+assert sys.version_info >= (3, 6)
 
-from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.validators import ProgramExistsPrerequisite, ExitCodePostcondition, FileExistsPrerequisite
+
+from kolejka.judge.commands.base import *
+from kolejka.judge.paths import *
+from kolejka.judge.typing import *
+from kolejka.judge.validators import *
 
 
-class ExtractArchive(CommandBase):
-    extensions = ['zip', 'tar', 'tar.gz', 'tar.bz2', '7z', 'rar']
+__all__ = [ 'Un7zCommand', 'UnzipCommand', 'UnrarCommand', 'UntarCommand', ]
+def __dir__():
+    return __all__
 
-    def __init__(self, archive, archive_type=None, directory='sources'):
-        super().__init__()
-        self.archive = archive
-        self.directory = os.path.join(directory, '')
-        self.archive_type = archive_type
-        if archive_type is None:
-            self.detect_archive_type()
 
-    def get_configuration_status(self):
-        return (True, None) if self.archive_type in self.extensions else (False, 'EXT')
+class ExtractCommand(ProgramCommand):
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self._source = get_output_path(source)
+        self._target = get_output_path(target)
 
-    def detect_archive_type(self):
-        for extension in self.extensions:
-            if self.archive.endswith('.' + extension):
-                self.archive_type = extension
-                break
+    @property
+    def source(self):
+        return self.get_source()
+    def get_source(self):
+        return self._source
 
-    def get_zip_command(self):
-        return ['unzip', '-o', '-d', self.directory, self.archive]
+    @property
+    def target(self):
+        return self.get_target()
+    def get_target(self):
+        return self._target
 
-    def get_tar_command(self):
-        return ['tar', '-xvf', self.archive, '--one-top-level={}'.format(self.directory)]
-
-    def get_tar_gz_command(self):
-        return ['tar', '-xzf', self.archive, '--one-top-level={}'.format(self.directory)]
-
-    def get_tar_bz2_command(self):
-        return ['tar', '-xjf', self.archive, '--one-top-level={}'.format(self.directory)]
-
-    def get_7z_command(self):
-        return ['7z', 'x', self.archive, '-o{}'.format(self.directory), '-y']
-
-    def get_rar_command(self):
-        return ['unrar', 'x', self.archive, self.directory, '-y']
-
-    def get_command(self):
-        commands = {
-            'zip': self.get_zip_command,
-            'tar': self.get_tar_command,
-            'tar.gz': self.get_tar_gz_command,
-            'tar.bz2': self.get_tar_bz2_command,
-            '7z': self.get_7z_command,
-            'rar': self.get_rar_command,
-        }
-        return commands[self.archive_type]()
-
-    def prerequisites(self):
-        programs = {
-            'zip': 'unzip',
-            'tar': 'tar',
-            'tar.gz': 'tar',
-            'tar.bz2': 'tar',
-            '7z': '7z',
-            'rar': 'unrar',
-        }
-        return [ProgramExistsPrerequisite(programs[self.archive_type]), FileExistsPrerequisite(self.archive)]
-
-    def postconditions(self):
-        return [
-            (ExitCodePostcondition(), 'EXT')
+    def get_prerequirements(self):
+        return super().get_prerequirements() + [
+            FileExistsPrerequirement(self.source),
+            DirectoryExistsPrerequirement(self.target),
         ]
+
+
+class Un7zCommand(ExtractCommand):
+    DEFAULT_PROGRAM='7z'
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def get_program_arguments(self):
+        return [ 'x', '-y', '-aoa', '-bso0', '-bse2', '-bsp0', '-bb0', '-bd', ['-o', self.target], self.source ]
+    #TODO: quiet/verbose
+class UnzipCommand(Un7zCommand):
+    pass
+class UnrarCommand(Un7zCommand):
+    pass
+class UntarCommand(ExtractCommand):
+    DEFAULT_PROGRAM='tar'
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def get_program_arguments(self):
+        return [ '--extract', '-f', self.source, '--force-local', '--auto-compress', '--overwrite', '--no-same-owner', '--no-acls', '--no-selinux', '--no-xattrs', '-C', self.target ]
+    #TODO: quiet/verbose

@@ -1,3 +1,4 @@
+# vim:ts=4:sts=4:sw=4:expandtab
 import json
 import os
 import shutil
@@ -11,16 +12,18 @@ from copy import deepcopy
 from datetime import timedelta
 from json import JSONEncoder
 from pathlib import Path
-from typing import Optional
+assert sys.version_info >= (3, 6)
 
+
+from kolejka.judge.typing import *
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments.base import ExecutionEnvironmentBase
-from kolejka.judge.environments.local import LocalExecutionEnvironmentValidatorsMixin
+from kolejka.judge.systems.base import SystemBase
+from kolejka.judge.systems.local import LocalSystemValidatorsMixin
 
 
-class PsutilEnvironment(ExecutionEnvironmentBase):
+class PsutilSystem(SystemBase):
     recognized_limits = ['cpu_affinity', 'time', 'memory']
 
     class LocalStats:
@@ -38,7 +41,7 @@ class PsutilEnvironment(ExecutionEnvironmentBase):
             self.memory = self.MemoryStats()
             self.cpus = {'*': self.CpusStats()}
 
-    class Validators(ExecutionEnvironmentBase.Validators, LocalExecutionEnvironmentValidatorsMixin):
+    class Validators(SystemBase.Validators, LocalSystemValidatorsMixin):
         pass
 
     class ExecutionStatusEncoder(JSONEncoder):
@@ -76,7 +79,7 @@ class PsutilEnvironment(ExecutionEnvironmentBase):
             execution_status.stats.cpus['*'].user = user
             execution_status.stats.memory.max_usage = memory_max_usage
 
-    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], env,
+    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], environment,
                     user, group):
         import psutil
 
@@ -86,13 +89,13 @@ class PsutilEnvironment(ExecutionEnvironmentBase):
             stderr_file = stderr and stack.enter_context(self.get_file_handle(stderr, 'w'))
 
             execution_status = subprocess.CompletedProcess(command, None, stdout, stderr)
-            execution_status.stats = PsutilEnvironment.LocalStats()
+            execution_status.stats = PsutilSystem.LocalStats()
             process = psutil.Popen(
                 command,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
-                env=env,
+                environment=environment,
                 preexec_fn=self.get_change_user_function(user=user, group=group),
             )
             monitoring_thread = threading.Thread(target=self.monitor_process, args=(process, execution_status))

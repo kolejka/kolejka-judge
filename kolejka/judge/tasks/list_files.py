@@ -1,8 +1,8 @@
 import glob
 import itertools
 from functools import partial
-from typing import Tuple, Optional
 
+from kolejka.judge.typing import *
 from kolejka.judge.tasks.base import TaskBase
 
 

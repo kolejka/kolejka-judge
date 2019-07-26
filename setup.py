@@ -22,7 +22,7 @@ kolejka_judge = {
         'long_description' : 'kolejka is a lightweight task scheduling platform developed for a small computational grid at Faculty of Mathematics and Computer Science of the Jagiellonian University in Kraków.',
         'license' : 'MIT',
         'version' : '0.1',
-        'python_requires' : '>=3.0',
+        'python_requires' : '>=3.6',
         'namespace_packages' : [ 'kolejka' ],
     }
 

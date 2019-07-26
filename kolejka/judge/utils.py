@@ -1,11 +1,16 @@
+# vim:ts=4:sts=4:sw=4:expandtab
 import argparse
+import sys
+assert sys.version_info >= (3, 6)
 
-from kolejka.judge.environments import LocalEnvironment, ObserverEnvironment, PsutilEnvironment
 
-KNOWN_ENVIRONMENTS = {
-    'local': LocalEnvironment,
-    'kolejkaobserver': ObserverEnvironment,
-    'psutil': PsutilEnvironment,
+from kolejka.judge.systems import *
+
+
+KNOWN_SYSTEMS = {
+    'local': LocalSystem,
+    'kolejkaobserver': ObserverSystem,
+    'psutil': PsutilSystem,
 }
 
 
@@ -15,27 +20,27 @@ def parse_default_arguments(command):
     return vars(parser.parse_known_args(command)[0])
 
 
-KNOWN_ENVIRONMENTS_ARGUMENTS = {
+KNOWN_SYSTEMS_ARGUMENTS = {
     'local': parse_default_arguments,
     'kolejkaobserver': parse_default_arguments,
     'psutil': parse_default_arguments,
 }
 
 
-def detect_environment():
-    default_environment = 'local'
+def detect_system():
+    default_system = 'local'
 
     parser = argparse.ArgumentParser()
 
-    for env_id, env_cls in KNOWN_ENVIRONMENTS.items():
+    for sys_id, sys_cls in KNOWN_SYSTEMS.items():
         parser.add_argument(
-            '--{}'.format(env_id),
-            dest='environment',
+            '--{}'.format(sys_id),
+            dest='system',
             action='store_const',
-            const=env_id,
-            default=default_environment,
+            const=sys_id,
+            default=default_system,
         )
 
     args, remnants = parser.parse_known_args()
-    environment_arguments = KNOWN_ENVIRONMENTS_ARGUMENTS[args.environment](remnants)
-    return KNOWN_ENVIRONMENTS[args.environment](**environment_arguments)
+    system_arguments = KNOWN_SYSTEMS_ARGUMENTS[args.system](remnants)
+    return KNOWN_SYSTEMS[args.system](**system_arguments)

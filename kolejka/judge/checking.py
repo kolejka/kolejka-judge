@@ -1,15 +1,29 @@
-# coding=utf-8
-from typing import Dict
+# vim:ts=4:sts=4:sw=4:expandtab
+import sys
+assert sys.version_info >= (3, 6)
 
-from kolejka.judge.environments import ExecutionEnvironmentBase
+
+from kolejka.judge.typing import *
+from kolejka.judge.systems.base import SystemBase
 from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.tasks.java import TaskBase
+from kolejka.judge.tasks.base import TaskBase
+
+
+__all__ = [ 'Checking' ]
+def __dir__():
+    return __all__
 
 
 class Checking:
-    def __init__(self, environment: ExecutionEnvironmentBase):
+    def __init__(self, system: SystemBase):
         self.steps: Dict[str, CommandBase or TaskBase] = {}
-        self.environment = environment
+        self.system = system
+
+    def __getattr__(self, key):
+        return self.steps[key]
+
+    def __getitem__(self, key):
+        return self.steps[key]
 
     # requires python3.6 for kwargs order preservation
     def add_steps(self, *args, **kwargs):
@@ -29,11 +43,11 @@ class Checking:
             self.steps[name] = func
 
     def run(self):
-        return self.environment.run_steps(self.steps)
+        return self.system.run_steps(self.steps)
 
     def format_result(self, result):
         formatted_result = {}
         for key, value in result.items():
-            formatted_result[key] = self.environment.format_execution_status(value)
+            formatted_result[key] = self.system.format_execution_status(value)
 
         return formatted_result

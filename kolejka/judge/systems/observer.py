@@ -1,3 +1,4 @@
+# vim:ts=4:sts=4:sw=4:expandtab
 import json
 import os
 import shutil
@@ -11,19 +12,20 @@ from copy import deepcopy
 from datetime import timedelta
 from json import JSONEncoder
 from pathlib import Path
-from typing import Optional
+assert sys.version_info >= (3, 6)
 
+from kolejka.judge.typing import *
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.environments.base import ExecutionEnvironmentBase
-from kolejka.judge.environments.local import LocalExecutionEnvironmentValidatorsMixin
+from kolejka.judge.systems.base import SystemBase
+from kolejka.judge.systems.local import LocalSystemValidatorsMixin
 
 
-class ObserverEnvironment(ExecutionEnvironmentBase):
+class ObserverSystem(SystemBase):
     recognized_limits = ['cpus', 'cpus_offset', 'pids', 'memory', 'time']
 
-    class Validators(ExecutionEnvironmentBase.Validators, LocalExecutionEnvironmentValidatorsMixin):
+    class Validators(SystemBase.Validators, LocalSystemValidatorsMixin):
         pass
 
     class ExecutionStatusEncoder(JSONEncoder):

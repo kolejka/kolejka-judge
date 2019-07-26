@@ -2,8 +2,8 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Tuple, Optional
 
+from kolejka.judge.typing import *
 from kolejka.judge.tasks.base import TaskBase
 
 
