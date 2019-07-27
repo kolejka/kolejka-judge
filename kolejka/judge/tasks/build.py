@@ -78,16 +78,16 @@ class BuildTask(TaskBase):
             target_path = self.resolve_path(path / self.build_target)
             if target.is_file() and (target.stat().st_mode & 0o111):
                 return path / self.build_target
-            binaries = [ f for f in self.find_files(path) if self.resolve_path(f).stat().st_mode & 0o111 ]
-            if len(binaries) > 0:
-                binary = max(binaries, key=lambda f : self.resolve_path(f).stat().st_mtime, default=None)
-                return path / binary.relative_to(self.resolve_path(path))
+        binaries = [ f for f in self.find_files(path) if self.resolve_path(f).stat().st_mode & 0o111 ]
+        if len(binaries) > 0:
+            binary = max(binaries, key=lambda f : self.resolve_path(f).stat().st_mtime, default=None)
+            return binary
 
     def ok(self):
         return False
 
     def get_execution_command(self):
-        return self.find_binary(build_path) or self.find_binary(source_path)
+        return [ self.find_binary(self.build_directory) ]
 
     def execute(self):
         status = None
@@ -176,9 +176,9 @@ class BuildMakeTask(BuildTask):
         return self.resolve_path(self.source_directory / 'Makefile').is_file()
 
     def execute_build(self):
-        #TODO: How to use build directory?
         status = None
-        status = status or self.run_command('make', MakeCommand, build_directory=self.source_directory, build_target=self.build_target)
+        status = status or self.run_command('copy', ProgramCommand, program='rsync', program_arguments=['-a', [self.source_directory,'/'], [self.build_directory,'/']])
+        status = status or self.run_command('make', MakeCommand, build_directory=self.build_directory, build_target=self.build_target)
         return status
 
 
