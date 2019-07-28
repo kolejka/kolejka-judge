@@ -243,19 +243,22 @@ class SystemBase(AbstractSystem):
             mode += 'a'
         return path.open(mode)
 
+    def get_uid_gid_groups(self, user=None, group=None):
+        uid = pwd.getpwnam(user).pw_uid if user is not None else None
+        gid = grp.getgrnam(group).gr_gid if group is not None else None
+        groups = [ gid ] if group is not None else None
+        if user:
+            groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
+        return (uid, gid, groups)
+
     @staticmethod
     def get_change_user_function(user=None, group=None):
         if os.getuid() != 0:
             return None
         if user is None and group is None:
             return None
-        uid = pwd.getpwnam(user).pw_uid if user is not None else None
-        gid = grp.getgrnam(group).gr_gid if group is not None else None
-        groups = [ gid ]
-        if user:
-            groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
 
-
+        uid, gid, groups = self.get_uid_gid_groups(user=user, group=group)
         def change_user():
             try:
                 if groups is not None:
@@ -267,7 +270,6 @@ class SystemBase(AbstractSystem):
                 os.setsid()
             except OSError:
                 pass
-
         return change_user
 
     class Validators:

@@ -511,3 +511,18 @@ register(
     load=load_blob,
     dump=dump_blob
 )
+
+from kolejka.judge.limits import Limits
+from kolejka.judge.result import Result
+
+register(
+    Scalar,
+    type=Limits,
+    tag='!limits',
+)
+
+register(
+    Scalar,
+    type=Result,
+    tag='!result',
+)

@@ -8,6 +8,7 @@ assert sys.version_info >= (3, 6)
 
 
 from kolejka.judge import ctxyaml
+from kolejka.judge.systems import *
 
 
 __all__ = [ 'parse_args', 'write_results' ]
@@ -22,11 +23,11 @@ DEFAULT_JUDGE_DESCRIPTION='SATORI KOLEJKA judge'
 
 
 def known_systems():
-    from kolejka.judge.systems import LocalSystem, PsutilSystem, ObserverSystem
     known_systems = {
         'local': LocalSystem,
         'psutil': PsutilSystem,
         'observer': ObserverSystem,
+        'systemd': SystemdSystem,
         #'kolejka' : KolejkaTask,
     }
     return known_systems
