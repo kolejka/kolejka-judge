@@ -21,11 +21,11 @@ class ReturnCodePostcondition:
 
 class TimeLimitPostcondition:
     def __init__(self, cpu_time=None, real_time=None):
-        self.cpu_time = parse_time(cpu_time)
-        self.real_time = parse_time(real_time)
+        self.cpu_time = cpu_time or parse_time(cpu_time)
+        self.real_time = real_time or parse_time(real_time)
 
     def __call__(self, system, result):
-        return ( self.cpu_time is None or result.cpu_time_usage < self.cpu_time ) and ( self.real_time is None or result.real_time_usage < self.real_time )
+        return ( self.cpu_time is None or result.cpu_time < self.cpu_time ) and ( self.real_time is None or result.real_time < self.real_time )
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, repr(self.cpu_time), repr(self.real_time))
@@ -36,7 +36,7 @@ class MemoryLimitPostcondition:
         self.memory = parse_memory(memory)
 
     def __call__(self, system, result):
-        return ( self.memory is None or result.memory_usage < self.memory )
+        return ( self.memory is None or result.memory < self.memory )
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, repr(self.memory))

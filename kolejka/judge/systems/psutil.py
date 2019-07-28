@@ -1,110 +1,61 @@
 # vim:ts=4:sts=4:sw=4:expandtab
-import json
+from contextlib import ExitStack
 import os
-import shutil
-import subprocess
 import sys
-import tempfile
 import threading
 import time
-from contextlib import ExitStack
-from copy import deepcopy
-from datetime import timedelta
-from json import JSONEncoder
-from pathlib import Path
 assert sys.version_info >= (3, 6)
 
 
-from kolejka.judge.typing import *
-from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.tasks.base import TaskBase
-from kolejka.judge.systems.base import SystemBase
-from kolejka.judge.systems.local import LocalSystemValidatorsMixin
+from kolejka.judge.systems.local import LocalSystem
 
+def monitor_process(process, limits, result):
+    import psutil
+    try:
+        if limits.cores:
+            process.cpu_affinity(range(limits.cores))
+        while True:
+            with process.oneshot():
+                result.update_memory(process.memory_info().vms)
+                result.update_real_time(time.time() - process.create_time())
+                cpu_times = process.cpu_times()
+                result.update_cpu_time(cpu_times.user + cpu_times.system)
+                result.update_cpu_time(cpu_times.user + cpu_times.system + cpu_times.children_user + cpu_times.children_system)
 
-class PsutilSystem(SystemBase):
-    recognized_limits = ['cpu_affinity', 'time', 'memory']
+            if limits.cpu_time and result.cpu_time > limits.cpu_time:
+                process.kill()
+            if limits.real_time and result.real_time > limits.real_time:
+                process.kill()
+            if limits.memory and result.memory > limits.memory:
+                process.kill()
+            if limits.pids and len(process.children(recursive=True)) > limits.pids:
+                process.kill()
 
-    class LocalStats:
-        class MemoryStats:
-            def __init__(self, max_usage=None):
-                self.max_usage = max_usage
+            time.sleep(0.1)
 
-        class CpusStats:
-            def __init__(self, usage=None, system=None, user=None):
-                self.usage = usage
-                self.system = system
-                self.user = user
-
-        def __init__(self):
-            self.memory = self.MemoryStats()
-            self.cpus = {'*': self.CpusStats()}
-
-    class Validators(SystemBase.Validators, LocalSystemValidatorsMixin):
+    except psutil.NoSuchProcess:
         pass
 
-    class ExecutionStatusEncoder(JSONEncoder):
-        def default(self, o):
-            if isinstance(o, (Path, timedelta)):
-                return str(o)
-            return o.__dict__
 
-    def monitor_process(self, process, execution_status):
+class PsutilSystem(LocalSystem):
+    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
         import psutil
-        try:
-            usage = timedelta(0)
-            system = timedelta(0)
-            user = timedelta(0)
-            memory_max_usage = 0
-
-            process.cpu_affinity(self.limits.get('cpu_affinity', []))
-            while True:
-                with process.oneshot():
-                    usage = max(usage, timedelta(seconds=time.time() - process.create_time()))
-                    system = max(system, timedelta(seconds=process.cpu_times().system))
-                    user = max(user, timedelta(seconds=process.cpu_times().user))
-                    memory_max_usage = max(memory_max_usage, process.memory_info().vms)
-
-                if 'time' in self.limits and usage.total_seconds() > self.limits['time']:
-                    process.kill()
-                if 'memory' in self.limits and memory_max_usage > self.limits['memory']:
-                    process.kill()
-
-                time.sleep(0.1)
-
-        except psutil.NoSuchProcess:
-            execution_status.stats.cpus['*'].usage = usage
-            execution_status.stats.cpus['*'].system = system
-            execution_status.stats.cpus['*'].user = user
-            execution_status.stats.memory.max_usage = memory_max_usage
-
-    def run_command(self, command, stdin: Optional[Path], stdout: Optional[Path], stderr: Optional[Path], environment,
-                    user, group):
-        import psutil
-
         with ExitStack() as stack:
-            stdin_file = stdin and stack.enter_context(self.get_file_handle(stdin, 'r'))
-            stdout_file = stdout and stack.enter_context(self.get_file_handle(stdout, 'w'))
-            stderr_file = stderr and stack.enter_context(self.get_file_handle(stderr, 'w'))
+            stdin_file = stack.enter_context(self.read_file(stdin_path))
+            stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
+            stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
 
-            execution_status = subprocess.CompletedProcess(command, None, stdout, stderr)
-            execution_status.stats = PsutilSystem.LocalStats()
             process = psutil.Popen(
                 command,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
-                environment=environment,
+                env=environment,
                 preexec_fn=self.get_change_user_function(user=user, group=group),
+                cwd=work_path,
             )
-            monitoring_thread = threading.Thread(target=self.monitor_process, args=(process, execution_status))
+            monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
             monitoring_thread.start()
             process.wait()
             monitoring_thread.join()
-
-            execution_status.returncode = process.returncode
-            return execution_status
-
-    @classmethod
-    def format_execution_status(cls, status):
-        return json.loads(json.dumps(status, cls=cls.ExecutionStatusEncoder))
+            result.set_returncode(process.returncode)

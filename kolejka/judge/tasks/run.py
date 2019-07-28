@@ -94,8 +94,8 @@ class SolutionExecutableTask(ExecutableTask):
     DEFAULT_EXECUTABLE='solution/run'
     DEFAULT_ANSWER_PATH='test/answer'
     DEFAULT_RESULT_ON_ERROR='RTE'
-#TODO:    DEFAULT_RESULT_ON_TIME='TLE'
-#TODO:    DEFAULT_RESULT_ON_MEMORY='MEM'
+    DEFAULT_RESULT_ON_TIME='TLE'
+    DEFAULT_RESULT_ON_MEMORY='MEM'
     @default_kwargs
     def __init__(self, input_path=None, answer_path=None, **kwargs):
         super().__init__(**kwargs)

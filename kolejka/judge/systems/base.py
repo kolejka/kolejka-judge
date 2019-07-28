@@ -1,23 +1,25 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+from contextlib import ExitStack
+from copy import deepcopy
+import datetime
+import grp
 import json
 import logging
 import os
 import pathlib
+import pwd
 import shutil
 import subprocess
 import sys
 import tempfile
 import threading
 import time
-from contextlib import ExitStack
-from copy import deepcopy
-from datetime import timedelta
-from json import JSONEncoder
 assert sys.version_info >= (3, 6)
 
 
 from kolejka.judge.exceptions import *
 from kolejka.judge.paths import *
+from kolejka.judge.result import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
@@ -34,7 +36,6 @@ class SystemBase(AbstractSystem):
         self._users = set()
         self._groups = set()
         self._paths = set()
-        self._variables = dict()
         self.validators = self.Validators(self)
 
     @property
@@ -87,8 +88,8 @@ class SystemBase(AbstractSystem):
         return self.get_paths()
     def get_paths(self):
         return self._paths
-    def add_path(self, path: str):
-        self._paths.add(path)
+    def add_path(self, path):
+        self._paths.add(str(get_input_path(path).path))
 
     @property
     def log_directory(self) -> OutputPath:
@@ -132,7 +133,7 @@ class SystemBase(AbstractSystem):
         return ''.join([ self.resolve(part, work_directory=work_directory) for part in obj ])
     
     def update_limits(self, limits: Optional[AbstractLimits] =None) -> AbstractLimits:
-        raise NotImplementedError
+        return limits
 
     def run_step(self, step, name):
         if isinstance(step, AbstractCommand):
@@ -151,7 +152,7 @@ class SystemBase(AbstractSystem):
         return 'OK', result
 
     def run_command(self, command: AbstractCommand, name: str):
-        self.validators.set_work_directory(command.get_work_directory())
+        self.validators.set_work_directory(command.work_directory)
         command.set_name(name)
         command.set_system(self)
         command.sequence_id
@@ -184,22 +185,37 @@ class SystemBase(AbstractSystem):
                 logging.info(debug_line)
                 command_file.write('\n\nResolved command line:\n')
                 command_file.write(debug_line+'\n')
-            limits = self.update_limits(command.limits)
-            environment = command.update_environment(self.environment)
-            result = self.execute_command(
-                command_line,
-                command.stdin_path,
-                command.stdout_path,
-                command.stdout_append,
-                command.stderr_path,
-                command.stderr_append,
-                environment,
-                command.work_path,
-                command.user,
-                command.group,
-                limits,
-            )
-            command.set_result(result)
+                limits = self.update_limits(command.limits)
+                environment = command.update_environment(self.environment)
+                result = Result(
+                        args = command_line,
+                        work_directory = command.work_path,
+                        environment = environment,
+                        user = command.user,
+                        group = command.group,
+                        limits = limits,
+                        stdin = command.stdin_path,
+                        stdout = command.stdout_path,
+                        stderr = command.stderr_path,
+                    )
+                self.execute_command(
+                    command_line,
+                    command.stdin_path,
+                    command.stdout_path,
+                    command.stdout_append,
+                    command.stderr_path,
+                    command.stderr_append,
+                    environment,
+                    command.work_path,
+                    command.user,
+                    command.group,
+                    limits,
+                    result,
+                )
+                command.set_result(result)
+                command_file.write('\n\nResult:\n')
+                command_file.write(repr(result)+'\n')
+
             exit_status = command.verify_postconditions()
 
         self.validators.set_work_directory(None)
@@ -213,9 +229,6 @@ class SystemBase(AbstractSystem):
         task.set_system(self)
         task.verify_prerequirements()
         return task.execute()
-
-    def set_variable(self, variable_name, value):
-        self.variables[variable_name] = value
 
     def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None):
         if not isinstance(path, pathlib.Path):
@@ -236,9 +249,6 @@ class SystemBase(AbstractSystem):
             return None
         if user is None and group is None:
             return None
-
-        import pwd
-        import grp
         uid = pwd.getpwnam(user).pw_uid if user is not None else None
         gid = grp.getgrnam(group).gr_gid if group is not None else None
         groups = [ gid ]
@@ -248,26 +258,67 @@ class SystemBase(AbstractSystem):
 
         def change_user():
             try:
-                os.setsid()
                 if groups is not None:
                     os.setgroups(groups)
                 if gid is not None:
                     os.setgid(gid)
                 if uid is not None:
                     os.setuid(uid)
+                os.setsid()
             except OSError:
                 pass
 
         return change_user
 
     class Validators:
-        def __init__(self, system):
-            self.system = system
+        def __init__(self, system, path=None):
+            self._system = system
+            self._work_directory = get_output_path(path or '.')
 
+        @property
+        def system(self) -> AbstractSystem:
+            return self.get_system()
+        def get_system(self):
+            return self._system
+
+        @property
+        def work_directory(self) -> OutputPath:
+            return self.get_work_directory()
+        def get_work_directory(self):
+            return self._work_directory
         def set_work_directory(self, path):
-            self.work_directory = path
+            self._work_directory = get_output_path(path or '.')
+
+        def resolve_path(self, path: Optional[AbstractPath]) -> pathlib.Path:
+            return self.system.resolve_path(path, work_directory=self.work_directory)
 
         def noop_validator(self, *args, **kwargs) -> bool:
+            return True
+
+        def file_exists(self, path) -> bool:
+            if isinstance(path, InputPath):
+                return self.system_path_exists(path)
+            path = self.resolve_path(path)
+            return path.is_file() or path == pathlib.Path('/dev/null')
+
+        def directory_exists(self, path) -> bool:
+            return self.resolve_path(path).is_dir()
+
+        def program_exists(self, path) -> bool:
+            path = self.resolve_path(path)
+            return path.is_file() and ( path.stat().st_mode & 0o111 )
+
+        def file_empty(self, path) -> bool:
+            path = self.resolve_path(path)
+            return not path.is_file() or path.stat().st_size < 1
+
+        def file_does_not_match(self, path, regexes) -> bool:
+            path = self.resolve_path(path)
+            with path.open() as path_file:
+                for line in path_file:
+                    for regex in regexes:
+                        if regex.fullmatch(line):
+                            return False
             return True
 
         def system_group_exists(self, group):
@@ -275,6 +326,13 @@ class SystemBase(AbstractSystem):
 
         def system_user_exists(self, user):
             return user in self.system.users
+
+        def system_path_exists(self, path):
+            path = str(get_input_path(path).path)
+            return path in self.system.paths or path=='/dev/null' or True #TODO: enforce paths
+
+        def system_program_exists(self, path):
+            return shutil.which(path) is not None
 
         def __getattr__(self, item):
             return self.noop_validator
