@@ -1,6 +1,7 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 from copy import deepcopy
 import pathlib
+import pwd
 import sys
 assert sys.version_info >= (3, 6)
 
@@ -90,7 +91,17 @@ class CommandBase(AbstractCommand):
     def environment(self) -> Dict[str, Optional[Resolvable]]:
         return self.get_environment()
     def get_environment(self):
-        return self._environment
+        environment = deepcopy(self._environment)
+        environment['PWD'] = self.work_directory
+        environment['SHELL'] = '/bin/bash'
+        if self.user:
+            environment['USER'] = self.user
+            environment['USERNAME'] = self.user
+            environment['LOGNAME'] = self.user
+            home = pwd.getpwnam(self.user).pw_name
+            environment['HOME'] = home 
+            environment['XDG_RUNTIME_DIR'] = home
+        return environment
 
     @property
     def user(self) -> Optional[str]:
@@ -264,7 +275,7 @@ class CommandBase(AbstractCommand):
                 del result[key]
             else:
                 result[key] = self.resolve(value)
-        return environment
+        return result
 
 
 class ExecutableCommand(CommandBase):

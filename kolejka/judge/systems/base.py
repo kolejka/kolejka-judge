@@ -48,10 +48,7 @@ class SystemBase(AbstractSystem):
     def program_path(self) -> str:
         return self.get_program_path()
     def get_program_path(self):
-        if self.superuser:
-            return '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-        else:
-            return '/usr/local/bin:/usr/bin:/bin'
+        return '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
     @property
     def environment(self) -> Dict[str, Optional[Resolvable]]:
@@ -59,6 +56,7 @@ class SystemBase(AbstractSystem):
     def get_environment(self):
         environment = deepcopy(self._environment)
         environment['PATH'] = self.program_path
+        environment['LANG'] = 'en_US.UTF-8'
         return environment
 
     @property
@@ -244,6 +242,8 @@ class SystemBase(AbstractSystem):
         return path.open(mode)
 
     def get_uid_gid_groups(self, user=None, group=None):
+        if not self.superuser:
+            return None, None, None
         uid = pwd.getpwnam(user).pw_uid if user is not None else None
         gid = grp.getgrnam(group).gr_gid if group is not None else None
         groups = [ gid ] if group is not None else None
