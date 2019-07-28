@@ -9,6 +9,7 @@ from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 from kolejka.judge.tasks.base import *
 from kolejka.judge.systems.base import *
+from kolejka.judge import config
 
 
 __all__ = [ 'RulesTask', 'SolutionSourceRulesTask', 'SolutionBuildRulesTask' ]
@@ -35,14 +36,14 @@ class RulesTask(TaskBase):
 
 
 class SolutionSourceRulesTask(RulesTask):
-    DEFAULT_TARGET='solution/src'
+    DEFAULT_TARGET=config.SOLUTION_SOURCE
     @default_kwargs
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
 class SolutionBuildRulesTask(RulesTask):
-    DEFAULT_TARGET='solution/build'
+    DEFAULT_TARGET=config.SOLUTION_BUILD
     @default_kwargs
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

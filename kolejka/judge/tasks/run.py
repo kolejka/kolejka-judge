@@ -10,6 +10,7 @@ from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 from kolejka.judge.commands.base import *
 from kolejka.judge.tasks.base import TaskBase
+from kolejka.judge import config
 
 
 __all__ = [ 'ExecutableTask', 'SolutionExecutableTask', 'ToolExecutableTask', ]
@@ -91,8 +92,8 @@ class ExecutableTask(TaskBase):
 
 
 class SolutionExecutableTask(ExecutableTask):
-    DEFAULT_EXECUTABLE='solution/run'
-    DEFAULT_ANSWER_PATH='test/answer'
+    DEFAULT_EXECUTABLE=config.SOLUTION_EXEC
+    DEFAULT_ANSWER_PATH=config.TEST_ANSWER
     DEFAULT_RESULT_ON_ERROR='RTE'
     DEFAULT_RESULT_ON_TIME='TLE'
     DEFAULT_RESULT_ON_MEMORY='MEM'
@@ -107,7 +108,7 @@ class SolutionExecutableTask(ExecutableTask):
         return self.answer_path
 
 class ToolExecutableTask(ExecutableTask):
-    DEFAULT_EXECUTABLE='tool/{tool_name}'
+    DEFAULT_EXECUTABLE=config.TOOL_EXEC
     DEFAULT_RESULT_ON_ERROR='INT'
     @default_kwargs
     def __init__(self, tool_name, **kwargs):
