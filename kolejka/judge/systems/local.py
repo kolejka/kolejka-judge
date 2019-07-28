@@ -20,7 +20,6 @@ from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
 from kolejka.judge.systems.base import SystemBase
 

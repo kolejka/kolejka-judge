@@ -17,7 +17,6 @@ assert sys.version_info >= (3, 6)
 
 from kolejka.judge.typing import *
 from kolejka.judge.commands.base import CommandBase
-from kolejka.judge.lazy import DependentExpr
 from kolejka.judge.tasks.base import TaskBase
 from kolejka.judge.systems.base import SystemBase
 from kolejka.judge.systems.local import LocalSystemValidatorsMixin

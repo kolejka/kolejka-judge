@@ -25,7 +25,6 @@ class Checking:
     def __getitem__(self, key):
         return self.steps[key]
 
-    # requires python3.6 for kwargs order preservation
     def add_steps(self, *args, **kwargs):
         steps = {}
 

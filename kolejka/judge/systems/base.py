@@ -21,8 +21,6 @@ from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
-from kolejka.judge.lazy import DependentExpr
-
 
 __all__ = [ 'SystemBase' ]
 def __dir__():
