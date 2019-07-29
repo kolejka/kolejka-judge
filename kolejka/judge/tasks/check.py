@@ -1,10 +1,9 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 import glob
 import shlex
-import sys
-assert sys.version_info >= (3, 6)
 
 
+from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *

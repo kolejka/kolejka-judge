@@ -3,11 +3,10 @@ from contextlib import ExitStack
 import datetime
 import os
 import subprocess
-import sys
 import tempfile
-assert sys.version_info >= (3, 6)
 
 
+from kolejka.judge import config
 from kolejka.judge.systems.base import *
 from kolejka.judge.parse import *
 

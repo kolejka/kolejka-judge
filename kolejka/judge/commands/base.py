@@ -2,10 +2,8 @@
 from copy import deepcopy
 import pathlib
 import pwd
-import sys
-assert sys.version_info >= (3, 6)
 
-
+from kolejka.judge import config
 from kolejka.judge.exceptions import *
 from kolejka.judge.limits import *
 from kolejka.judge.paths import *

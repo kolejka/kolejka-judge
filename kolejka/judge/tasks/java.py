@@ -1,8 +1,11 @@
+# vim:ts=4:sts=4:sw=4:expandtab
 import os
 import re
 import shutil
 from pathlib import Path
 
+
+from kolejka.judge import config
 from kolejka.judge.typing import *
 from kolejka.judge.tasks.base import TaskBase
 

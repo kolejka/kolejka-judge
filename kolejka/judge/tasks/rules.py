@@ -1,15 +1,13 @@
 # vim:ts=4:sts=4:sw=4:expandtab
-import sys
-assert sys.version_info >= (3, 6)
 
 
+from kolejka.judge import config
 from kolejka.judge.parse import *
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 from kolejka.judge.tasks.base import *
 from kolejka.judge.systems.base import *
-from kolejka.judge import config
 
 
 __all__ = [ 'RulesTask', 'SolutionSourceRulesTask', 'SolutionBuildRulesTask' ]

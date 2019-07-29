@@ -1,9 +1,9 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 from copy import deepcopy
-import sys
 from typing import Any, Callable, Dict, Generator, List, Optional, Sequence, Set, Tuple, Union
-assert sys.version_info >= (3, 6)
 
+
+from kolejka.judge import config
 
 __all__ = [ 'AbstractCommand', 'AbstractTask', 'AbstractSystem', 'AbstractLimits', 'AbstractResult', 'AbstractPath', 'Resolvable', 'default_kwargs', ]
 __all__ += [ 'Any', 'Callable', 'Dict', 'Generator', 'List', 'Optional', 'Sequence', 'Set', 'Tuple', 'Union', ]
@@ -50,6 +50,7 @@ class default_kwargs:
             for key, val in cls.__dict__.items():
                 if key.startswith('DEFAULT_'):
                     key = key[8:].lower()
-                    kwargs[key] = kwargs.get(key, deepcopy(val))
+                    if val is not None:
+                        kwargs[key] = kwargs.get(key, val)
             return fn(self, *args, **kwargs)
         setattr(owner, name, fun)

@@ -1,9 +1,8 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 from copy import deepcopy
-import sys
-assert sys.version_info >= (3, 6)
 
 
+from kolejka.judge import config
 from kolejka.judge.commands.system import *
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
@@ -14,7 +13,6 @@ from kolejka.judge.tasks.prepare import *
 from kolejka.judge.tasks.run import *
 from kolejka.judge.tasks.system import *
 from kolejka.judge.systems.base import SystemBase
-from kolejka.judge import config
 
 
 __all__ = [ 'ToolTask', 'GeneratorTask', 'VerifierTask', 'HinterTask', 'CheckerTask' ]
@@ -33,8 +31,8 @@ class ToolTask(TaskBase):
             arguments=None, input_path=None, output_path=None, error_path=None,
             **kwargs):
 
-        self._tool_name = tool_name
         super().__init__(**kwargs)
+        self._tool_name = tool_name
         self._user_name = user_name
         self._group_name = group_name
 

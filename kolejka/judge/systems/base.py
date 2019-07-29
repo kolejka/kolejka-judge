@@ -10,13 +10,12 @@ import pathlib
 import pwd
 import shutil
 import subprocess
-import sys
 import tempfile
 import threading
 import time
-assert sys.version_info >= (3, 6)
 
 
+from kolejka.judge import config
 from kolejka.judge.exceptions import *
 from kolejka.judge.paths import *
 from kolejka.judge.result import *

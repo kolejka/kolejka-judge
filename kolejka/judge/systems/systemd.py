@@ -5,12 +5,10 @@ import os
 import random
 import string
 import subprocess
-import sys
 import threading
 import time
-assert sys.version_info >= (3, 6)
 
-
+from kolejka.judge import config
 from kolejka.judge.systems.local import LocalSystem
 
 def monitor_process(unit, superuser, limits, result):

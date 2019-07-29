@@ -1,8 +1,7 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 import datetime
-import sys
-assert sys.version_info >= (3, 6)
 
+from kolejka.judge import config
 from kolejka.judge.parse import *
 from kolejka.judge.typing import *
 
