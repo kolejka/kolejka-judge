@@ -98,9 +98,10 @@ class CommandBase(AbstractCommand):
             environment['USER'] = self.user
             environment['USERNAME'] = self.user
             environment['LOGNAME'] = self.user
-            home = pwd.getpwnam(self.user).pw_name
-            environment['HOME'] = home 
-            environment['XDG_RUNTIME_DIR'] = home
+            home = self.system.get_home(self.user)
+            if home:
+                environment['HOME'] = home 
+                environment['XDG_RUNTIME_DIR'] = home
         return environment
 
     @property
@@ -117,7 +118,7 @@ class CommandBase(AbstractCommand):
 
     @property
     def superuser(self) -> bool:
-        return self.get_superuser()
+        return self.system.superuser and self.get_superuser()
     def get_superuser(self):
         return self._superuser
 

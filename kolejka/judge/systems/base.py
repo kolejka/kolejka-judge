@@ -30,12 +30,13 @@ def __dir__():
 
 
 class SystemBase(AbstractSystem):
-    def __init__(self, output_directory, environment=None):
-        self._output_directory = pathlib.Path(output_directory).resolve()
+    def __init__(self, output_directory=None, environment=None, paths=None):
+        self._output_directory = pathlib.Path(output_directory or '.').resolve()
         self._environment = dict(environment or {})
         self._users = set()
+        self._users_homes = dict()
         self._groups = set()
-        self._paths = set()
+        self._paths = set(paths or [])
         self.validators = self.Validators(self)
 
     @property
@@ -70,8 +71,9 @@ class SystemBase(AbstractSystem):
         return self.get_users()
     def get_users(self):
         return self._users
-    def add_user(self, user: str):
+    def add_user(self, user: str, home: str):
         self._users.add(user)
+        self._users_homes[user] = home
 
     @property
     def groups(self) -> Set[str]:
@@ -244,11 +246,26 @@ class SystemBase(AbstractSystem):
     def get_uid_gid_groups(self, user=None, group=None):
         if not self.superuser:
             return None, None, None
-        uid = pwd.getpwnam(user).pw_uid if user is not None else None
-        gid = grp.getgrnam(group).gr_gid if group is not None else None
-        groups = [ gid ] if group is not None else None
+        uid = None
+        gid = None
+        groups = None
+        try:
+            uid = pwd.getpwnam(user).pw_uid if user is not None else None
+        except:
+            pass
+        try:
+            gid = grp.getgrnam(group).gr_gid if group is not None else None
+        except:
+            pass
+        try:
+            groups = [ gid ] if group is not None else None
+        except:
+            pass
         if user:
-            groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
+            try:
+                groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
+            except:
+                pass
         return (uid, gid, groups)
 
     @staticmethod
@@ -271,6 +288,17 @@ class SystemBase(AbstractSystem):
             except OSError:
                 pass
         return change_user
+
+    def get_home(self, user=None):
+        if user is None:
+            return None
+        home = self._users_homes.get(user, None)
+        if home is None:
+            try:
+                home = pwd.getpwnam(user).pw_home
+            except:
+                pass
+        return home
 
     class Validators:
         def __init__(self, system, path=None):
@@ -331,7 +359,7 @@ class SystemBase(AbstractSystem):
 
         def system_path_exists(self, path):
             path = str(get_input_path(path).path)
-            return path in self.system.paths or path=='/dev/null' or True #TODO: enforce paths
+            return path in self.system.paths or path=='/dev/null'
 
         def system_program_exists(self, path):
             return shutil.which(path) is not None

@@ -58,6 +58,8 @@ class UserAddCommand(ProgramCommand):
     def get_command(self):
         if self.superuser:
             return super().get_command()
+        else:
+            return [ 'mkdir', '-p', self.home, ]
     def get_program_arguments(self):
         args = []
         args += [ '--comment', self.comment, ]
@@ -104,9 +106,9 @@ class DirectoryAddCommand(CommandBase):
         return str(self.mode)
     def get_command(self):
         command = [ 'install' ]
-        if self.user_name is not None:
+        if self.superuser and self.user_name is not None:
             command += [ '--owner', str(self.user_name) ]
-        if self.group_name is not None:
+        if self.superuser and self.group_name is not None:
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
@@ -135,9 +137,9 @@ class InstallCommand(CommandBase):
         return str(self.mode)
     def get_command(self):
         command = [ 'install' ]
-        if self.user_name is not None:
+        if self.superuser and self.user_name is not None:
             command += [ '--owner', str(self.user_name) ]
-        if self.group_name is not None:
+        if self.superuser and self.group_name is not None:
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]

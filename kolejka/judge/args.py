@@ -4,10 +4,12 @@ import glob
 import logging
 import pathlib
 import sys
-assert sys.version_info >= (3, 6)
+import urllib.request
 
 
+from kolejka.judge import config
 from kolejka.judge import ctxyaml
+from kolejka.judge.paths import *
 from kolejka.judge.systems import *
 
 
@@ -35,6 +37,7 @@ def known_systems():
 
 def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--update', action='store_true', default=False, help='update Kolejka Judge library')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='show more info')
     parser.add_argument('-d', '--debug', action='store_true', default=False, help='show debug info')
     envs = known_systems()
@@ -56,13 +59,13 @@ def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
         parser.add_argument('--solution', default=solution[0], type=str, help='Solution file')
     else:
         parser.add_argument('--solution', required=True, type=str, help='Solution file')
-    parser.add_argument('--output-dir', default='results', type=str, help='Output directory')
+    parser.add_argument('--output-directory', default='results', type=str, help='Output directory')
     parser.add_argument('--results', default='results.yaml', type=str, help='Results file')
     return parser
 
 
 def write_results(args, results):
-    results = (args.output_dir / args.results).resolve()
+    results = (args.output_directory / args.results).resolve()
     results.parent.mkdir(parents=True, exist_ok=True)
     with results.open('w') as results_file:
         ctxyaml.dump(results, results_file)
@@ -78,6 +81,15 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
     if args.debug:
         level=logging.DEBUG
     logging.basicConfig(level=level)
+
+    if args.update:
+        with urllib.request.urlopen(config.DISTRIBUTION_ADDRESS) as library_request:
+            if library_request.status == 200 and library_request.reason == 'OK':
+                library_data = library_request.read()
+                with open('KolejkaJudge.zip', 'wb') as library_file:
+                    library_file.write(library_data)
+                logging.warning('New Kolejka Judge library installed')
+                sys.exit(0)
 
     if not pathlib.Path(args.tests).is_file():
         parser.error('TESTS file {} does not exist'.format(args.tests))
@@ -96,6 +108,21 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
             }
     except:
         parser.error('TEST {} does not exist in TESTS file {}'.format(args.test, args.tests))
+
+    input_paths = dict()
+    for id, test in tests.items():
+        input_paths[id] = set()
+        def collect(a):
+            if isinstance(a, ctxyaml.Blob):
+                input_paths[id].add(str(get_input_path(a).path))
+            if isinstance(a, list):
+                for b in a:
+                    collect(b)
+            if isinstance(a, dict):
+                for k,v in a.items():
+                    collect(k)
+                    collect(v)
+        collect(test)
     
     if not pathlib.Path(args.solution).is_file():
         parser.error('SOLUTION file {} does not exist'.format(args.solution))
@@ -103,14 +130,14 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
     if not args.system in envs:
         parser.error('Execution system {} does not exist'.format(args.system))
 
-    pathlib.Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-    if not pathlib.Path(args.output_dir).is_dir():
-        parser.error('Output directory {} is not a directory'.format(args.output_dir))
+    pathlib.Path(args.output_directory).mkdir(parents=True, exist_ok=True)
+    if not pathlib.Path(args.output_directory).is_dir():
+        parser.error('Output directory {} is not a directory'.format(args.output_directory))
 
     solution = pathlib.Path(args.solution).resolve()
     results = pathlib.Path(args.results).resolve()
     system = envs[args.system]
-    output_dir = pathlib.Path(args.output_dir).resolve()
+    output_directory = pathlib.Path(args.output_directory).resolve()
 
 
-    return argparse.Namespace(tests=tests, solution=solution, results=results, system=system, output_dir=output_dir)
+    return argparse.Namespace(tests=tests, input_paths=input_paths, solution=solution, results=results, system=system, output_directory=output_directory)

@@ -88,7 +88,10 @@ class SystemPrepareTask(TaskBase):
             name = user['user_name']
             cmd_name = 'usr_'+name
             self.run_command(cmd_name, UserAddCommand, **user)
-            self.system.add_user(name)
+            home = user.get('home', None)
+            if home:
+                home = str(self.resolve_path(home))
+            self.system.add_user(name, home)
         for directory in self.directories.values():
             cmd_name = 'dir_'+str(directory['path']).replace('/', '_')
             self.run_command(cmd_name, DirectoryAddCommand, **directory)

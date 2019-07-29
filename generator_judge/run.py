@@ -19,15 +19,16 @@ args = kolejka.judge.parse_args()
 results = dict()
 
 for test_id, test in args.tests.items():
-    checking = kolejka.judge.Checking(system=args.system(args.output_dir / str(test_id)))
+    checking = kolejka.judge.Checking(system=args.system(output_directory = args.output_directory / str(test_id), paths=args.input_paths[test_id]))
+    checking.system.add_path(args.solution)
     checking.add_steps(
-        prepare=SystemPrepareTask(default_logs=False),
+        prepare=SystemPrepareTask(default_logs=True),
         source=SolutionPrepareTask(source=get_input_path(args.solution), allow_extract=True, override=test.get('environment', None), limit_real_time='5s'),
         source_rules=SolutionSourceRulesTask(max_size='10K'),
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],
             [SolutionBuildMakeTask, [], {}],
-            [SolutionBuildGXXTask, [], {'version': '7', 'standard': 'c++17', 'static': True}],
+            [SolutionBuildGXXTask, [], {'standard': 'c++14',}],
         ], limit_real_time='30s', limit_memory='256M'),
         build_rules=SolutionBuildRulesTask(max_size='10M'),
     )
@@ -64,7 +65,8 @@ for test_id, test in args.tests.items():
             checker=AnswerHintDiffTask(hint_path=hint_path, answer_path=answer_path)
         )
     status, res = checking.run()
-    results[test_id] = checking.format_result(res)
+    results[test_id] = res
     print(test_id, status)
 
+print(results)
 kolejka.judge.write_results(args, results)
