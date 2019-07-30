@@ -165,15 +165,6 @@ class SystemBase(AbstractSystem):
         command_line = command.resolved_command
         if command_line:
             with self.write_file(command.get_log_path('cmd')) as command_file:
-                stdin_out = command.stdin
-                if isinstance(stdin_out, RelativePath):
-                    stdin_out = command.work_directory / stdin_out
-                stdout_out = command.stdout
-                if isinstance(stdout_out, RelativePath):
-                    stdout_out = command.work_directory / stdout_out
-                stderr_out = command.stderr
-                if isinstance(stderr_out, RelativePath):
-                    stderr_out = command.work_directory / stderr_out
                 command_file.write('Command:\n')
                 command_file.write(repr(command)+'\n')
                 command_file.write('\n\nCommand line:\n')
@@ -204,9 +195,9 @@ class SystemBase(AbstractSystem):
                         user = command.user,
                         group = command.group,
                         limits = limits,
-                        stdin = stdin_out,
-                        stdout = stdout_out,
-                        stderr = stderr_out,
+                        stdin = command.stdin_path,
+                        stdout = command.stdout_path,
+                        stderr = command.stderr_path,
                     )
                 self.execute_command(
                     command_line,

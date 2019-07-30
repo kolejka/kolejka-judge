@@ -6,7 +6,6 @@ import yaml
 
 from kolejka.judge import config
 from kolejka.judge.parse import *
-from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 
 class Loader(yaml.SafeLoader):
@@ -66,7 +65,7 @@ def _load(value, root):
         if isinstance(value, t):
             return t([_load(e, root) for e in value])
     if isinstance(value, _File):
-        return get_input_path((root / value.file).resolve())
+        return (root / value.file).resolve()
     if isinstance(value, _Include):
         return ctxyaml_load(root / value.include)
     raise ValueError('Type {} is not supported by ctxyaml.'.format(type(value)))
@@ -95,9 +94,11 @@ def _dump(value, output_dir, root):
     for t in [ list, tuple, ]:
         if isinstance(value, t):
             return t([_dump(e, output_dir, root) for e in value])
-    if isinstance(value, OutputPath):
-        value = (output_dir / value.path).resolve().relative_to(root)
-        return _File(value)
+    if isinstance(value, pathlib.Path):
+        try:
+            return _File((output_dir / value).resolve().relative_to(root))
+        except:
+            return None
     raise ValueError('Type {} is not supported by ctxyaml.'.format(type(value)))
 
 

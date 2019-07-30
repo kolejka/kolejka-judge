@@ -30,9 +30,9 @@ class Result(AbstractResult):
         self._user = user and str(user)
         self._group = group and str(group)
         self._limits = limits or get_limits()
-        self._stdin = stdin
-        self._stdout = stdout
-        self._stderr = stderr
+        self._stdin = stdin and pathlib.Path(stdin)
+        self._stdout = stdout and pathlib.Path(stdout)
+        self._stderr = stderr and pathlib.Path(stderr)
         self._status = status
 
     def __repr__(self):
@@ -57,11 +57,11 @@ class Result(AbstractResult):
         yaml['work_directory'] = self.work_directory
         yaml['environment'] = self.environment
         yaml['limits'] = self.limits and self.limits.yaml or None
-        if isinstance(self.stdin, OutputPath):
+        if self.stdin and str(self.stdin) != '/dev/null':
             yaml['stdin'] = self.stdin
-        if isinstance(self.stdout, OutputPath):
+        if self.stdout and str(self.stdout) != '/dev/null':
             yaml['stdout'] = self.stdout
-        if isinstance(self.stderr, OutputPath):
+        if self.stderr and str(self.stderr) != '/dev/null':
             yaml['stderr'] = self.stderr
         yaml['cpu_time'] = unparse_time(self.cpu_time)
         yaml['real_time'] = unparse_time(self.real_time)

@@ -109,15 +109,14 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
     for id, test in tests.items():
         input_paths[id] = set()
         def collect(a):
-            if isinstance(a, InputPath):
-                input_paths[id].add(str(a.path))
+            if isinstance(a, pathlib.Path):
+                input_paths[id].add(str(a))
+                return get_input_path(a)
             if isinstance(a, list):
-                for b in a:
-                    collect(b)
+                return [ collect(e) for e in a ]
             if isinstance(a, dict):
-                for k,v in a.items():
-                    collect(k)
-                    collect(v)
+                return dict( [ (collect(k), collect(v)) for k,v in a.items() ] )
+            return a
         collect(test)
     
     if not pathlib.Path(args.solution).is_file():
