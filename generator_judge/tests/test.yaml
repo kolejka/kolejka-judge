@@ -1,0 +1,2 @@
+!include : common_test.yaml
+hinter:    !file sol.cpp

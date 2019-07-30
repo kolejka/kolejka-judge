@@ -1,82 +1,142 @@
+# vim:ts=4:sts=4:sw=4:expandtab
+from pathlib import Path
 import re
-from kolejka.judge.environments import ExecutionEnvironment
 
 
-class ExitCodePostcondition:
+from kolejka.judge import config
+from kolejka.judge.parse import *
+
+
+class ReturnCodePostcondition:
     def __init__(self, allowed_codes=None):
         self.allowed_codes = allowed_codes or [0]
 
-    def __call__(self, result):
+    def __call__(self, system, result):
         return result.returncode in self.allowed_codes
 
-
-class UsedTimePostcondition:
-    def __init__(self, time):
-        self.time = time
-
-    def __call__(self, result):
-        return result.stats.time.total_seconds() < self.time
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.allowed_codes))
 
 
-class UsedMemoryPostcondition:
-    def __init__(self, memory):
-        self.memory = memory
+class TimeLimitPostcondition:
+    def __init__(self, cpu_time=None, real_time=None):
+        self.cpu_time = cpu_time or parse_time(cpu_time)
+        self.real_time = real_time or parse_time(real_time)
 
-    def __call__(self, result):
-        return result.stats.memory.max_usage < self.memory
+    def __call__(self, system, result):
+        return ( self.cpu_time is None or result.cpu_time < self.cpu_time ) and ( self.real_time is None or result.real_time < self.real_time )
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.cpu_time), repr(self.real_time))
 
 
-class PSQLErrorPostcondition:
-    def __call__(self, result):
+class MemoryLimitPostcondition:
+    def __init__(self, memory=None):
+        self.memory = parse_memory(memory)
+
+    def __call__(self, system, result):
+        return ( self.memory is None or result.memory < self.memory )
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.memory))
+
+
+class EmptyErrorPostcondition:
+    def __call__(self, system, result):
         if result.stderr is not None:
-            with open(result.stderr, 'r') as stderr_file:
-                # 87ccefd52b6a4c9a0d81df42c54535a2.py
-                notice = re.compile('^.*ERROR:')
-                for line in stderr_file:
-                    if notice.match(line.rstrip()):
-                        return False
+            return system.validators.file_empty(result.stderr)
         return True
 
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__)
 
-class NonEmptyListPrerequisite:
-    def __init__(self, lst):
-        self.list = lst
 
-    def __call__(self, environment: ExecutionEnvironment):
-        return len(self.list) > 0
+class ParsedErrorPostcondition:
+    def __init__(self, *args):
+        self.disallowed_lines = [ re.compile(dl) for dl in args ]
+
+    def __call__(self, system, result):
+        if result.stderr is not None:
+            return system.validators.file_does_not_match(result.stderr, self.disallowed_lines)
+        return True
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.list))
+        return '{}({})'.format(self.__class__.__name__, repr(self.disallowed_lines))
 
 
-class FileExistsPrerequisite:
-    def __init__(self, file):
-        self.file = file
+class FileExistsPrerequirement:
+    def __init__(self, path):
+        self.path = path
 
-    def __call__(self, environment: ExecutionEnvironment):
-        return environment.validators.file_exists(self.file)
-
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.file))
-
-
-class ProgramExistsPrerequisite:
-    def __init__(self, file):
-        self.file = file
-
-    def __call__(self, environment: ExecutionEnvironment):
-        return environment.validators.program_exists(self.file)
+    def __call__(self, system):
+        if not self.path:
+            return True
+        return system.validators.file_exists(self.path)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.file))
+        return '{}({})'.format(self.__class__.__name__, repr(self.path))
 
 
-class FileOnARequiredListPrerequisite:
-    def __init__(self, file):
-        self.file = file
+class DirectoryExistsPrerequirement:
+    def __init__(self, path):
+        self.path = path
 
-    def __call__(self, environment: ExecutionEnvironment):
-        return environment.validators.file_on_a_required_list(self.file)
+    def __call__(self, system):
+        if not self.path:
+            return True
+        return system.validators.directory_exists(self.path)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.file))
+        return '{}({})'.format(self.__class__.__name__, repr(self.path))
+
+
+class ProgramExistsPrerequirement:
+    def __init__(self, path):
+        self.path = path
+
+    def __call__(self, system):
+        if not self.path:
+            return True
+        return system.validators.program_exists(self.path)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.path))
+
+
+class SystemProgramExistsPrerequirement:
+    def __init__(self, path):
+        self.path = path
+
+    def __call__(self, system):
+        if not self.path:
+            return True
+        return system.validators.system_program_exists(self.path)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.path))
+
+
+class SystemUserExistsPrerequirement:
+    def __init__(self, user=None):
+        self.user = user
+
+    def __call__(self, system):
+        if not self.user:
+            return True
+        return system.validators.system_user_exists(self.user)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.user))
+
+
+class SystemGroupExistsPrerequirement:
+    def __init__(self, group=None):
+        self.group = group
+
+    def __call__(self, system):
+        if not self.group:
+            return True
+        return system.validators.system_group_exists(self.group)
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__, repr(self.group))

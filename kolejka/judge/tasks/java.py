@@ -1,9 +1,12 @@
+# vim:ts=4:sts=4:sw=4:expandtab
 import os
 import re
 import shutil
 from pathlib import Path
-from typing import Tuple, Optional
 
+
+from kolejka.judge import config
+from kolejka.judge.typing import *
 from kolejka.judge.tasks.base import TaskBase
 
 
@@ -18,7 +21,7 @@ class RenameJavaFile(TaskBase):
 
     def execute(self, environment) -> Tuple[Optional[str], Optional[object]]:
         test_class = ''
-        with self.source_file.open() as file:
+        with environment.get_path(self.source_file).open() as file:
             for line in file.readlines():
                 for p in re.findall(r'^\s*package\s+([^;]+)', line):
                     test_class = p.strip() + '.'
@@ -32,4 +35,4 @@ class RenameJavaFile(TaskBase):
         self.target_directory.mkdir(parents=True, exist_ok=True)
         shutil.move(self.source_file, self.target_directory / file)
 
-        return None, None
+        return self.result
