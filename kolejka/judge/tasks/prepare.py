@@ -17,6 +17,7 @@ def __dir__():
 
 class PrepareTask(TaskBase):
     DEFAULT_SUPERUSER=True
+    DEFAULT_RECORD_RESULT=False
     @default_kwargs
     def __init__(self, source, target, allow_extract=False, user_name=None, group_name=None, override=None, **kwargs):
         super().__init__(**kwargs)
@@ -48,7 +49,8 @@ class PrepareTask(TaskBase):
         if self.user_name or self.group_name:
             cmd_name = 'chown'
             status = status or self.run_command(cmd_name, ChownDirCommand, target=self.target, recursive=True, user_name=self.user_name, group_name=self.group_name)
-        return status, self.result
+        self.set_result(status)
+        return self.result
 
 
 class SolutionPrepareTask(PrepareTask):

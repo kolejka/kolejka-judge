@@ -142,13 +142,15 @@ class SystemBase(AbstractSystem):
         raise RuntimeError('Step is neither Command nor Task')
 
     def run_steps(self, steps):
-        result = {}
+        result = ResultDict()
         for name, step in steps.items():
-            exit_status, result[name] = self.run_step(step, name)
-            if exit_status is not None:
-                return exit_status, result
-
-        return 'OK', result
+            step_result = self.run_step(step, name)
+            result.set(name, step_result)
+            if step_result and step_result.status is not None:
+                result.set_status(step_status.status)
+                return result
+        result.set_status('OK')
+        return result
 
     def run_command(self, command: AbstractCommand, name: str):
         self.validators.set_work_directory(command.work_directory)
@@ -163,6 +165,15 @@ class SystemBase(AbstractSystem):
         command_line = command.resolved_command
         if command_line:
             with self.write_file(command.get_log_path('cmd')) as command_file:
+                stdin_out = command.stdin
+                if isinstance(stdin_out, RelativePath):
+                    stdin_out = command.work_directory / stdin_out
+                stdout_out = command.stdout
+                if isinstance(stdout_out, RelativePath):
+                    stdout_out = command.work_directory / stdout_out
+                stderr_out = command.stderr
+                if isinstance(stderr_out, RelativePath):
+                    stderr_out = command.work_directory / stderr_out
                 command_file.write('Command:\n')
                 command_file.write(repr(command)+'\n')
                 command_file.write('\n\nCommand line:\n')
@@ -193,9 +204,9 @@ class SystemBase(AbstractSystem):
                         user = command.user,
                         group = command.group,
                         limits = limits,
-                        stdin = command.stdin_path,
-                        stdout = command.stdout_path,
-                        stderr = command.stderr_path,
+                        stdin = stdin_out,
+                        stdout = stdout_out,
+                        stderr = stderr_out,
                     )
                 self.execute_command(
                     command_line,
@@ -211,14 +222,15 @@ class SystemBase(AbstractSystem):
                     limits,
                     result,
                 )
-                command.set_result(result)
                 command_file.write('\n\nResult:\n')
                 command_file.write(repr(result)+'\n')
 
+            command.set_result(result)
             exit_status = command.verify_postconditions()
+            result.set_status(exit_status)
 
         self.validators.set_work_directory(None)
-        return exit_status, result
+        return result
 
     def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits):
         raise NotImplementedError
@@ -227,7 +239,8 @@ class SystemBase(AbstractSystem):
         task.set_name(name)
         task.set_system(self)
         task.verify_prerequirements()
-        return task.execute()
+        result = task.execute()
+        return result
 
     def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None):
         if not isinstance(path, pathlib.Path):

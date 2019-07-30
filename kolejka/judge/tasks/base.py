@@ -6,6 +6,7 @@ from kolejka.judge import config
 from kolejka.judge.exceptions import *
 from kolejka.judge.limits import *
 from kolejka.judge.paths import *
+from kolejka.judge.result import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
@@ -16,7 +17,7 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, superuser=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, superuser=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True):
         self._name = name
         self._system = system
         self._work_directory = work_directory
@@ -45,8 +46,9 @@ class TaskBase(AbstractTask):
         self._result_on_error = result_on_error
         self._result_on_time = result_on_time
         self._result_on_memory = result_on_memory
+        self._record_result = bool(record_result)
         self._commands = dict()
-        self._result = dict()
+        self._result = ResultDict()
         self._prerequirements = list()
 
     def __repr__(self):
@@ -149,12 +151,22 @@ class TaskBase(AbstractTask):
         return self._result_on_memory
 
     @property
-    def result(self) -> Dict[str, Any]:
+    def record_result(self) -> bool:
+        return self.get_record_result()
+    def get_record_result(self):
+        return self._record_result
+
+    @property
+    def result(self) -> ResultDict:
         return self.get_result()
     def get_result(self):
-        return self._result
-    def set_result(self, name: str, value):
-        self._result[name] = value
+        if self.record_result:
+            return self._result
+    def set_result(self, status =None, name: Optional[str] =None, value: Optional[Any] =None):
+        if status is not None:
+            self._result.set_status(status)
+        if name is not None:
+            self._result.set(name, value)
 
     @property
     def commands(self) -> Dict[str, AbstractCommand]:
@@ -234,10 +246,10 @@ class TaskBase(AbstractTask):
             cmd.add_prerequirement(requirement)
         for condition in self.command_postconditions:
             cmd.add_postcondition(*condition)
-        status, result = self.system.run_command(cmd, name=cmd_name)
-        self.set_result(name, result)
+        result = self.system.run_command(cmd, name=cmd_name)
+        self.set_result(None, name, result)
         self.set_command(name, cmd)
-        return status
+        return result and result.status
 
     def execute(self) -> Tuple[Optional[str], Optional[AbstractResult]]:
         raise NotImplementedError

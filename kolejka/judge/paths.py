@@ -4,25 +4,11 @@ import pathlib
 
 from kolejka.judge import config
 from kolejka.judge.typing import *
-from kolejka.judge.ctxyaml import Blob
 
 __all__ = [ 'PathBase', 'InputPath', 'OutputPath', 'RelativePath', 'get_input_path', 'get_output_path', 'get_relative_path' ]
 def __dir__():
     return __all__
 
-
-_inner_path = None
-_inner_relative = None
-_inner_input = None
-_inner_output = None
-def _path(obj):
-    return _inner_path(obj)
-def _relative(obj):
-    return _inner_relative(obj)
-def _input(obj):
-    return _inner_input(obj)
-def _output(obj):
-    return _inner_output(obj)
 
 class PathBase(AbstractPath):
     @property
@@ -113,52 +99,38 @@ class OutputPath(PathBase):
         return _output( _path(self).parent )
 
 
-class _InnerPath:
-    def __call__(self, obj):
-        for cls in [ RelativePath, InputPath, OutputPath, ]:
-            if isinstance(obj, cls):
-                return pathlib.PurePath(obj._path)
-        for cls in [ Blob, ]:
-            if isinstance(obj, cls):
-                return pathlib.PurePath(obj.path)
-        for cls in [ str, bytes, pathlib.PurePath,]:
-            if isinstance(obj, cls):
-                return pathlib.PurePath(obj)
-        raise ValueError(repr(obj)+" is not a path")
-_inner_path = _InnerPath()
-class _RelativePath:
-    def __call__(self, obj):
-        for cls in [ RelativePath, ]:
-            if isinstance(obj, cls):
-                return RelativePath(obj._path)
-        for cls in [ str, bytes, pathlib.PurePath,]:
-            if isinstance(obj, cls):
-                return RelativePath(obj)
-        raise ValueError(repr(obj)+" is not a relative path")
-_inner_relative = _RelativePath()
-class _InputPath:
-    def __call__(self, obj):
-        for cls in [ InputPath, ]:
-            if isinstance(obj, cls):
-                return InputPath(obj._path)
-        for cls in [ Blob, ]:
-            if isinstance(obj, cls):
-                return InputPath(obj.path)
-        for cls in [ str, bytes, pathlib.PurePath,]:
-            if isinstance(obj, cls):
-                return InputPath(obj)
-        raise ValueError(repr(obj)+" is not an input path")
-_inner_input = _InputPath()
-class _OutputPath:
-    def __call__(self, obj):
-        for cls in [ OutputPath, ]:
-            if isinstance(obj, cls):
-                return OutputPath(obj._path)
-        for cls in [ str, bytes, pathlib.PurePath,]:
-            if isinstance(obj, cls):
-                return OutputPath(obj)
-        raise ValueError(repr(obj)+" is not an output path")
-_inner_output = _OutputPath()
+def _path(obj):
+    for cls in [ RelativePath, InputPath, OutputPath, ]:
+        if isinstance(obj, cls):
+            return pathlib.PurePath(obj._path)
+    for cls in [ str, bytes, pathlib.PurePath,]:
+        if isinstance(obj, cls):
+            return pathlib.PurePath(obj)
+    raise ValueError(repr(obj)+" is not a path")
+def _relative(obj):
+    for cls in [ RelativePath, ]:
+        if isinstance(obj, cls):
+            return RelativePath(obj._path)
+    for cls in [ str, bytes, pathlib.PurePath,]:
+        if isinstance(obj, cls):
+            return RelativePath(obj)
+    raise ValueError(repr(obj)+" is not a relative path")
+def _input(obj):
+    for cls in [ InputPath, ]:
+        if isinstance(obj, cls):
+            return InputPath(obj._path)
+    for cls in [ str, bytes, pathlib.PurePath,]:
+        if isinstance(obj, cls):
+            return InputPath(obj)
+    raise ValueError(repr(obj)+" is not an input path")
+def _output(obj):
+    for cls in [ OutputPath, ]:
+        if isinstance(obj, cls):
+            return OutputPath(obj._path)
+    for cls in [ str, bytes, pathlib.PurePath,]:
+        if isinstance(obj, cls):
+            return OutputPath(obj)
+    raise ValueError(repr(obj)+" is not an output path")
 
 
 def get_input_path(path):

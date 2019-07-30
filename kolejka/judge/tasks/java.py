@@ -35,4 +35,4 @@ class RenameJavaFile(TaskBase):
         self.target_directory.mkdir(parents=True, exist_ok=True)
         shutil.move(self.source_file, self.target_directory / file)
 
-        return None, None
+        return self.result

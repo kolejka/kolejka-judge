@@ -84,9 +84,8 @@ class ExecutableTask(TaskBase):
         return kwargs
 
     def execute(self):
-        status = None
-        status = status or self.run_command('run', ExecutableCommand, executable=self.executable, executable_arguments=self.executable_arguments)
-        return status, self.result
+        self.set_result(self.run_command('run', ExecutableCommand, executable=self.executable, executable_arguments=self.executable_arguments))
+        return self.result
 
 
 class SolutionExecutableTask(ExecutableTask):
@@ -95,6 +94,8 @@ class SolutionExecutableTask(ExecutableTask):
     DEFAULT_RESULT_ON_ERROR='RTE'
     DEFAULT_RESULT_ON_TIME='TLE'
     DEFAULT_RESULT_ON_MEMORY='MEM'
+    DEFAULT_USER=config.USER_EXEC
+    DEFAULT_GROUP=config.USER_EXEC
     @default_kwargs
     def __init__(self, input_path=None, answer_path=None, **kwargs):
         super().__init__(**kwargs)

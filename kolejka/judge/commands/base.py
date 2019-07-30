@@ -236,8 +236,8 @@ class CommandBase(AbstractCommand):
         conditions = []
         conditions += self._postconditions
         return conditions
-    def add_postcondition(self, condition: Callable[[AbstractSystem, AbstractResult], bool], result: str):
-        self._postconditions.append((condition, result))
+    def add_postcondition(self, condition: Callable[[AbstractSystem, AbstractResult], bool], status: str):
+        self._postconditions.append((condition, status))
 
     def verify_prerequirements(self):
         for requirement in self.prerequirements:
@@ -266,15 +266,15 @@ class CommandBase(AbstractCommand):
         return [ self.resolve(part) for part in command ]
     
     def update_environment(self, environment: Dict[str, str] =dict()) -> Dict[str, str]:
-        result = dict()
+        env = dict()
         for key, value in environment.items():
-            result[key] = self.resolve(value)
+            env[key] = self.resolve(value)
         for key, value in self.environment.items():
-            if value is None and key in result:
-                del result[key]
+            if value is None and key in env:
+                del env[key]
             else:
-                result[key] = self.resolve(value)
-        return result
+                env[key] = self.resolve(value)
+        return env
 
 
 class ExecutableCommand(CommandBase):

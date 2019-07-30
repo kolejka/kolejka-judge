@@ -4,7 +4,7 @@ import datetime
 
 from kolejka.judge import config
 
-__all__ = [ 'parse_time', 'parse_memory', ]
+__all__ = [ 'parse_time', 'unparse_time', 'parse_memory', 'unparse_memory', ]
 def __dir__():
     return __all__
 
@@ -36,6 +36,11 @@ def parse_time(x) :
             'n' : 10**-9,
         }))
 
+def unparse_time(x) :
+    if x is not None:
+        assert isinstance(x, datetime.timedelta)
+        return str(x.total_seconds())+'s'
+
 
 def parse_memory(x):
     if x is not None:
@@ -53,3 +58,8 @@ def parse_memory(x):
             'p' : 1024**5,
             'P' : 1024**5,
         })))
+
+def unparse_memory(x):
+    if x is not None:
+        assert isinstance(x, int)
+        return str(x)+'b'

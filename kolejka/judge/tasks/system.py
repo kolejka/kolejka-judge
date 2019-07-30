@@ -16,6 +16,7 @@ def __dir__():
 
 class SystemPrepareTask(TaskBase):
     DEFAULT_SUPERUSER=True
+    DEFAULT_RECORD_RESULT=False
     @default_kwargs
     def __init__(self, users =config.SYSTEM_USERS, groups =config.SYSTEM_GROUPS, directories =config.SYSTEM_DIRECTORIES, **kwargs):
         super().__init__(**kwargs)
@@ -72,7 +73,6 @@ class SystemPrepareTask(TaskBase):
             self.directories[path] = kwargs
 
     def execute(self):
-        status = None
         for name in self.users.keys():
             self.run_command('usr_del_'+name, UserDelCommand, user_name=name)
         for name in self.groups.keys():
@@ -88,9 +88,9 @@ class SystemPrepareTask(TaskBase):
             self.run_command(cmd_name, UserAddCommand, **user)
             home = user.get('home', None)
             if home:
-                home = str(self.resolve_path(home))
+                home = str(self.resolve_path(get_output_path(home)))
             self.system.add_user(name, home)
         for directory in self.directories.values():
             cmd_name = 'dir_'+str(directory['path']).replace('/', '_')
             self.run_command(cmd_name, DirectoryAddCommand, **directory)
-        return status, self.result
+        return self.result

@@ -1,20 +1,22 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+from collections import OrderedDict
 import datetime
 import pathlib
 
 from kolejka.judge import config
 from kolejka.judge.parse import *
+from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 
 
-__all__ = [ 'Result', ]
+__all__ = [ 'Result', 'ResultDict', ]
 def __dir__():
     return __all__
 
 
 class Result(AbstractResult):
 
-    def __init__(self, args=None, returncode=None, cpu_time=None, real_time=None, memory=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=None, stderr=None,):
+    def __init__(self, args=None, returncode=None, cpu_time=None, real_time=None, memory=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=None, stderr=None, status=None,):
         self._args = args and [str(a) for a in args] or []
         self._returncode = returncode and int(returncode) or 0
         self._cpu_time = None
@@ -28,9 +30,10 @@ class Result(AbstractResult):
         self._user = user and str(user)
         self._group = group and str(group)
         self._limits = limits or get_limits()
-        self._stdin = stdin and str(pathlib.Path(stdin))
-        self._stdout = stdout and str(pathlib.Path(stdout))
-        self._stderr = stderr and str(pathlib.Path(stderr))
+        self._stdin = stdin
+        self._stdout = stdout
+        self._stderr = stderr
+        self._status = status
 
     def __repr__(self):
         repr_dict = dict()
@@ -44,10 +47,35 @@ class Result(AbstractResult):
         return rep
 
     @property
+    def yaml(self):
+        yaml = nononedict()
+        yaml['status'] = self.status
+        yaml['args'] = self.args
+        yaml['returncode'] = self.returncode
+        yaml['user'] = self.user
+        yaml['group'] = self.group
+        yaml['work_directory'] = self.work_directory
+        yaml['environment'] = self.environment
+        yaml['limits'] = self.limits and self.limits.yaml or None
+        if isinstance(self.stdin, OutputPath):
+            yaml['stdin'] = self.stdin
+        if isinstance(self.stdout, OutputPath):
+            yaml['stdout'] = self.stdout
+        if isinstance(self.stderr, OutputPath):
+            yaml['stderr'] = self.stderr
+        yaml['cpu_time'] = unparse_time(self.cpu_time)
+        yaml['real_time'] = unparse_time(self.real_time)
+        yaml['memory'] = unparse_memory(self.memory)
+        return OrderedDict(yaml)
+    @yaml.setter
+    def yaml(self, value):
+        raise NotImplementedError #TODO: Need/Want?
+
+    @property
     def args(self) -> List[str]:
         return self.get_args()
     def get_args(self):
-        return _args
+        return self._args
 
     @property
     def returncode(self) -> int:
@@ -91,17 +119,17 @@ class Result(AbstractResult):
     def stdin(self) -> str:
         return self.get_stdin()
     def get_stdin(self):
-        return self.stdin
+        return self._stdin
     @property
     def stdout(self) -> str:
         return self.get_stdout()
     def get_stdout(self):
-        return self.stdout
+        return self._stdout
     @property
     def stderr(self) -> str:
         return self.get_stderr()
     def get_stderr(self):
-        return self.stderr
+        return self._stderr
 
     @property
     def cpu_time(self) -> datetime.timedelta:
@@ -132,3 +160,50 @@ class Result(AbstractResult):
         self._memory = parse_memory(memory or '0b')
     def update_memory(self, memory):
         self._memory = max(self._memory, parse_memory(memory or '0b'))
+
+    @property
+    def status(self):
+        return self.get_status()
+    def get_status(self):
+        return self._status
+    def set_status(self, status):
+        self._status = status
+
+
+class ResultDict:
+    def __init__(self):
+        self._dict = OrderedDict()
+        self._status = None
+        pass
+    def __repr__(self):
+        return f'{self.__class__.__name__}: {self._dict}'
+
+    def __getattr__(self, key):
+        return self._dict[key]
+    def __getitem__(self, key):
+        return self._dict[key]
+    def set(self, key, val):
+        assert key != 'status'
+        assert key not in self._dict
+        assert isinstance(key, str) or isinstance(key, int)
+        if val is None:
+            return
+        assert isinstance(val, Result) or isinstance(val, ResultDict)
+        self._dict[key] = val
+    @property
+    def status(self):
+        return self.get_status()
+    def get_status(self):
+        return self._status
+    def set_status(self, status):
+        self._status = status
+    @property
+    def yaml(self):
+        yaml = nononedict()
+        yaml['status'] = self._status
+        for key, val in self._dict.items():
+            yaml[key] = val.yaml or None
+        return OrderedDict(yaml)
+    @yaml.setter
+    def yaml(self, value):
+        raise NotImplementedError #TODO: Need/Want?

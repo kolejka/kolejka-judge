@@ -27,5 +27,5 @@ class AnswerHintDiffTask(TaskBase):
         self.space_sensitive = bool(space_sensitive)
 
     def execute(self):
-        status = self.run_command('diff', DiffCommand, path_a=self.hint_path, path_b=self.answer_path, case_sensitive=self.case_sensitive, space_sensitive=self.space_sensitive)
-        return status, self.result
+        self.set_result(self.run_command('diff', DiffCommand, path_a=self.hint_path, path_b=self.answer_path, case_sensitive=self.case_sensitive, space_sensitive=self.space_sensitive))
+        return self.result

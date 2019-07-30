@@ -42,10 +42,3 @@ class Checking:
 
     def run(self):
         return self.system.run_steps(self.steps)
-
-    def format_result(self, result):
-        formatted_result = {}
-        for key, value in result.items():
-            formatted_result[key] = self.system.format_execution_status(value)
-
-        return formatted_result

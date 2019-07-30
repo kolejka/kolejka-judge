@@ -8,7 +8,7 @@ import urllib.request
 
 
 from kolejka.judge import config
-from kolejka.judge import ctxyaml
+from kolejka.judge.ctxyaml import *
 from kolejka.judge.paths import *
 from kolejka.judge.systems import *
 
@@ -65,10 +65,8 @@ def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
 
 
 def write_results(args, results):
-    results = (args.output_directory / args.results).resolve()
-    results.parent.mkdir(parents=True, exist_ok=True)
-    with results.open('w') as results_file:
-        ctxyaml.dump(results, results_file)
+    args.results.parent.mkdir(parents=True, exist_ok=True)
+    ctxyaml_dump(results.yaml, args.output_directory, args.results)
 
 
 def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION):
@@ -95,9 +93,7 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
         parser.error('TESTS file {} does not exist'.format(args.tests))
 
     try:
-        import kolejka.judge.ctxyaml as ctxyaml
-        with open(args.tests) as tests_file:
-            tests = ctxyaml.load(tests_file)
+        tests = ctxyaml_load(args.tests)
     except:
         parser.error('Failed to load TESTS file {}'.format(args.tests))
 
@@ -113,8 +109,8 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
     for id, test in tests.items():
         input_paths[id] = set()
         def collect(a):
-            if isinstance(a, ctxyaml.Blob):
-                input_paths[id].add(str(get_input_path(a).path))
+            if isinstance(a, InputPath):
+                input_paths[id].add(str(a.path))
             if isinstance(a, list):
                 for b in a:
                     collect(b)
@@ -135,9 +131,9 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
         parser.error('Output directory {} is not a directory'.format(args.output_directory))
 
     solution = pathlib.Path(args.solution).resolve()
-    results = pathlib.Path(args.results).resolve()
     system = envs[args.system]
     output_directory = pathlib.Path(args.output_directory).resolve()
+    results = (output_directory / args.results).resolve()
 
 
     return argparse.Namespace(tests=tests, input_paths=input_paths, solution=solution, results=results, system=system, output_directory=output_directory)

@@ -110,15 +110,18 @@ class ToolTask(TaskBase):
         self.run_command('dir_build', DirectoryAddCommand, path=self.build.build_directory, user_name=self.user_name, group_name=self.group_name, mode=0o2750)
         status = None
         if not status:
-            status, result = self.source.execute()
-            self.set_result('source', result)
+            result = self.source.execute()
+            status = result and result.status
+            self.set_result(status, 'source', result)
         if not status:
-            status, result = self.build.execute()
-            self.set_result('build', result)
+            result = self.build.execute()
+            status = result and result.status
+            self.set_result(status, 'build', result)
         if not status:
-            status, result = self.executable.execute()
-            self.set_result('exec', result)
-        return status, self.result
+            result = self.executable.execute()
+            status = result and result.status
+            self.set_result(status, 'exec', result)
+        return self.result
 
 
 class GeneratorTask(ToolTask):

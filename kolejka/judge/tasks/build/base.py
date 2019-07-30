@@ -87,7 +87,8 @@ class BuildTask(TaskBase):
         status = None
         status = status or self.execute_build()
         status = status or self.execute_post_build()
-        return status, self.result
+        self.set_result(status)
+        return self.result
 
     def execute_build(self):
         raise NotImplementedError()

@@ -7,16 +7,18 @@ import sys
 library = Path(__file__).parent.resolve()/KOLEJKA_JUDGE_LIBRARY
 if library.is_file():
     sys.path.insert(0, str(library))
+import logging
 
 import kolejka.judge
 from kolejka.judge.commands import *
 from kolejka.judge.limits import *
 from kolejka.judge.parse import *
 from kolejka.judge.paths import *
+from kolejka.judge.result import *
 from kolejka.judge.tasks import *
 
 args = kolejka.judge.parse_args()
-results = dict()
+results = ResultDict()
 
 for test_id, test in args.tests.items():
     checking = kolejka.judge.Checking(system=args.system(output_directory = args.output_directory / str(test_id), paths=args.input_paths[test_id]))
@@ -64,9 +66,8 @@ for test_id, test in args.tests.items():
         checking.add_steps(
             checker=AnswerHintDiffTask(hint_path=hint_path, answer_path=answer_path)
         )
-    status, res = checking.run()
-    results[test_id] = res
-    print(test_id, status)
+    result = checking.run()
+    results.set(test_id, result)
+    logging.warning('Result {} on test {}.'.format(result.status, test_id))
 
-print(results)
 kolejka.judge.write_results(args, results)

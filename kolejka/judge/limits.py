@@ -1,4 +1,5 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+from collections import OrderedDict
 import datetime
 
 from kolejka.judge import config
@@ -35,6 +36,19 @@ class Limits(AbstractLimits):
             repr_dict[k] = repr(v)
         rep = f'{self.__class__.__name__}: {repr_dict}'
         return rep
+
+    @property
+    def yaml(self):
+        yaml = nononedict()
+        yaml['cpu_time'] = unparse_time(self.cpu_time)
+        yaml['real_time'] = unparse_time(self.real_time)
+        yaml['memory'] = unparse_memory(self.memory)
+        yaml['cores'] = self.cores
+        yaml['pids'] = self.pids
+        return OrderedDict(yaml)
+    @yaml.setter
+    def yaml(self, value):
+        raise NotImplementedError #TODO: Need/Want?
 
     @property
     def cpu_time(self) -> datetime.timedelta:

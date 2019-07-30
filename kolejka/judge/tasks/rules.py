@@ -29,8 +29,8 @@ class RulesTask(TaskBase):
                     [ self.resolve_path(f).stat().st_size for f in self.find_files(self.target) ]
                     )
             if used_size > self.max_size:
-                return self.result_on_error, self.result
-        return None, self.result
+                self.set_result(self.result_on_error)
+        return self.result
 
 
 class SolutionSourceRulesTask(RulesTask):
