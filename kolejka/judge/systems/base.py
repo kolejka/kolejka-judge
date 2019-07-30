@@ -94,7 +94,7 @@ class SystemBase(AbstractSystem):
     def log_directory(self) -> OutputPath:
         return self.get_log_directory()
     def get_log_directory(self):
-        return get_output_path('log')
+        return get_output_path(config.LOG)
 
     def resolve_path(self, path: Optional[AbstractPath], work_directory: Optional[OutputPath] =None) -> pathlib.Path:
         if not work_directory:
@@ -271,8 +271,7 @@ class SystemBase(AbstractSystem):
                 pass
         return (uid, gid, groups)
 
-    @staticmethod
-    def get_change_user_function(user=None, group=None):
+    def get_change_user_function(self, user=None, group=None):
         if os.getuid() != 0:
             return None
         if user is None and group is None:

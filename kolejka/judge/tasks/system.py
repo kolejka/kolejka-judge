@@ -15,7 +15,6 @@ def __dir__():
 
 
 class SystemPrepareTask(TaskBase):
-    DEFAULT_SUPERUSER=True
     DEFAULT_RECORD_RESULT=False
     @default_kwargs
     def __init__(self, users =config.SYSTEM_USERS, groups =config.SYSTEM_GROUPS, directories =config.SYSTEM_DIRECTORIES, **kwargs):

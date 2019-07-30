@@ -20,7 +20,7 @@ class GroupAddCommand(ProgramCommand):
         self.group_name = str(group_name)
         self.gid = gid and int(gid)
     def get_command(self):
-        if self.superuser:
+        if self.system.superuser:
             return super().get_command()
     def get_program_arguments(self):
         args = []
@@ -37,7 +37,7 @@ class GroupDelCommand(ProgramCommand):
         super().__init__(**kwargs)
         self.group_name = group_name
     def get_command(self):
-        if self.superuser:
+        if self.system.superuser:
             return super().get_command()
     def get_program_arguments(self):
         return [ self.group_name, ]
@@ -55,7 +55,7 @@ class UserAddCommand(ProgramCommand):
         self.shell = shell and str(shell)
         self.comment = comment or self.user_name
     def get_command(self):
-        if self.superuser:
+        if self.system.superuser:
             return super().get_command()
         else:
             return [ 'mkdir', '-p', self.home, ]
@@ -84,7 +84,7 @@ class UserDelCommand(ProgramCommand):
         super().__init__(**kwargs)
         self.user_name = user_name
     def get_command(self):
-        if self.superuser:
+        if self.system.superuser:
             return super().get_command()
     def get_program_arguments(self):
         return [ self.user_name, ]
@@ -105,9 +105,9 @@ class DirectoryAddCommand(CommandBase):
         return str(self.mode)
     def get_command(self):
         command = [ 'install' ]
-        if self.superuser and self.user_name is not None:
+        if self.system.superuser and self.user_name is not None:
             command += [ '--owner', str(self.user_name) ]
-        if self.superuser and self.group_name is not None:
+        if self.system.superuser and self.group_name is not None:
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
@@ -136,9 +136,9 @@ class InstallCommand(CommandBase):
         return str(self.mode)
     def get_command(self):
         command = [ 'install' ]
-        if self.superuser and self.user_name is not None:
+        if self.system.superuser and self.user_name is not None:
             command += [ '--owner', str(self.user_name) ]
-        if self.superuser and self.group_name is not None:
+        if self.system.superuser and self.group_name is not None:
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
@@ -163,7 +163,7 @@ class ChownDirCommand(CommandBase):
         self.recursive = recursive
     def get_command(self):
         command = []
-        if not self.superuser:
+        if not self.system.superuser:
             return None
         if self.user_name and self.group_name:
             command += [ 'chown', self.user_name+':'+self.group_name, ]
@@ -195,7 +195,7 @@ class ChownFileCommand(CommandBase):
         self.group_name = group_name
     def get_command(self):
         command = []
-        if not self.superuser:
+        if not self.system.superuser:
             return None
         if self.user_name and self.group_name:
             command += [ 'chown', self.user_name+':'+self.group_name, ]

@@ -25,14 +25,13 @@ DEFAULT_OUTPUT = CommandDefaultOutput()
 
 
 class CommandBase(AbstractCommand):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, superuser=False, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stderr=DEFAULT_OUTPUT, stderr_append=False, verbose=False, default_logs=True):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stderr=DEFAULT_OUTPUT, stderr_append=False, verbose=False, default_logs=True):
         self._name = name
         self._system = system
         self._work_directory = work_directory or get_output_path('.')
         self._environment = dict(environment or {})
         self._user = user and str(user)
         self._group = group and str(group)
-        self._superuser = bool(superuser)
         self._limits = limits or get_limits()
         self._stdin = stdin and get_output_path(stdin)
         self._stdout = stdout and get_output_path(stdout)
@@ -113,12 +112,6 @@ class CommandBase(AbstractCommand):
         return self.get_group()
     def get_group(self):
         return self._group
-
-    @property
-    def superuser(self) -> bool:
-        return self.system.superuser and self.get_superuser()
-    def get_superuser(self):
-        return self._superuser
 
     @property
     def limits(self) -> AbstractLimits:

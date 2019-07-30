@@ -16,7 +16,6 @@ def __dir__():
 
 
 class PrepareTask(TaskBase):
-    DEFAULT_SUPERUSER=True
     DEFAULT_RECORD_RESULT=False
     @default_kwargs
     def __init__(self, source, target, allow_extract=False, user_name=None, group_name=None, override=None, **kwargs):

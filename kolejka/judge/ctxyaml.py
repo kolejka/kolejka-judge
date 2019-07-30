@@ -96,7 +96,7 @@ def _dump(value, output_dir, root):
             return t([_dump(e, output_dir, root) for e in value])
     if isinstance(value, pathlib.Path):
         try:
-            return _File((output_dir / value).resolve().relative_to(root))
+            return _File((output_dir / value).relative_to(root))
         except:
             return None
     raise ValueError('Type {} is not supported by ctxyaml.'.format(type(value)))

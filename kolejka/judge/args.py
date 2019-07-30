@@ -38,6 +38,7 @@ def known_systems():
 def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--update', action='store_true', default=False, help='update Kolejka Judge library')
+    parser.add_argument('--task', help='directory for Kolejka Task')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='show more info')
     parser.add_argument('-d', '--debug', action='store_true', default=False, help='show debug info')
     envs = known_systems()
@@ -69,7 +70,7 @@ def write_results(args, results):
     ctxyaml_dump(results.yaml, args.output_directory, args.results)
 
 
-def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION):
+def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION):
     envs = known_systems()
     parser = argument_parser(description=description)
     args = parser.parse_args(args=args, namespace=namespace)
@@ -134,5 +135,11 @@ def parse_args(args=None, namespace=None, description=DEFAULT_JUDGE_DESCRIPTION)
     output_directory = pathlib.Path(args.output_directory).resolve()
     results = (output_directory / args.results).resolve()
 
+
+    if args.task:
+        from kolejka.judge.task import commit_task
+        commit_task(args.task, tests, solution, runpy)
+        logging.warning('Kolejka Task creasted')
+        sys.exit(0)
 
     return argparse.Namespace(tests=tests, input_paths=input_paths, solution=solution, results=results, system=system, output_directory=output_directory)

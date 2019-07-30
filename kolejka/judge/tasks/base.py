@@ -17,14 +17,13 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, superuser=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True):
         self._name = name
         self._system = system
         self._work_directory = work_directory
         self._environment = environment
         self._user = user
         self._group = group
-        self._superuser = superuser
         self._limits = limits and get_limits(limits)
         if limit_cpu_time:
             self._limits = self._limits or get_limits()
@@ -109,12 +108,6 @@ class TaskBase(AbstractTask):
         return self._group
 
     @property
-    def superuser(self) -> Optional[bool]:
-        return self.get_superuser()
-    def get_superuser(self):
-        return self._superuser
-
-    @property
     def limits(self) -> Optional[AbstractLimits]:
         return self.get_limits()
     def get_limits(self):
@@ -193,9 +186,6 @@ class TaskBase(AbstractTask):
         group = self.group
         if group is not None:
             kwargs['group'] = group
-        superuser = self.superuser
-        if superuser is not None:
-            kwargs['superuser'] = superuser and self.system.superuser
         limits = self.limits
         if limits is not None:
             kwargs['limits'] = limits
