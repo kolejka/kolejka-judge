@@ -13,8 +13,10 @@ pushd "${OFFICE}" >/dev/null 2>&1
         python3 wheel_repair.py "${OFFICE}/${LIBRARY}" >/dev/null 2>&1
     popd >/dev/null 2>&1
 
-    rm -rf results
+    rm -rf task
+    ./run.py --task task
 
+    rm -rf results
     ./run.py "$@"
 
 popd >/dev/null 2>&1

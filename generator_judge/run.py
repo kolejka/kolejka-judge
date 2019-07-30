@@ -17,7 +17,11 @@ from kolejka.judge.paths import *
 from kolejka.judge.result import *
 from kolejka.judge.tasks import *
 
-args = kolejka.judge.parse_args()
+
+args = kolejka.judge.parse_args(__file__)
+
+#tasker('task', args.tests, args.solution, __file__)
+
 results = ResultDict()
 
 for test_id, test in args.tests.items():
