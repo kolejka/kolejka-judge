@@ -1,0 +1,28 @@
+1:
+  !include :   test.yaml
+  input:       !file 1.in
+  hint:        !file 1.out
+  time:        1s
+2:
+  !include :   test.yaml
+  input:       !file 2.gen
+  generator:   !file generator.cpp
+  hinter:      !file hinter.cpp
+  time:        1s
+3:
+  !include :   test.yaml
+  input:       !file 3.gen
+  generator:   !file generator.cpp
+  verifier:    !file verifier.zip
+  hinter:      !file hinter.cpp
+  checker:     !file checker.zip
+  time:        1s
+4:
+  !include :   test.yaml
+  environment: !file environment.zip
+  input:       !file 4.gen
+  generator:   !file generator.cpp
+  verifier:    !file verifier.zip
+  hinter:      !file hinter.cpp
+  checker:     !file checker.zip
+  time:        1s

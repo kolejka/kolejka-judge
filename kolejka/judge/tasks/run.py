@@ -7,7 +7,7 @@ from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
-from kolejka.judge.commands.base import *
+from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
 

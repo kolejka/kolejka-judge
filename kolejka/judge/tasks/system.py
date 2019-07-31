@@ -5,7 +5,7 @@ from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
-from kolejka.judge.commands.system import *
+from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import *
 
 
@@ -84,10 +84,10 @@ class SystemPrepareTask(TaskBase):
         for user in self.users.values():
             name = user['user_name']
             cmd_name = 'usr_'+name
-            self.run_command(cmd_name, UserAddCommand, **user)
             home = user.get('home', None)
             if home:
                 home = str(self.resolve_path(get_output_path(home)))
+            self.run_command(cmd_name, UserAddCommand, **user)
             self.system.add_user(name, home)
         for directory in self.directories.values():
             cmd_name = 'dir_'+str(directory['path']).replace('/', '_')

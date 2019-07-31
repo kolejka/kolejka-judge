@@ -2,5 +2,12 @@
 
 
 from kolejka.judge import config
-from kolejka.judge.args import parse_args, write_results
-from kolejka.judge.checking import Checking
+from kolejka.judge.args import *
+from kolejka.judge.checking import *
+from kolejka.judge.limits import *
+from kolejka.judge.parse import *
+from kolejka.judge.paths import *
+from kolejka.judge.result import *
+
+from kolejka.judge.commands import *
+from kolejka.judge.tasks import *

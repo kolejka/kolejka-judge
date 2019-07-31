@@ -29,11 +29,18 @@ class Limits(AbstractLimits):
     def __repr__(self):
         repr_dict = dict()
         for k,v in self.__dict__.items():
+            if v is None:
+                continue
             if k in [ '_system', '_name' ]:
                 continue
             if len(k) and k[0] == '_':
                 k=k[1:]
-            repr_dict[k] = repr(v)
+            if k.endswith('time'):
+                repr_dict[k] = unparse_time(v)
+            elif k.endswith('memory'):
+                repr_dict[k] = unparse_memory(v)
+            else:
+                repr_dict[k] = repr(v)
         rep = f'{self.__class__.__name__}: {repr_dict}'
         return rep
 

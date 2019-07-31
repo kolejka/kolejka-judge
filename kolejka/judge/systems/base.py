@@ -147,7 +147,7 @@ class SystemBase(AbstractSystem):
             step_result = self.run_step(step, name)
             result.set(name, step_result)
             if step_result and step_result.status is not None:
-                result.set_status(step_status.status)
+                result.set_status(step_result.status)
                 return result
         result.set_status('OK')
         return result

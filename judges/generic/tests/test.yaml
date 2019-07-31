@@ -1,0 +1,7 @@
+tools:        !file tools.zip
+memory:       512MB
+kolejka:
+    image     : 'kolejka/satori:judge'
+    exclusive : false
+    requires  : [ 'cpu:xeon e3-1270 v5' ]
+    collect   : [ 'logs/*' ]

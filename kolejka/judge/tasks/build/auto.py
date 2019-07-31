@@ -9,9 +9,7 @@ from kolejka.judge.tasks.build.base import *
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
-from kolejka.judge.commands.base import *
-from kolejka.judge.commands.compile import *
-from kolejka.judge.commands.make import *
+from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
 

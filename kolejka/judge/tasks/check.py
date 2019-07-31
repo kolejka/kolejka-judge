@@ -7,7 +7,7 @@ from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
-from kolejka.judge.commands.check import *
+from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
 
@@ -18,6 +18,7 @@ def __dir__():
 
 class AnswerHintDiffTask(TaskBase):
     DEFAULT_RESULT_ON_ERROR='ANS'
+    DEFAULT_ANSWER_PATH=config.TEST_ANSWER
     @default_kwargs
     def __init__(self, hint_path, answer_path, case_sensitive=True, space_sensitive=False, **kwargs):
         super().__init__(**kwargs)

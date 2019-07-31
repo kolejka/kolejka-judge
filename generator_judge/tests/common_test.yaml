@@ -1,7 +1,0 @@
-tools:        !file common_tools.zip
-memory:       512MB
-kolejka:
-    image: 'ubuntu:latest'
-    exclusive: false
-    requires: [ 'cpu:xeon e3-1270 v5' ]
-    collect: [ 'logs/*' ]

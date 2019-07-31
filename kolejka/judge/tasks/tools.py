@@ -3,7 +3,7 @@ from copy import deepcopy
 
 
 from kolejka.judge import config
-from kolejka.judge.commands.system import *
+from kolejka.judge.commands import *
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
@@ -72,6 +72,7 @@ class ToolTask(TaskBase):
         if error_path:
             executable_kwargs['stderr'] = error_path
         executable_kwargs['executable'] = self.build.execution_script
+        executable_kwargs['executable_arguments'] = arguments
         self.executable = ToolExecutableTask(**executable_kwargs)
         self.input_path = self.executable.stdin
         self.output_path = self.executable.stdout
@@ -150,6 +151,7 @@ class HinterTask(ToolTask):
 class CheckerTask(ToolTask):
     DEFAULT_TOOL_NAME='checker'
     DEFAULT_RESULT_ON_ERROR='ANS'
+    DEFAULT_ANSWER_PATH=config.TEST_ANSWER
     @default_kwargs
     def __init__(self, input_path, hint_path, answer_path, **kwargs):
         self.input_path = input_path and get_output_path(input_path)

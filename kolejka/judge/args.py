@@ -8,12 +8,13 @@ import urllib.request
 
 
 from kolejka.judge import config
+from kolejka.judge.checking import *
 from kolejka.judge.ctxyaml import *
 from kolejka.judge.paths import *
 from kolejka.judge.systems import *
 
 
-__all__ = [ 'parse_args', 'write_results' ]
+__all__ = [ 'parse_args', 'get_checking', 'write_results' ]
 def __dir__():
     return __all__
 
@@ -107,7 +108,7 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         parser.error('TEST {} does not exist in TESTS file {}'.format(args.test, args.tests))
 
     input_paths = dict()
-    for id, test in tests.items():
+    for id in tests.keys():
         input_paths[id] = set()
         def collect(a):
             if isinstance(a, pathlib.Path):
@@ -118,7 +119,7 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
             if isinstance(a, dict):
                 return dict( [ (collect(k), collect(v)) for k,v in a.items() ] )
             return a
-        collect(test)
+        tests[id] = collect(tests[id])
     
     if not pathlib.Path(args.solution).is_file():
         parser.error('SOLUTION file {} does not exist'.format(args.solution))
@@ -131,6 +132,8 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         parser.error('Output directory {} is not a directory'.format(args.output_directory))
 
     solution = pathlib.Path(args.solution).resolve()
+    for k in input_paths.keys():
+        input_paths[k].add(str(solution))
     system = envs[args.system]
     output_directory = pathlib.Path(args.output_directory).resolve()
     results = (output_directory / args.results).resolve()
@@ -142,4 +145,7 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         logging.warning('Kolejka Task creasted')
         sys.exit(0)
 
-    return argparse.Namespace(tests=tests, input_paths=input_paths, solution=solution, results=results, system=system, output_directory=output_directory)
+    return argparse.Namespace(tests=tests, input_paths=input_paths, solution=get_input_path(solution), results=results, system=system, output_directory=output_directory)
+
+def get_checking(args, test_id):
+    return Checking(system=args.system(output_directory = args.output_directory / str(test_id), paths=args.input_paths[test_id]))

@@ -8,9 +8,7 @@ from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.validators import *
-from kolejka.judge.commands.base import *
-from kolejka.judge.commands.compile import *
-from kolejka.judge.commands.make import *
+from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
 
@@ -28,6 +26,7 @@ class SolutionBuildMixin:
     DEFAULT_EXECUTION_SCRIPT=config.SOLUTION_EXEC
     DEFAULT_USER=config.USER_BUILD
     DEFAULT_GROUP=config.USER_BUILD
+    DEFAULT_GROUP_NAME=config.GROUP_ALL
     DEFAULT_RESULT_ON_ERROR='CME'
     @default_kwargs
     def __init__(self, *args, **kwargs):
@@ -49,13 +48,15 @@ class ToolBuildMixin:
 
 
 class BuildTask(TaskBase):
-    def __init__(self, source_directory, build_directory, execution_script=None, build_options=None, build_target=None, **kwargs):
+    def __init__(self, source_directory, build_directory, execution_script=None, build_options=None, build_target=None, user_name=None, group_name=None, **kwargs):
         super().__init__(**kwargs)
         self.source_directory = get_output_path(source_directory)
         self.build_directory = get_output_path(build_directory)
         self.execution_script = get_output_path(execution_script)
         self.build_options = build_options
         self.build_target = build_target and get_relative_path(build_target)
+        self.user_name = user_name
+        self.group_name = group_name
 
     def write_execution_script(self):
         if self.execution_script:
@@ -95,6 +96,9 @@ class BuildTask(TaskBase):
 
     def execute_post_build(self):
         self.write_execution_script()
+        if self.user_name or self.group_name:
+            self.run_command('chown', ChownDirCommand, target=self.build_directory, recursive=True, user_name=self.user_name, group_name=self.group_name)
+            self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.build_directory])
 
 class SolutionBuildTask(SolutionBuildMixin, BuildTask):
     pass
