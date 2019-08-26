@@ -1,0 +1,6 @@
+* Java
+* Python
+* Run lighter containers when possible (avoid cgroups to save some time) in SystemD system
+* System guess
+* logging
+* tests
