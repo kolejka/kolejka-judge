@@ -5,6 +5,7 @@ assert sys.version_info >= (3, 6)
 DISTRIBUTION_ADDRESS = 'https://kolejka.matinf.uj.edu.pl/KolejkaJudge.zip'
 
 LOG = 'log'
+COLLECTED_LOG = 'log.zip'
 
 SOLUTION = 'solution'
 SOLUTION_SOURCE = SOLUTION + '/src'

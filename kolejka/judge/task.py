@@ -1,4 +1,5 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+import datetime
 import pathlib
 
 
@@ -14,22 +15,53 @@ def __dir__():
     return __all__
 
 
-def commit_task(task_dir, tests, solution, runpy):
+def commit_task(task_dir, tests, solution, judgepy):
 
-    kolejka_image = 'kolejka/satori:judge'
-    kolejka_requires = []
-    kolejka_exclusive = True
-    kolejka_limits = {}
+    kolejka_image = None
+    kolejka_requires = set()
+    kolejka_exclusive = False
+    kolejka_collects = dict()
     kolejka_stdout = 'console_stdout.txt'
     kolejka_stderr = 'console_stderr.txt'
-    kolejka_collect = []
+    kolejka_limits = {}
 
-    kolejka_system = '--local'
+    kolejka_system = '--observer'
+
+    for test_id, test in tests.items():
+        kolejka_opts = test.get('kolejka', dict())
+
+        if 'image' in kolejka_opts:
+            if kolejka_image and kolejka_image != kolejka_opts['image']:
+                raise ValueError
+            kolejka_image = kolejka_opts['image']
+        for req in kolejka_opts.get('requires', []):
+            kolejka_requires.add(req)
+        kolejka_exclusive = kolejka_exclusive or bool(kolejka_opts.get('exclusive', False))
+        kolejka_collects[test_id] = kolejka_opts.get('collect', [])
+        test_limits = kolejka_opts.get('limits', {})
+        if 'time' in test_limits:
+            kolejka_limits['time'] = kolejka_limits.get('time', datetime.timedelta(seconds=1)) + parse_time(test_limits['time'])
+        if 'memory' in test_limits:
+            kolejka_limits['memory'] = max(kolejka_limits.get('memory', 0), parse_memory(test_limits['memory']))
+        if 'swap' in test_limits:
+            kolejka_limits['swap'] = max(kolejka_limits.get('swap', 0), parse_memory(test_limits['swap']))
+        if 'cpus' in test_limits:
+            kolejka_limits['cpus'] = max(kolejka_limits.get('cpus', 1), int(test_limits['cpus']))
+        if 'network' in test_limits:
+            kolejka_limits['network'] = kolejka_limits.get('network', False) or bool(test_limits['network'])
+        if 'pids' in test_limits:
+            kolejka_limits['pids'] = max(kolejka_limits.get('pids', 16), int(test_limits['pids']))
+        if 'storage' in test_limits:
+            kolejka_limits['storage'] = kolejka_limits.get('storage', 0) + parse_memory(test_limits['storage'])
+        if 'workspace' in test_limits:
+            kolejka_limits['workspace'] = kolejka_limits.get('workspace', 0) + parse_memory(test_limits['workspace'])
+
+    kolejka_image = kolejka_image or 'kolejka/satori:judge'
 
     from kolejka.common import KolejkaTask, KolejkaLimits
     task_dir = pathlib.Path(task_dir).resolve()
     solution = pathlib.Path(solution).resolve()
-    runpy = pathlib.Path(runpy).resolve()
+    judgepy = pathlib.Path(judgepy).resolve()
     
     task_dir.mkdir(parents=True)
     test_dir = pathlib.PurePath('tests')
@@ -39,18 +71,21 @@ def commit_task(task_dir, tests, solution, runpy):
     results_dir = pathlib.PurePath('results')
     results_yaml = pathlib.PurePath('results.yaml')
 
+    kolejka_collect = []
     kolejka_collect += [{'glob' : str(results_dir/results_yaml)}]
-    kolejka_collect += [{'glob' : str(results_dir / '**' / config.LOG / '*')}]
+    for test_id, collects in kolejka_collects.items():
+        for collect in collects:
+            kolejka_collect += [{'glob' : str(results_dir / str(test_id) / str(collect))}]
 
     tests_yaml = test_dir / 'tests.yaml'
     solution_path = solution_dir / solution.name
     (task_dir/solution_path).symlink_to(solution)
-    runpy_path = pathlib.PurePath('run.py')
-    (task_dir/runpy_path).symlink_to(runpy)
+    judgepy_path = pathlib.PurePath('judge.py')
+    (task_dir/judgepy_path).symlink_to(judgepy)
     lib_path = pathlib.PurePath('KolejkaJudge.zip')
-    (task_dir/lib_path).symlink_to(runpy.parent / lib_path)
+    (task_dir/lib_path).symlink_to(judgepy.parent / lib_path)
 
-    task_args = [ 'python3', 'run.py', kolejka_system, '--tests', str(tests_yaml), '--solution', str(solution_path), '--output-directory', str(results_dir), '--results', str(results_yaml), ]
+    task_args = [ 'python3', str(judgepy_path), kolejka_system, '--tests', str(tests_yaml), '--solution', str(solution_path), '--output-directory', str(results_dir), '--results', str(results_yaml), ]
 
     input_map = dict()
     class collect:
@@ -58,6 +93,8 @@ def commit_task(task_dir, tests, solution, runpy):
             self.input_count = 0
             self.input_map = input_map
         def __call__(self, a):
+            if isinstance(a, InputPath):
+                a = pathlib.Path(a.path)
             if isinstance(a, pathlib.Path):
                 if a in self.input_map:
                     return self.input_map[a]
@@ -79,14 +116,14 @@ def commit_task(task_dir, tests, solution, runpy):
     task = KolejkaTask(
             str(task_dir),
             image = kolejka_image,
-            requires = kolejka_requires,
+            requires = list(kolejka_requires),
             exclusive = kolejka_exclusive,
             limits = kolejka_limits,
             args = task_args,
             stdout = kolejka_stdout,
             stderr = kolejka_stderr,
             files = dict([ (str(p), None) for p in
-                    [ tests_yaml, solution_path, runpy_path, lib_path, ]
+                    [ tests_yaml, solution_path, judgepy_path, lib_path, ]
                     + list(input_map.values())
                 ]),
             collect = kolejka_collect,

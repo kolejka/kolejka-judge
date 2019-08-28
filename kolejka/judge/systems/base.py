@@ -144,11 +144,11 @@ class SystemBase(AbstractSystem):
     def run_steps(self, steps):
         result = ResultDict()
         for name, step in steps.items():
-            step_result = self.run_step(step, name)
-            result.set(name, step_result)
-            if step_result and step_result.status is not None:
-                result.set_status(step_result.status)
-                return result
+            if result.status is None or step.obligatory:
+                step_result = self.run_step(step, name)
+                result.set(name, step_result)
+                if result.status is None and step_result and step_result.status is not None:
+                    result.set_status(step_result.status)
         result.set_status('OK')
         return result
 

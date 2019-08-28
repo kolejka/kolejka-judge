@@ -52,6 +52,7 @@ for test_id, test in args.tests.items():
         checking.add_steps(
             checker=AnswerHintDiffTask(hint_path=hint_path)
         )
+    checking.add_steps(logs=CollectLogsTask())
     results.set(test_id, checking.run())
     print('Result {} on test {}.'.format(results[test_id].status, test_id))
 

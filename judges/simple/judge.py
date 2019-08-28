@@ -26,6 +26,7 @@ for test_id, test in args.tests.items():
             limit_memory=memory_limit
         ),
         checker=AnswerHintDiffTask(hint_path=test['hint']),
+        logs=CollectLogsTask(),
     )
     results.set(test_id, checking.run())
     print('Result {} on test {}.'.format(results[test_id].status, test_id))

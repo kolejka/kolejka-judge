@@ -1,0 +1,35 @@
+# vim:ts=4:sts=4:sw=4:expandtab
+
+
+from kolejka.judge import config
+from kolejka.judge.paths import *
+from kolejka.judge.typing import *
+from kolejka.judge.validators import *
+from kolejka.judge.commands import *
+from kolejka.judge.tasks.base import *
+
+
+__all__ = [ 'CollectLogsTask' ]
+def __dir__():
+    return __all__
+
+
+class CollectLogsTask(TaskBase):
+    DEFAULT_SOURCE=config.LOG
+    DEFAULT_TARGET=config.COLLECTED_LOG
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = get_output_path(source)
+        self.target = get_output_path(target)
+
+    @property
+    def sources(self):
+        return self.get_sources()
+
+    def get_sources(self):
+        return self.find_files(self.source)
+
+    def execute(self):
+        self.set_result(self.run_command('zip', ZipCommand, target=self.target, sources=self.sources, store_directories=False))
+        return self.result

@@ -17,7 +17,7 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False):
         self._name = name
         self._system = system
         self._work_directory = work_directory
@@ -46,6 +46,7 @@ class TaskBase(AbstractTask):
         self._result_on_time = result_on_time
         self._result_on_memory = result_on_memory
         self._record_result = bool(record_result)
+        self._obligatory = bool(obligatory)
         self._commands = dict()
         self._result = ResultDict()
         self._prerequirements = list()
@@ -148,6 +149,12 @@ class TaskBase(AbstractTask):
         return self.get_record_result()
     def get_record_result(self):
         return self._record_result
+
+    @property
+    def obligatory(self) -> bool:
+        return self.get_obligatory()
+    def get_obligatory(self):
+        return self._obligatory
 
     @property
     def result(self) -> ResultDict:
