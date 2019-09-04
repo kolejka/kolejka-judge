@@ -4,6 +4,9 @@ assert sys.version_info >= (3, 6)
 
 DISTRIBUTION_ADDRESS = 'https://kolejka.matinf.uj.edu.pl/KolejkaJudge.zip'
 
+SATORI_STRING_LENGTH = 4096
+SATORI_RESULT = 'satori'
+
 LOG = 'log'
 COLLECTED_LOG = 'log.zip'
 

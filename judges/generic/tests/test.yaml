@@ -14,3 +14,11 @@ kolejka:
         pids        : 256
         storage     : '2G'
         workspace   : '2G'
+satori:
+    result:
+        execute_time_real : '/executor/run/real_time'
+        execute_time_cpu  : '/executor/run/cpu_time'
+        execute_memory    : '/executor/run/memory'
+        compile_log       : 'str:/builder/**/stdout,/builder/**/stderr'
+        checker_log       : 'str:/checker/**/stdout,/checker/**/stderr'
+        logs              : '/logs/logs'

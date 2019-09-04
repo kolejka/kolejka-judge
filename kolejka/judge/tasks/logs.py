@@ -32,4 +32,6 @@ class CollectLogsTask(TaskBase):
 
     def execute(self):
         self.set_result(self.run_command('zip', ZipCommand, target=self.target, sources=self.sources, store_directories=False))
+        if not self.status:
+            self.set_result(name='logs', value=self.resolve_path(self.target))
         return self.result

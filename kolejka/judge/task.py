@@ -10,12 +10,12 @@ from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 
 
-__all__ = [ 'commit_task', ]
+__all__ = [ 'kolejka_task', ]
 def __dir__():
     return __all__
 
 
-def commit_task(task_dir, tests, solution, judgepy):
+def kolejka_task(task_dir, tests, solution, judgepy):
 
     kolejka_image = None
     kolejka_requires = set()
@@ -38,6 +38,7 @@ def commit_task(task_dir, tests, solution, judgepy):
             kolejka_requires.add(req)
         kolejka_exclusive = kolejka_exclusive or bool(kolejka_opts.get('exclusive', False))
         kolejka_collects[test_id] = kolejka_opts.get('collect', [])
+        kolejka_collects[test_id].append(config.SATORI_RESULT+'/**')
         test_limits = kolejka_opts.get('limits', {})
         if 'time' in test_limits:
             kolejka_limits['time'] = kolejka_limits.get('time', datetime.timedelta(seconds=1)) + parse_time(test_limits['time'])

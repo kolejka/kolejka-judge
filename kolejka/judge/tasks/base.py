@@ -167,6 +167,9 @@ class TaskBase(AbstractTask):
             self._result.set_status(status)
         if name is not None:
             self._result.set(name, value)
+    @property
+    def status(self) -> Optional[str]:
+        return self.result.status
 
     @property
     def commands(self) -> Dict[str, AbstractCommand]:

@@ -195,7 +195,7 @@ class ResultDict:
         assert isinstance(key, str) or isinstance(key, int)
         if val is None:
             return
-        assert isinstance(val, Result) or isinstance(val, ResultDict)
+        assert isinstance(val, Result) or isinstance(val, ResultDict) or isinstance(val, str) or isinstance(val, int) or isinstance(val, float) or isinstance(val, pathlib.Path)
         self._dict[key] = val
     @property
     def status(self):
@@ -207,10 +207,20 @@ class ResultDict:
     @property
     def yaml(self):
         yaml = nononedict()
-        yaml['status'] = self._status
+        yaml['status'] = self.status
         for key, val in self._dict.items():
-            yaml[key] = val.yaml or None
+            if isinstance(val, str) or isinstance(val, int) or isinstance(val, float) or isinstance(val, pathlib.Path):
+                yaml[key] = val
+            else:
+                yaml[key] = val.yaml or None
         return OrderedDict(yaml)
     @yaml.setter
     def yaml(self, value):
         raise NotImplementedError #TODO: Need/Want?
+    def items(self):
+        ret = list()
+        ret.append(('status', self.status))
+        for key, val in self._dict.items():
+            ret.append((key,val))
+        return ret
+

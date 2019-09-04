@@ -67,6 +67,9 @@ def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
 
 
 def write_results(args, results):
+    from kolejka.judge.satori import satori_result
+    for test_id, test in args.tests.items():
+        satori_result(test, results[test_id], args.output_directory / str(test_id) )
     args.results.parent.mkdir(parents=True, exist_ok=True)
     ctxyaml_dump(results.yaml, args.output_directory, args.results)
 
@@ -95,7 +98,7 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         parser.error('TESTS file {} does not exist'.format(args.tests))
 
     try:
-        tests = ctxyaml_load(args.tests)
+        tests = dict([ (str(k),v) for k,v in ctxyaml_load(args.tests).items() ])
     except:
         parser.error('Failed to load TESTS file {}'.format(args.tests))
 
@@ -140,8 +143,8 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
 
 
     if args.task:
-        from kolejka.judge.task import commit_task
-        commit_task(args.task, tests, solution, runpy)
+        from kolejka.judge.task import kolejka_task
+        kolejka_task(args.task, tests, solution, runpy)
         logging.warning('Kolejka Task creasted')
         sys.exit(0)
 
