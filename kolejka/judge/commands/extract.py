@@ -14,6 +14,8 @@ def __dir__():
 
 
 class ExtractCommand(ProgramCommand):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, source, target, **kwargs):
         super().__init__(**kwargs)
         self._source = get_output_path(source)

@@ -14,6 +14,7 @@ def __dir__():
 
 class GroupAddCommand(ProgramCommand):
     DEFAULT_PROGRAM='groupadd'
+    DEFAULT_SAFE=True
     @default_kwargs
     def __init__(self, group_name, gid=None, **kwargs):
         super().__init__(**kwargs)
@@ -32,6 +33,7 @@ class GroupAddCommand(ProgramCommand):
 
 class GroupDelCommand(ProgramCommand):
     DEFAULT_PROGRAM='groupdel'
+    DEFAULT_SAFE=True
     @default_kwargs
     def __init__(self, group_name, **kwargs):
         super().__init__(**kwargs)
@@ -45,6 +47,7 @@ class GroupDelCommand(ProgramCommand):
 
 class UserAddCommand(ProgramCommand):
     DEFAULT_PROGRAM='useradd'
+    DEFAULT_SAFE=True
     @default_kwargs
     def __init__(self, user_name, uid=None, home=None, groups=None, shell=None, comment=None, **kwargs):
         super().__init__(**kwargs)
@@ -79,6 +82,7 @@ class UserAddCommand(ProgramCommand):
 
 class UserDelCommand(ProgramCommand):
     DEFAULT_PROGRAM='userdel'
+    DEFAULT_SAFE=True
     @default_kwargs
     def __init__(self, user_name, **kwargs):
         super().__init__(**kwargs)
@@ -91,6 +95,8 @@ class UserDelCommand(ProgramCommand):
 
 
 class DirectoryAddCommand(CommandBase):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, path, user_name=None, group_name=None, mode=None, **kwargs):
         super().__init__(**kwargs)
         self.path = get_output_path(path)
@@ -121,6 +127,8 @@ class DirectoryAddCommand(CommandBase):
         ]
 
 class InstallCommand(CommandBase):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, source, target, user_name=None, group_name=None, mode=None, **kwargs):
         super().__init__(**kwargs)
         self.source = get_output_path(source)
@@ -155,6 +163,8 @@ class InstallCommand(CommandBase):
 
 
 class ChownDirCommand(CommandBase):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, target, recursive=True, user_name=None, group_name=None, **kwargs):
         super().__init__(**kwargs)
         self.target = get_output_path(target)
@@ -188,6 +198,8 @@ class ChownDirCommand(CommandBase):
 
 
 class ChownFileCommand(CommandBase):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, target, user_name=None, group_name=None, **kwargs):
         super().__init__(**kwargs)
         self.target = get_output_path(target)

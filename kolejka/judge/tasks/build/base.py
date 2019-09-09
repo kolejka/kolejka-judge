@@ -98,7 +98,7 @@ class BuildTask(TaskBase):
         self.write_execution_script()
         if self.user_name or self.group_name:
             self.run_command('chown', ChownDirCommand, target=self.build_directory, recursive=True, user_name=self.user_name, group_name=self.group_name)
-            self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.build_directory])
+            self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.build_directory], safe=True) #TODO: upgrade to Command
 
 class SolutionBuildTask(SolutionBuildMixin, BuildTask):
     pass

@@ -14,6 +14,8 @@ def __dir__():
 
 
 class CompressCommand(ProgramCommand):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, sources, target, **kwargs):
         super().__init__(**kwargs)
         self._sources = [ get_output_path(source) for source in sources ]

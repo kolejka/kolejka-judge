@@ -15,6 +15,7 @@ def __dir__():
 
 class DiffCommand(ProgramCommand):
     DEFAULT_PROGRAM='diff'
+    DEFAULT_SAFE=True
     @default_kwargs
     def __init__(self, path_a, path_b, case_sensitive=True, space_sensitive=False, **kwargs):
         super().__init__(**kwargs)
@@ -42,6 +43,8 @@ class DiffCommand(ProgramCommand):
 
 
 class CheckerCommand(ExecutableCommand):
+    DEFAULT_SAFE=True
+    @default_kwargs
     def __init__(self, input_path=None, hint_path=None, answer_path=None, **kwargs):
         super().__init__(**kwargs)
         self.input_path = input_path and get_output_path(input_path)

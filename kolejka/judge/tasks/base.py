@@ -17,7 +17,7 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None):
         self._name = name
         self._system = system
         self._work_directory = work_directory
@@ -47,6 +47,7 @@ class TaskBase(AbstractTask):
         self._result_on_memory = result_on_memory
         self._record_result = bool(record_result)
         self._obligatory = bool(obligatory)
+        self._safe = safe
         self._commands = dict()
         self._result = ResultDict()
         self._prerequirements = list()
@@ -157,6 +158,12 @@ class TaskBase(AbstractTask):
         return self._obligatory
 
     @property
+    def safe(self) -> bool:
+        return self.get_safe()
+    def get_safe(self):
+        return self._safe
+
+    @property
     def result(self) -> ResultDict:
         return self.get_result()
     def get_result(self):
@@ -205,6 +212,9 @@ class TaskBase(AbstractTask):
         default_logs = self.default_logs
         if default_logs is not None:
             kwargs['default_logs'] = default_logs
+        safe = self.safe
+        if safe is not None:
+            kwargs['safe'] = safe
         return kwargs
 
     @property

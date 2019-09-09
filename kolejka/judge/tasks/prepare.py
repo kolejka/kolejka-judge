@@ -46,7 +46,7 @@ class PrepareTask(TaskBase):
             status = status or self.prepare_source('override', self.override)
         if self.user_name or self.group_name:
             status = status or self.run_command('chown', ChownDirCommand, target=self.target, recursive=True, user_name=self.user_name, group_name=self.group_name)
-            status = status or self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.target])
+            status = status or self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.target], safe=True)
         self.set_result(status)
         return self.result
 

@@ -25,7 +25,7 @@ DEFAULT_OUTPUT = CommandDefaultOutput()
 
 
 class CommandBase(AbstractCommand):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stderr=DEFAULT_OUTPUT, stderr_append=False, verbose=False, default_logs=True, obligatory=False):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stderr=DEFAULT_OUTPUT, stderr_append=False, verbose=False, default_logs=True, obligatory=False, safe=False):
         self._name = name
         self._system = system
         self._work_directory = work_directory or get_output_path('.')
@@ -41,6 +41,7 @@ class CommandBase(AbstractCommand):
         self._verbose = bool(verbose)
         self._default_logs = bool(default_logs)
         self._obligatory = bool(obligatory)
+        self._safe = bool(safe)
         self._result = None
         self._sequence_id = None
         self._prerequirements = list()
@@ -167,6 +168,12 @@ class CommandBase(AbstractCommand):
         return self.get_obligatory()
     def get_obligatory(self):
         return self._obligatory
+
+    @property
+    def safe(self) -> bool:
+        return self.get_safe()
+    def get_safe(self):
+        return self._safe
 
     @property
     def result(self) -> AbstractResult:

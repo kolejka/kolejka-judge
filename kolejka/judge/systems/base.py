@@ -199,20 +199,36 @@ class SystemBase(AbstractSystem):
                         stdout = command.stdout_path,
                         stderr = command.stderr_path,
                     )
-                self.execute_command(
-                    command_line,
-                    command.stdin_path,
-                    command.stdout_path,
-                    command.stdout_append,
-                    command.stderr_path,
-                    command.stderr_append,
-                    environment,
-                    command.work_path,
-                    command.user,
-                    command.group,
-                    limits,
-                    result,
-                )
+                if command.safe:
+                    self.execute_safe_command(
+                        command_line,
+                        command.stdin_path,
+                        command.stdout_path,
+                        command.stdout_append,
+                        command.stderr_path,
+                        command.stderr_append,
+                        environment,
+                        command.work_path,
+                        command.user,
+                        command.group,
+                        limits,
+                        result,
+                    )
+                else:
+                    self.execute_command(
+                        command_line,
+                        command.stdin_path,
+                        command.stdout_path,
+                        command.stdout_append,
+                        command.stderr_path,
+                        command.stderr_append,
+                        environment,
+                        command.work_path,
+                        command.user,
+                        command.group,
+                        limits,
+                        result,
+                    )
                 command_file.write('\n\nResult:\n')
                 command_file.write(repr(result)+'\n')
 
@@ -222,6 +238,9 @@ class SystemBase(AbstractSystem):
 
         self.validators.set_work_directory(None)
         return result
+
+    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits):
+        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits)
 
     def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits):
         raise NotImplementedError

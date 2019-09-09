@@ -2,13 +2,34 @@
 from contextlib import ExitStack
 import datetime
 import os
+import resource
 import subprocess
 import tempfile
+import threading
+import traceback
 
 
 from kolejka.judge import config
 from kolejka.judge.systems.base import *
 from kolejka.judge.parse import *
+
+from kolejka.judge.systems.proc import *
+
+
+def monitor_safe_process(process, limits, result):
+    while True:
+        proc = proc_info(process.pid)
+        if proc is None:
+            break
+        result.update_memory(proc['rss'])
+        result.update_real_time(proc['real_time'])
+        result.update_cpu_time(proc['cpu_user'] + proc['cpu_sys'])
+        if limits.cpu_time and result.cpu_time > limits.cpu_time:
+            process.kill()
+        if limits.real_time and result.real_time > limits.real_time:
+            process.kill()
+        if limits.memory and result.memory > limits.memory:
+            process.kill()
 
 
 class LocalSystem(SystemBase):
@@ -18,6 +39,43 @@ class LocalSystem(SystemBase):
 
     def get_superuser(self):
         return os.getuid() == 0
+
+    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
+        with ExitStack() as stack:
+            stdin_file = stack.enter_context(self.read_file(stdin_path))
+            stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
+            stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
+
+            change_user = self.get_change_user_function(user=user, group=group)
+            def preexec():
+                try:
+                    if limits.cpu_time:
+                        resource.setrlimit(resource.RLIMIT_CPU, (limits.cpu_time,limits.cpu_time))
+                    if limits.memory:
+                        resource.setrlimit(resource.RLIMIT_RSS, (limits.memory,limits.memory))
+                    resource.setrlimit(resource.RLIMIT_CORE, (0,0))
+                    resource.setrlimit(resource.RLIMIT_NPROC, (1,1))
+                    if change_user is not None:
+                        change_user()
+                except:
+                    traceback.print_exc()
+                    pass
+
+            process = subprocess.Popen(
+                command,
+                stdin=stdin_file,
+                stdout=stdout_file,
+                stderr=stderr_file,
+                env=environment,
+                preexec_fn=preexec,
+                cwd=work_path,
+            )
+            monitoring_thread = threading.Thread(target=monitor_safe_process, args=(process, limits, result))
+            monitoring_thread.start()
+            process.wait()
+            monitoring_thread.join()
+            result.set_returncode(process.returncode)
+
 
     def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
         with ExitStack() as stack:
