@@ -89,7 +89,8 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         with urllib.request.urlopen(config.DISTRIBUTION_ADDRESS) as library_request:
             if library_request.status == 200 and library_request.reason == 'OK':
                 library_data = library_request.read()
-                with open('KolejkaJudge.zip', 'wb') as library_file:
+                library_path = pathlib.Path(runpy).resolve().parent / config.DISTRIBUTION_PATH
+                with library_path.open('wb') as library_file:
                     library_file.write(library_data)
                 logging.warning('New Kolejka Judge library installed')
                 sys.exit(0)

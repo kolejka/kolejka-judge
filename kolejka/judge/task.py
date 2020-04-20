@@ -1,5 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 import datetime
+import logging
 import pathlib
 
 
@@ -82,9 +83,12 @@ def kolejka_task(task_dir, tests, solution, judgepy):
     solution_path = solution_dir / solution.name
     (task_dir/solution_path).symlink_to(solution)
     judgepy_path = pathlib.PurePath('judge.py')
-    (task_dir/judgepy_path).symlink_to(judgepy)
-    lib_path = pathlib.PurePath('KolejkaJudge.zip')
-    (task_dir/lib_path).symlink_to(judgepy.parent / lib_path)
+    (task_dir / judgepy_path).symlink_to(judgepy)
+    lib_path = pathlib.PurePath(config.DISTRIBUTION_PATH)
+    (task_dir / lib_path).symlink_to(judgepy.parent / lib_path)
+    if not (judgepy.parent / lib_path).is_file():
+        logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
+
 
     task_args = [ 'python3', str(judgepy_path), kolejka_system, '--tests', str(tests_yaml), '--solution', str(solution_path), '--output-directory', str(results_dir), '--results', str(results_yaml), ]
 

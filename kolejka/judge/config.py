@@ -2,7 +2,8 @@
 import sys
 assert sys.version_info >= (3, 6)
 
-DISTRIBUTION_ADDRESS = 'https://kolejka.matinf.uj.edu.pl/KolejkaJudge.zip'
+DISTRIBUTION_PATH = 'KolejkaJudge.zip'
+DISTRIBUTION_ADDRESS = 'https://kolejka.matinf.uj.edu.pl/' + DISTRIBUTION_PATH
 
 SATORI_STRING_LENGTH = 4096
 SATORI_RESULT = 'satori'
