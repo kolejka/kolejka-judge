@@ -1,0 +1,1202 @@
+'1':
+  status: OK
+  builder:
+    compile:
+      args: [g++, -std=c++14, -Wall, -O2, /var/lib/kolejka/task/results/1/solution/src/solution.cpp,
+        -o, /var/lib/kolejka/task/results/1/solution/build/a.out]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/1/solution/build
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: a0b6f44fdb0281e55b617a599872c46ae4d3837e, KOLEJKA_RUNNER_SESSION: 00c3522b4813490489bcb669f51158e5,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1/solution/build, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild}
+      limits: {real_time: 30.0s, memory: 536870912b}
+      stdout: !file '1/log/027_builder_03_compile_stdout.txt'
+      stderr: !file '1/log/027_builder_03_compile_stderr.txt'
+      cpu_time: 0.253886s
+      real_time: 0.0s
+      memory: 37433344b
+  executor:
+    run:
+      args: [/var/lib/kolejka/task/results/1/solution/exec]
+      returncode: 0
+      user: kolejkajudgeexec
+      group: kolejkajudgeexec
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgeexec, KOLEJKA_RUNNER_SECRET: fb404698b2da75b81a7c6a5651c2ddfa1a5552c1,
+        KOLEJKA_RUNNER_SESSION: 609bf11fb2ef4a57a20956f43754b8a6, LANG: en_US.UTF-8,
+        LOGNAME: kolejkajudgeexec, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash, USER: kolejkajudgeexec,
+        USERNAME: kolejkajudgeexec, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgeexec}
+      limits: {cpu_time: 1.0s, real_time: 2.0s, memory: 536870912b, cores: 1}
+      stdin: null
+      stdout: !file '1/test/answer'
+      stderr: !file '1/log/030_executor_run_stderr.txt'
+      cpu_time: 0.018127s
+      real_time: 0.0s
+      memory: 1179648b
+  checker:
+    diff:
+      args: [diff, -q, -w, -B, /var/lib/kolejka/task/tests/003/1.out, /var/lib/kolejka/task/results/1/test/answer]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash}
+      stdout: !file '1/log/031_checker_diff_stdout.txt'
+      stderr: !file '1/log/031_checker_diff_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+  logs:
+    zip:
+      args: [zip, --junk-paths, --no-wild, --symlinks, '-9', /var/lib/kolejka/task/results/1/log.zip,
+        /var/lib/kolejka/task/results/1/log/024_source_source_extract_cmd.txt, /var/lib/kolejka/task/results/1/log/024_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/024_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/025_source_chown_cmd.txt, /var/lib/kolejka/task/results/1/log/025_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/025_source_chown_stderr.txt, /var/lib/kolejka/task/results/1/log/026_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/026_source_chmod_stdout.txt, /var/lib/kolejka/task/results/1/log/026_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/027_builder_03_compile_cmd.txt, /var/lib/kolejka/task/results/1/log/027_builder_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/027_builder_03_compile_stderr.txt, /var/lib/kolejka/task/results/1/log/028_builder_chown_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/028_builder_chown_stdout.txt, /var/lib/kolejka/task/results/1/log/028_builder_chown_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/029_builder_chmod_cmd.txt, /var/lib/kolejka/task/results/1/log/029_builder_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/029_builder_chmod_stderr.txt, /var/lib/kolejka/task/results/1/log/030_executor_run_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/030_executor_run_stderr.txt, /var/lib/kolejka/task/results/1/log/031_checker_diff_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/031_checker_diff_stdout.txt, /var/lib/kolejka/task/results/1/log/031_checker_diff_stderr.txt]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash}
+      stdout: !file '1/log/032_logs_zip_stdout.txt'
+      stderr: !file '1/log/032_logs_zip_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    logs: !file '1/log.zip'
+  satori: {status: OK, checker_log: '', compile_log: '', execute_memory: 1179648b,
+    execute_time_cpu: 0.018127s, execute_time_real: 0.0s, logs: !file '1/satori/logs/log.zip'}
+'2':
+  status: OK
+  builder:
+    compile:
+      args: [g++, -std=c++14, -Wall, -O2, /var/lib/kolejka/task/results/2/solution/src/solution.cpp,
+        -o, /var/lib/kolejka/task/results/2/solution/build/a.out]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/2/solution/build
+      environment: {HOME: /var/lib/kolejka/task/results/2/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: a07db39623282695f725ee40be7de56bafe4a490, KOLEJKA_RUNNER_SESSION: 05571bc64cf0444899aa734839291ce3,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2/solution/build, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/2/home_kolejkajudgebuild}
+      limits: {real_time: 30.0s, memory: 536870912b}
+      stdout: !file '2/log/059_builder_03_compile_stdout.txt'
+      stderr: !file '2/log/059_builder_03_compile_stderr.txt'
+      cpu_time: 0.260574s
+      real_time: 0.0s
+      memory: 37011456b
+  generator:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '2/log/062_generator_dir_source_stdout.txt'
+      stderr: !file '2/log/062_generator_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '2/log/063_generator_dir_build_stdout.txt'
+      stderr: !file '2/log/063_generator_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/2/tools/src/generator/generator.cpp,
+          -o, /var/lib/kolejka/task/results/2/tools/build/generator/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/2/tools/build/generator
+        environment: {HOME: /var/lib/kolejka/task/results/2/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: e11a1fc4f65d04271a7029056f9b59348a53d9ae, KOLEJKA_RUNNER_SESSION: 28d7159d18244d248ab96ac372be9100,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/2/tools/build/generator, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/2/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '2/log/068_generator_build_03_compile_stdout.txt'
+        stderr: !file '2/log/068_generator_build_03_compile_stderr.txt'
+        cpu_time: 0.348628s
+        real_time: 0.0s
+        memory: 54808576b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/2/tools/generator]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/2
+        environment: {KOLEJKA_RUNNER_SECRET: 50adf3b8a5f2f71afe88e25112a8957dd99546b4,
+          KOLEJKA_RUNNER_SESSION: 5cc84079be144a2f821d613475df0a28, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/2,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: null
+        stdout: !file '2/test/input'
+        stderr: !file '2/log/069_generator_exec_run_stderr.txt'
+        cpu_time: 0.018525s
+        real_time: 0.0s
+        memory: 1179648b
+  executor:
+    run:
+      args: [/var/lib/kolejka/task/results/2/solution/exec]
+      returncode: 0
+      user: kolejkajudgeexec
+      group: kolejkajudgeexec
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {HOME: /var/lib/kolejka/task/results/2/home_kolejkajudgeexec, KOLEJKA_RUNNER_SECRET: 44dda6f9d10f409f75709ebdb633cd03daaabee0,
+        KOLEJKA_RUNNER_SESSION: 90b0e3cdcc0e4346ba3dd02733bd9e5b, LANG: en_US.UTF-8,
+        LOGNAME: kolejkajudgeexec, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash, USER: kolejkajudgeexec,
+        USERNAME: kolejkajudgeexec, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/2/home_kolejkajudgeexec}
+      limits: {cpu_time: 1.0s, real_time: 2.0s, memory: 536870912b, cores: 1}
+      stdin: !file '2/test/input'
+      stdout: !file '2/test/answer'
+      stderr: !file '2/log/070_executor_run_stderr.txt'
+      cpu_time: 0.018094s
+      real_time: 0.0s
+      memory: 1179648b
+  hinter:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '2/log/071_hinter_dir_source_stdout.txt'
+      stderr: !file '2/log/071_hinter_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '2/log/072_hinter_dir_build_stdout.txt'
+      stderr: !file '2/log/072_hinter_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/2/tools/src/hinter/hinter.cpp,
+          -o, /var/lib/kolejka/task/results/2/tools/build/hinter/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/2/tools/build/hinter
+        environment: {HOME: /var/lib/kolejka/task/results/2/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 4ec61e85e1a1c60b6a03f4cfb173176b74ced7df, KOLEJKA_RUNNER_SESSION: 9b2aa861aec043528c0642ac1f858397,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/2/tools/build/hinter, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/2/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '2/log/077_hinter_build_03_compile_stdout.txt'
+        stderr: !file '2/log/077_hinter_build_03_compile_stderr.txt'
+        cpu_time: 0.25314s
+        real_time: 0.0s
+        memory: 37253120b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/2/tools/hinter]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/2
+        environment: {KOLEJKA_RUNNER_SECRET: 596136c43f51fd64e3f252a06cd42eaa2c359b74,
+          KOLEJKA_RUNNER_SESSION: 49b5a1deb53d4cb286e0b30536e1a46b, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/2,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: !file '2/test/input'
+        stdout: !file '2/test/hint'
+        stderr: !file '2/log/078_hinter_exec_run_stderr.txt'
+        cpu_time: 0.018534s
+        real_time: 0.0s
+        memory: 1179648b
+  checker:
+    diff:
+      args: [diff, -q, -w, -B, /var/lib/kolejka/task/results/2/test/hint, /var/lib/kolejka/task/results/2/test/answer]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      stdout: !file '2/log/079_checker_diff_stdout.txt'
+      stderr: !file '2/log/079_checker_diff_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+  logs:
+    zip:
+      args: [zip, --junk-paths, --no-wild, --symlinks, '-9', /var/lib/kolejka/task/results/2/log.zip,
+        /var/lib/kolejka/task/results/2/log/056_source_source_extract_cmd.txt, /var/lib/kolejka/task/results/2/log/056_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/056_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/057_source_chown_cmd.txt, /var/lib/kolejka/task/results/2/log/057_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/057_source_chown_stderr.txt, /var/lib/kolejka/task/results/2/log/058_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/058_source_chmod_stdout.txt, /var/lib/kolejka/task/results/2/log/058_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/059_builder_03_compile_cmd.txt, /var/lib/kolejka/task/results/2/log/059_builder_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/059_builder_03_compile_stderr.txt, /var/lib/kolejka/task/results/2/log/060_builder_chown_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/060_builder_chown_stdout.txt, /var/lib/kolejka/task/results/2/log/060_builder_chown_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/061_builder_chmod_cmd.txt, /var/lib/kolejka/task/results/2/log/061_builder_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/061_builder_chmod_stderr.txt, /var/lib/kolejka/task/results/2/log/062_generator_dir_source_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/062_generator_dir_source_stdout.txt, /var/lib/kolejka/task/results/2/log/062_generator_dir_source_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/063_generator_dir_build_cmd.txt, /var/lib/kolejka/task/results/2/log/063_generator_dir_build_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/063_generator_dir_build_stderr.txt, /var/lib/kolejka/task/results/2/log/064_generator_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/064_generator_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/064_generator_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/065_generator_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/065_generator_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/065_generator_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/066_generator_source_chown_cmd.txt, /var/lib/kolejka/task/results/2/log/066_generator_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/066_generator_source_chown_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/067_generator_source_chmod_cmd.txt, /var/lib/kolejka/task/results/2/log/067_generator_source_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/067_generator_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/068_generator_build_03_compile_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/068_generator_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/068_generator_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/069_generator_exec_run_cmd.txt, /var/lib/kolejka/task/results/2/log/069_generator_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/070_executor_run_cmd.txt, /var/lib/kolejka/task/results/2/log/070_executor_run_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/071_hinter_dir_source_cmd.txt, /var/lib/kolejka/task/results/2/log/071_hinter_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/071_hinter_dir_source_stderr.txt, /var/lib/kolejka/task/results/2/log/072_hinter_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/072_hinter_dir_build_stdout.txt, /var/lib/kolejka/task/results/2/log/072_hinter_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/073_hinter_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/073_hinter_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/073_hinter_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/074_hinter_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/074_hinter_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/074_hinter_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/075_hinter_source_chown_cmd.txt, /var/lib/kolejka/task/results/2/log/075_hinter_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/075_hinter_source_chown_stderr.txt, /var/lib/kolejka/task/results/2/log/076_hinter_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/2/log/076_hinter_source_chmod_stdout.txt, /var/lib/kolejka/task/results/2/log/076_hinter_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/077_hinter_build_03_compile_cmd.txt, /var/lib/kolejka/task/results/2/log/077_hinter_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/077_hinter_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/078_hinter_exec_run_cmd.txt, /var/lib/kolejka/task/results/2/log/078_hinter_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/2/log/079_checker_diff_cmd.txt, /var/lib/kolejka/task/results/2/log/079_checker_diff_stdout.txt,
+        /var/lib/kolejka/task/results/2/log/079_checker_diff_stderr.txt]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/2
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/2, SHELL: /bin/bash}
+      stdout: !file '2/log/080_logs_zip_stdout.txt'
+      stderr: !file '2/log/080_logs_zip_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    logs: !file '2/log.zip'
+  satori: {status: OK, checker_log: '', compile_log: '', execute_memory: 1179648b,
+    execute_time_cpu: 0.018094s, execute_time_real: 0.0s, logs: !file '2/satori/logs/log.zip'}
+'3':
+  status: OK
+  builder:
+    compile:
+      args: [g++, -std=c++14, -Wall, -O2, /var/lib/kolejka/task/results/3/solution/src/solution.cpp,
+        -o, /var/lib/kolejka/task/results/3/solution/build/a.out]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/3/solution/build
+      environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: 2c3678ea1d6fcd4e9846df9b8c6938f2deedded9, KOLEJKA_RUNNER_SESSION: 19ddde9c47f04ddaa9b7b81b3b236405,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3/solution/build, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgebuild}
+      limits: {real_time: 30.0s, memory: 536870912b}
+      stdout: !file '3/log/107_builder_03_compile_stdout.txt'
+      stderr: !file '3/log/107_builder_03_compile_stderr.txt'
+      cpu_time: 0.253318s
+      real_time: 0.0s
+      memory: 37003264b
+  generator:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/110_generator_dir_source_stdout.txt'
+      stderr: !file '3/log/110_generator_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/111_generator_dir_build_stdout.txt'
+      stderr: !file '3/log/111_generator_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/3/tools/src/generator/generator.cpp,
+          -o, /var/lib/kolejka/task/results/3/tools/build/generator/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/3/tools/build/generator
+        environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: bc3ffff88bda1a3cac9e780e43f4a0e27a0273c0, KOLEJKA_RUNNER_SESSION: 53e8532f58ec4ae38e09fb683404d6c1,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/3/tools/build/generator, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '3/log/116_generator_build_03_compile_stdout.txt'
+        stderr: !file '3/log/116_generator_build_03_compile_stderr.txt'
+        cpu_time: 0.351995s
+        real_time: 0.0s
+        memory: 54853632b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/3/tools/generator]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/3
+        environment: {KOLEJKA_RUNNER_SECRET: 75ec766be428346dd7fd6a5e084e0e6c98c62c9a,
+          KOLEJKA_RUNNER_SESSION: 6267ddee78d94ad499104c231908004f, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/3,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: null
+        stdout: !file '3/test/input'
+        stderr: !file '3/log/117_generator_exec_run_stderr.txt'
+        cpu_time: 0.018186s
+        real_time: 0.0s
+        memory: 1232896b
+  verifier:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/verifier]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/118_verifier_dir_source_stdout.txt'
+      stderr: !file '3/log/118_verifier_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/verifier]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/119_verifier_dir_build_stdout.txt'
+      stderr: !file '3/log/119_verifier_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/3/tools/src/verifier/verifier.cpp,
+          -o, /var/lib/kolejka/task/results/3/tools/build/verifier/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/3/tools/build/verifier
+        environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 73239428ac5caca97b34a62b63fac0f16ec29ddd, KOLEJKA_RUNNER_SESSION: 797708e7133e4daab348a38d645f6f9b,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/3/tools/build/verifier, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '3/log/124_verifier_build_03_compile_stdout.txt'
+        stderr: !file '3/log/124_verifier_build_03_compile_stderr.txt'
+        cpu_time: 0.45645s
+        real_time: 0.0s
+        memory: 56930304b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/3/tools/verifier]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/3
+        environment: {KOLEJKA_RUNNER_SECRET: c7bf1af4e8225e8cb300fcf707cfb766be21648b,
+          KOLEJKA_RUNNER_SESSION: c05cd5a79b1344b5a8f197443b920b2b, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/3,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: !file '3/test/input'
+        stdout: !file '3/log/125_verifier_exec_run_stdout.txt'
+        stderr: !file '3/log/125_verifier_exec_run_stderr.txt'
+        cpu_time: 0.02459s
+        real_time: 0.0s
+        memory: 1179648b
+  executor:
+    run:
+      args: [/var/lib/kolejka/task/results/3/solution/exec]
+      returncode: 0
+      user: kolejkajudgeexec
+      group: kolejkajudgeexec
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgeexec, KOLEJKA_RUNNER_SECRET: 09ac556288b995357a9b7504d96986b0a53e60ab,
+        KOLEJKA_RUNNER_SESSION: c49022c43beb4f99b70d85d3ad3094aa, LANG: en_US.UTF-8,
+        LOGNAME: kolejkajudgeexec, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash, USER: kolejkajudgeexec,
+        USERNAME: kolejkajudgeexec, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgeexec}
+      limits: {cpu_time: 1.0s, real_time: 2.0s, memory: 536870912b, cores: 1}
+      stdin: !file '3/test/input'
+      stdout: !file '3/test/answer'
+      stderr: !file '3/log/126_executor_run_stderr.txt'
+      cpu_time: 0.01836s
+      real_time: 0.0s
+      memory: 1179648b
+  hinter:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/127_hinter_dir_source_stdout.txt'
+      stderr: !file '3/log/127_hinter_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '3/log/128_hinter_dir_build_stdout.txt'
+      stderr: !file '3/log/128_hinter_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/3/tools/src/hinter/hinter.cpp,
+          -o, /var/lib/kolejka/task/results/3/tools/build/hinter/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/3/tools/build/hinter
+        environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 510a4ec3d806c2530425b2427dd82a67b52b9529, KOLEJKA_RUNNER_SESSION: 3b884f1c40c440ae833c20d6c58497ae,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/3/tools/build/hinter, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '3/log/133_hinter_build_03_compile_stdout.txt'
+        stderr: !file '3/log/133_hinter_build_03_compile_stderr.txt'
+        cpu_time: 0.253186s
+        real_time: 0.0s
+        memory: 37294080b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/3/tools/hinter]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/3
+        environment: {KOLEJKA_RUNNER_SECRET: a522bf508d78eb19b8f0c6af81b85d5bab933c87,
+          KOLEJKA_RUNNER_SESSION: 8e995a3839ca4752bd8016a3c3566ab4, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/3,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: !file '3/test/input'
+        stdout: !file '3/test/hint'
+        stderr: !file '3/log/134_hinter_exec_run_stderr.txt'
+        cpu_time: 0.018046s
+        real_time: 0.0s
+        memory: 1179648b
+  checker:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/checker]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      stdout: !file '3/log/135_checker_dir_source_stdout.txt'
+      stderr: !file '3/log/135_checker_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/checker]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      stdout: !file '3/log/136_checker_dir_build_stdout.txt'
+      stderr: !file '3/log/136_checker_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      cmake:
+        args: [cmake, /var/lib/kolejka/task/results/3/tools/src/checker]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/3/tools/build/checker
+        environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 43fd87bdbff7684ee49598e04a15c23671cbb53d, KOLEJKA_RUNNER_SESSION: 61e116c1b94448208a5478a2f31c80fd,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/3/tools/build/checker, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgetest}
+        stdout: !file '3/log/141_checker_build_01_cmake_stdout.txt'
+        stderr: !file '3/log/141_checker_build_01_cmake_stderr.txt'
+        cpu_time: 0.897845s
+        real_time: 0.0s
+        memory: 15622144b
+      make:
+        args: [make, --silent, --makefile, /var/lib/kolejka/task/results/3/tools/build/checker/Makefile]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/3/tools/build/checker
+        environment: {HOME: /var/lib/kolejka/task/results/3/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 618b333a354e0d328d2922db0c5d5ffbe0850b5a, KOLEJKA_RUNNER_SESSION: 335207c33aee407486464259aee5ff27,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/3/tools/build/checker, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/3/home_kolejkajudgetest}
+        stdout: !file '3/log/142_checker_build_01_make_stdout.txt'
+        stderr: !file '3/log/142_checker_build_01_make_stderr.txt'
+        cpu_time: 0.315956s
+        real_time: 0.0s
+        memory: 40865792b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/3/tools/checker, /var/lib/kolejka/task/results/3/test/input,
+          /var/lib/kolejka/task/results/3/test/hint, /var/lib/kolejka/task/results/3/test/answer]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/3
+        environment: {KOLEJKA_RUNNER_SECRET: fafe076b3d189346f44750ba9600b84cad7bd710,
+          KOLEJKA_RUNNER_SESSION: 714dc3a56a8c4fb7a7cd94f4c7d67d1a, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/3,
+          SHELL: /bin/bash}
+        stdout: !file '3/log/143_checker_exec_run_stdout.txt'
+        stderr: !file '3/log/143_checker_exec_run_stderr.txt'
+        cpu_time: 0.018394s
+        real_time: 0.0s
+        memory: 1179648b
+  logs:
+    zip:
+      args: [zip, --junk-paths, --no-wild, --symlinks, '-9', /var/lib/kolejka/task/results/3/log.zip,
+        /var/lib/kolejka/task/results/3/log/104_source_source_extract_cmd.txt, /var/lib/kolejka/task/results/3/log/104_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/104_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/105_source_chown_cmd.txt, /var/lib/kolejka/task/results/3/log/105_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/105_source_chown_stderr.txt, /var/lib/kolejka/task/results/3/log/106_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/106_source_chmod_stdout.txt, /var/lib/kolejka/task/results/3/log/106_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/107_builder_03_compile_cmd.txt, /var/lib/kolejka/task/results/3/log/107_builder_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/107_builder_03_compile_stderr.txt, /var/lib/kolejka/task/results/3/log/108_builder_chown_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/108_builder_chown_stdout.txt, /var/lib/kolejka/task/results/3/log/108_builder_chown_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/109_builder_chmod_cmd.txt, /var/lib/kolejka/task/results/3/log/109_builder_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/109_builder_chmod_stderr.txt, /var/lib/kolejka/task/results/3/log/110_generator_dir_source_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/110_generator_dir_source_stdout.txt, /var/lib/kolejka/task/results/3/log/110_generator_dir_source_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/111_generator_dir_build_cmd.txt, /var/lib/kolejka/task/results/3/log/111_generator_dir_build_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/111_generator_dir_build_stderr.txt, /var/lib/kolejka/task/results/3/log/112_generator_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/112_generator_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/112_generator_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/113_generator_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/113_generator_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/113_generator_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/114_generator_source_chown_cmd.txt, /var/lib/kolejka/task/results/3/log/114_generator_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/114_generator_source_chown_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/115_generator_source_chmod_cmd.txt, /var/lib/kolejka/task/results/3/log/115_generator_source_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/115_generator_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/116_generator_build_03_compile_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/116_generator_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/116_generator_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/117_generator_exec_run_cmd.txt, /var/lib/kolejka/task/results/3/log/117_generator_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/118_verifier_dir_source_cmd.txt, /var/lib/kolejka/task/results/3/log/118_verifier_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/118_verifier_dir_source_stderr.txt, /var/lib/kolejka/task/results/3/log/119_verifier_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/119_verifier_dir_build_stdout.txt, /var/lib/kolejka/task/results/3/log/119_verifier_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/120_verifier_source_source_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/120_verifier_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/120_verifier_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/121_verifier_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/121_verifier_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/121_verifier_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/122_verifier_source_chown_cmd.txt, /var/lib/kolejka/task/results/3/log/122_verifier_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/122_verifier_source_chown_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/123_verifier_source_chmod_cmd.txt, /var/lib/kolejka/task/results/3/log/123_verifier_source_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/123_verifier_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/124_verifier_build_03_compile_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/124_verifier_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/124_verifier_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/125_verifier_exec_run_cmd.txt, /var/lib/kolejka/task/results/3/log/125_verifier_exec_run_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/125_verifier_exec_run_stderr.txt, /var/lib/kolejka/task/results/3/log/126_executor_run_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/126_executor_run_stderr.txt, /var/lib/kolejka/task/results/3/log/127_hinter_dir_source_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/127_hinter_dir_source_stdout.txt, /var/lib/kolejka/task/results/3/log/127_hinter_dir_source_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/128_hinter_dir_build_cmd.txt, /var/lib/kolejka/task/results/3/log/128_hinter_dir_build_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/128_hinter_dir_build_stderr.txt, /var/lib/kolejka/task/results/3/log/129_hinter_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/129_hinter_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/129_hinter_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/130_hinter_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/130_hinter_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/130_hinter_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/131_hinter_source_chown_cmd.txt, /var/lib/kolejka/task/results/3/log/131_hinter_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/131_hinter_source_chown_stderr.txt, /var/lib/kolejka/task/results/3/log/132_hinter_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/132_hinter_source_chmod_stdout.txt, /var/lib/kolejka/task/results/3/log/132_hinter_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/133_hinter_build_03_compile_cmd.txt, /var/lib/kolejka/task/results/3/log/133_hinter_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/133_hinter_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/134_hinter_exec_run_cmd.txt, /var/lib/kolejka/task/results/3/log/134_hinter_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/135_checker_dir_source_cmd.txt, /var/lib/kolejka/task/results/3/log/135_checker_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/135_checker_dir_source_stderr.txt, /var/lib/kolejka/task/results/3/log/136_checker_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/136_checker_dir_build_stdout.txt, /var/lib/kolejka/task/results/3/log/136_checker_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/137_checker_source_source_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/137_checker_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/137_checker_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/138_checker_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/138_checker_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/138_checker_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/139_checker_source_chown_cmd.txt, /var/lib/kolejka/task/results/3/log/139_checker_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/139_checker_source_chown_stderr.txt, /var/lib/kolejka/task/results/3/log/140_checker_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/3/log/140_checker_source_chmod_stdout.txt, /var/lib/kolejka/task/results/3/log/140_checker_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/141_checker_build_01_cmake_cmd.txt, /var/lib/kolejka/task/results/3/log/141_checker_build_01_cmake_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/141_checker_build_01_cmake_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/142_checker_build_01_make_cmd.txt, /var/lib/kolejka/task/results/3/log/142_checker_build_01_make_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/142_checker_build_01_make_stderr.txt,
+        /var/lib/kolejka/task/results/3/log/143_checker_exec_run_cmd.txt, /var/lib/kolejka/task/results/3/log/143_checker_exec_run_stdout.txt,
+        /var/lib/kolejka/task/results/3/log/143_checker_exec_run_stderr.txt]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/3
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/3, SHELL: /bin/bash}
+      stdout: !file '3/log/144_logs_zip_stdout.txt'
+      stderr: !file '3/log/144_logs_zip_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    logs: !file '3/log.zip'
+  satori: {status: OK, checker_log: '-- The C compiler identification is GNU 7.5.0
+
+      -- The CXX compiler identification is GNU 7.5.0
+
+      -- Check for working C compiler: /usr/bin/cc
+
+      -- Check for working C compiler: /usr/bin/cc -- works
+
+      -- Detecting C compiler ABI info
+
+      -- Detecting C compiler ABI info - done
+
+      -- Detecting C compile features
+
+      -- Detecting C compile features - done
+
+      -- Check for working CXX compiler: /usr/bin/c++
+
+      -- Check for working CXX compiler: /usr/bin/c++ -- works
+
+      -- Detecting CXX compiler ABI info
+
+      -- Detecting CXX compiler ABI info - done
+
+      -- Detecting CXX compile features
+
+      -- Detecting CXX compile features - done
+
+      -- Configuring done
+
+      -- Generating done
+
+      -- Build files have been written to: /var/lib/kolejka/task/results/3/tools/build/checker
+
+
+      Scanning dependencies of target checker
+
+      [ 50%] Building CXX object CMakeFiles/checker.dir/checker.cpp.o
+
+      [100%] Linking CXX executable checker
+
+      [100%] Built target checker
+
+      ', compile_log: '', execute_memory: 1179648b, execute_time_cpu: 0.01836s, execute_time_real: 0.0s,
+    logs: !file '3/satori/logs/log.zip'}
+'4':
+  status: OK
+  builder:
+    copy:
+      args: [rsync, -a, /var/lib/kolejka/task/results/4/solution/src/, /var/lib/kolejka/task/results/4/solution/build/]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: 24d45f54e9d3720c5330f3bc77a37ba709b00479, KOLEJKA_RUNNER_SESSION: 32732eca9b064d098b59fa7ea692d3cb,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgebuild}
+      limits: {real_time: 30.0s, memory: 536870912b}
+      stdout: !file '4/log/172_builder_02_copy_stdout.txt'
+      stderr: !file '4/log/172_builder_02_copy_stderr.txt'
+      cpu_time: 0.019558s
+      real_time: 0.0s
+      memory: 1843200b
+    make:
+      args: [make, --silent, --makefile, /var/lib/kolejka/task/results/4/solution/build/Makefile]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/4/solution/build
+      environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: 7e154e1f70d8e4fe8a93410560a496dc7cda251e, KOLEJKA_RUNNER_SESSION: 0ee3851b07f145498fef9a6d69ce46dd,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4/solution/build, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgebuild}
+      limits: {real_time: 30.0s, memory: 536870912b}
+      stdout: !file '4/log/173_builder_02_make_stdout.txt'
+      stderr: !file '4/log/173_builder_02_make_stderr.txt'
+      cpu_time: 0.276815s
+      real_time: 0.0s
+      memory: 41877504b
+  generator:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/176_generator_dir_source_stdout.txt'
+      stderr: !file '4/log/176_generator_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/generator]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/177_generator_dir_build_stdout.txt'
+      stderr: !file '4/log/177_generator_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/4/tools/src/generator/generator.cpp,
+          -o, /var/lib/kolejka/task/results/4/tools/build/generator/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/4/tools/build/generator
+        environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 8fa5247481e5974101f7fe8101a6dd1a9d8d2ab6, KOLEJKA_RUNNER_SESSION: 644a6c9f3b254627b3475af2b306fca4,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/4/tools/build/generator, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '4/log/182_generator_build_03_compile_stdout.txt'
+        stderr: !file '4/log/182_generator_build_03_compile_stderr.txt'
+        cpu_time: 0.345097s
+        real_time: 0.0s
+        memory: 54800384b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/4/tools/generator]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/4
+        environment: {KOLEJKA_RUNNER_SECRET: 7fb687f8826679ec66f89c40100eee482b672295,
+          KOLEJKA_RUNNER_SESSION: b42cc78d9bb844eb89ec42752e4cfe3b, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/4,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: null
+        stdout: !file '4/test/input'
+        stderr: !file '4/log/183_generator_exec_run_stderr.txt'
+        cpu_time: 0.020632s
+        real_time: 0.0s
+        memory: 1179648b
+  verifier:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/verifier]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/184_verifier_dir_source_stdout.txt'
+      stderr: !file '4/log/184_verifier_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/verifier]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/185_verifier_dir_build_stdout.txt'
+      stderr: !file '4/log/185_verifier_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/4/tools/src/verifier/verifier.cpp,
+          -o, /var/lib/kolejka/task/results/4/tools/build/verifier/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/4/tools/build/verifier
+        environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: faedfa12054d2445d8f998143d845c86ecbc66fe, KOLEJKA_RUNNER_SESSION: eb12e69aaa3f4a108e7154968e617545,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/4/tools/build/verifier, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '4/log/190_verifier_build_03_compile_stdout.txt'
+        stderr: !file '4/log/190_verifier_build_03_compile_stderr.txt'
+        cpu_time: 0.458865s
+        real_time: 0.0s
+        memory: 56815616b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/4/tools/verifier]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/4
+        environment: {KOLEJKA_RUNNER_SECRET: 5cfa2eeafd958cb5fa1e5717218dc07b4d00f243,
+          KOLEJKA_RUNNER_SESSION: 6ac34b3c3a574ae0b879f1e42677f742, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/4,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: !file '4/test/input'
+        stdout: !file '4/log/191_verifier_exec_run_stdout.txt'
+        stderr: !file '4/log/191_verifier_exec_run_stderr.txt'
+        cpu_time: 0.021398s
+        real_time: 0.0s
+        memory: 1179648b
+  executor:
+    run:
+      args: [/var/lib/kolejka/task/results/4/solution/exec]
+      returncode: 0
+      user: kolejkajudgeexec
+      group: kolejkajudgeexec
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgeexec, KOLEJKA_RUNNER_SECRET: 65fd4c816d29352932ef2dee3f4598b4c2a96949,
+        KOLEJKA_RUNNER_SESSION: 5ce5c922b8fc4889bba71d0e4bd93032, LANG: en_US.UTF-8,
+        LOGNAME: kolejkajudgeexec, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash, USER: kolejkajudgeexec,
+        USERNAME: kolejkajudgeexec, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgeexec}
+      limits: {cpu_time: 1.0s, real_time: 2.0s, memory: 536870912b, cores: 1}
+      stdin: !file '4/test/input'
+      stdout: !file '4/test/answer'
+      stderr: !file '4/log/192_executor_run_stderr.txt'
+      cpu_time: 0.018123s
+      real_time: 0.0s
+      memory: 1179648b
+  hinter:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/193_hinter_dir_source_stdout.txt'
+      stderr: !file '4/log/193_hinter_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/hinter]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      limits: {real_time: 10.0s}
+      stdout: !file '4/log/194_hinter_dir_build_stdout.txt'
+      stderr: !file '4/log/194_hinter_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      compile:
+        args: [g++, -Wall, -O2, /var/lib/kolejka/task/results/4/tools/src/hinter/hinter.cpp,
+          -o, /var/lib/kolejka/task/results/4/tools/build/hinter/a.out]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/4/tools/build/hinter
+        environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 3b60881629d68b72d7db64d6536bfdba43372eb2, KOLEJKA_RUNNER_SESSION: 53e85f67304f443a9bc2eebbbac18370,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/4/tools/build/hinter, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgetest}
+        limits: {real_time: 10.0s}
+        stdout: !file '4/log/199_hinter_build_03_compile_stdout.txt'
+        stderr: !file '4/log/199_hinter_build_03_compile_stderr.txt'
+        cpu_time: 0.252852s
+        real_time: 0.0s
+        memory: 37261312b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/4/tools/hinter]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/4
+        environment: {KOLEJKA_RUNNER_SECRET: ee69467a9e1844ee7401f0d2fc4510c410300d1b,
+          KOLEJKA_RUNNER_SESSION: 5f5308c34a2c428496c7d05d828396ac, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/4,
+          SHELL: /bin/bash}
+        limits: {real_time: 10.0s}
+        stdin: !file '4/test/input'
+        stdout: !file '4/test/hint'
+        stderr: !file '4/log/200_hinter_exec_run_stderr.txt'
+        cpu_time: 0.017996s
+        real_time: 0.0s
+        memory: 1179648b
+  checker:
+    dir_source:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/src/checker]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      stdout: !file '4/log/201_checker_dir_source_stdout.txt'
+      stderr: !file '4/log/201_checker_dir_source_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    dir_build:
+      args: [install, --owner, kolejkajudgetest, --group, kolejkajudgetest, --mode,
+        '02750', --directory, tools/build/checker]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      stdout: !file '4/log/202_checker_dir_build_stdout.txt'
+      stderr: !file '4/log/202_checker_dir_build_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    build:
+      cmake:
+        args: [cmake, /var/lib/kolejka/task/results/4/tools/src/checker]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/4/tools/build/checker
+        environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 6894f2bc74ee77bd5f6bb6ec6845a9637c21bb81, KOLEJKA_RUNNER_SESSION: 5c5deb8b353f491f95d6f351487203ef,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/4/tools/build/checker, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgetest}
+        stdout: !file '4/log/207_checker_build_01_cmake_stdout.txt'
+        stderr: !file '4/log/207_checker_build_01_cmake_stderr.txt'
+        cpu_time: 0.90476s
+        real_time: 0.0s
+        memory: 15069184b
+      make:
+        args: [make, --silent, --makefile, /var/lib/kolejka/task/results/4/tools/build/checker/Makefile]
+        returncode: 0
+        user: kolejkajudgetest
+        group: kolejkajudgetest
+        work_directory: /var/lib/kolejka/task/results/4/tools/build/checker
+        environment: {HOME: /var/lib/kolejka/task/results/4/home_kolejkajudgetest,
+          KOLEJKA_RUNNER_SECRET: 437d216ba2c5a23873588b2c618f59500b2b87fb, KOLEJKA_RUNNER_SESSION: 53eb29c43b324a70803a041df0d0c684,
+          LANG: en_US.UTF-8, LOGNAME: kolejkajudgetest, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+          PWD: /var/lib/kolejka/task/results/4/tools/build/checker, SHELL: /bin/bash,
+          USER: kolejkajudgetest, USERNAME: kolejkajudgetest, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/4/home_kolejkajudgetest}
+        stdout: !file '4/log/208_checker_build_01_make_stdout.txt'
+        stderr: !file '4/log/208_checker_build_01_make_stderr.txt'
+        cpu_time: 0.31733s
+        real_time: 0.0s
+        memory: 40939520b
+    exec:
+      run:
+        args: [/var/lib/kolejka/task/results/4/tools/checker, /var/lib/kolejka/task/results/4/test/input,
+          /var/lib/kolejka/task/results/4/test/hint, /var/lib/kolejka/task/results/4/test/answer]
+        returncode: 0
+        work_directory: /var/lib/kolejka/task/results/4
+        environment: {KOLEJKA_RUNNER_SECRET: 73c935d7913f5bfb50dfa425c807b0fc489bc4e2,
+          KOLEJKA_RUNNER_SESSION: 9971df36d2434d62b487b8417e154b70, LANG: en_US.UTF-8,
+          PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', PWD: /var/lib/kolejka/task/results/4,
+          SHELL: /bin/bash}
+        stdout: !file '4/log/209_checker_exec_run_stdout.txt'
+        stderr: !file '4/log/209_checker_exec_run_stderr.txt'
+        cpu_time: 0.018223s
+        real_time: 0.0s
+        memory: 1179648b
+  logs:
+    zip:
+      args: [zip, --junk-paths, --no-wild, --symlinks, '-9', /var/lib/kolejka/task/results/4/log.zip,
+        /var/lib/kolejka/task/results/4/log/168_source_source_extract_cmd.txt, /var/lib/kolejka/task/results/4/log/168_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/168_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/169_source_override_extract_cmd.txt, /var/lib/kolejka/task/results/4/log/169_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/169_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/170_source_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/170_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/170_source_chown_stderr.txt, /var/lib/kolejka/task/results/4/log/171_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/171_source_chmod_stdout.txt, /var/lib/kolejka/task/results/4/log/171_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/172_builder_02_copy_cmd.txt, /var/lib/kolejka/task/results/4/log/172_builder_02_copy_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/172_builder_02_copy_stderr.txt, /var/lib/kolejka/task/results/4/log/173_builder_02_make_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/173_builder_02_make_stdout.txt, /var/lib/kolejka/task/results/4/log/173_builder_02_make_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/174_builder_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/174_builder_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/174_builder_chown_stderr.txt, /var/lib/kolejka/task/results/4/log/175_builder_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/175_builder_chmod_stdout.txt, /var/lib/kolejka/task/results/4/log/175_builder_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/176_generator_dir_source_cmd.txt, /var/lib/kolejka/task/results/4/log/176_generator_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/176_generator_dir_source_stderr.txt, /var/lib/kolejka/task/results/4/log/177_generator_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/177_generator_dir_build_stdout.txt, /var/lib/kolejka/task/results/4/log/177_generator_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/178_generator_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/178_generator_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/178_generator_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/179_generator_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/179_generator_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/179_generator_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/180_generator_source_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/180_generator_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/180_generator_source_chown_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/181_generator_source_chmod_cmd.txt, /var/lib/kolejka/task/results/4/log/181_generator_source_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/181_generator_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/182_generator_build_03_compile_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/182_generator_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/182_generator_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/183_generator_exec_run_cmd.txt, /var/lib/kolejka/task/results/4/log/183_generator_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/184_verifier_dir_source_cmd.txt, /var/lib/kolejka/task/results/4/log/184_verifier_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/184_verifier_dir_source_stderr.txt, /var/lib/kolejka/task/results/4/log/185_verifier_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/185_verifier_dir_build_stdout.txt, /var/lib/kolejka/task/results/4/log/185_verifier_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/186_verifier_source_source_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/186_verifier_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/186_verifier_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/187_verifier_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/187_verifier_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/187_verifier_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/188_verifier_source_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/188_verifier_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/188_verifier_source_chown_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/189_verifier_source_chmod_cmd.txt, /var/lib/kolejka/task/results/4/log/189_verifier_source_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/189_verifier_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/190_verifier_build_03_compile_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/190_verifier_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/190_verifier_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/191_verifier_exec_run_cmd.txt, /var/lib/kolejka/task/results/4/log/191_verifier_exec_run_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/191_verifier_exec_run_stderr.txt, /var/lib/kolejka/task/results/4/log/192_executor_run_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/192_executor_run_stderr.txt, /var/lib/kolejka/task/results/4/log/193_hinter_dir_source_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/193_hinter_dir_source_stdout.txt, /var/lib/kolejka/task/results/4/log/193_hinter_dir_source_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/194_hinter_dir_build_cmd.txt, /var/lib/kolejka/task/results/4/log/194_hinter_dir_build_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/194_hinter_dir_build_stderr.txt, /var/lib/kolejka/task/results/4/log/195_hinter_source_source_install_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/195_hinter_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/195_hinter_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/196_hinter_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/196_hinter_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/196_hinter_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/197_hinter_source_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/197_hinter_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/197_hinter_source_chown_stderr.txt, /var/lib/kolejka/task/results/4/log/198_hinter_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/198_hinter_source_chmod_stdout.txt, /var/lib/kolejka/task/results/4/log/198_hinter_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/199_hinter_build_03_compile_cmd.txt, /var/lib/kolejka/task/results/4/log/199_hinter_build_03_compile_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/199_hinter_build_03_compile_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/200_hinter_exec_run_cmd.txt, /var/lib/kolejka/task/results/4/log/200_hinter_exec_run_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/201_checker_dir_source_cmd.txt, /var/lib/kolejka/task/results/4/log/201_checker_dir_source_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/201_checker_dir_source_stderr.txt, /var/lib/kolejka/task/results/4/log/202_checker_dir_build_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/202_checker_dir_build_stdout.txt, /var/lib/kolejka/task/results/4/log/202_checker_dir_build_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/203_checker_source_source_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/203_checker_source_source_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/203_checker_source_source_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/204_checker_source_override_extract_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/204_checker_source_override_extract_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/204_checker_source_override_extract_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/205_checker_source_chown_cmd.txt, /var/lib/kolejka/task/results/4/log/205_checker_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/205_checker_source_chown_stderr.txt, /var/lib/kolejka/task/results/4/log/206_checker_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/4/log/206_checker_source_chmod_stdout.txt, /var/lib/kolejka/task/results/4/log/206_checker_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/207_checker_build_01_cmake_cmd.txt, /var/lib/kolejka/task/results/4/log/207_checker_build_01_cmake_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/207_checker_build_01_cmake_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/208_checker_build_01_make_cmd.txt, /var/lib/kolejka/task/results/4/log/208_checker_build_01_make_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/208_checker_build_01_make_stderr.txt,
+        /var/lib/kolejka/task/results/4/log/209_checker_exec_run_cmd.txt, /var/lib/kolejka/task/results/4/log/209_checker_exec_run_stdout.txt,
+        /var/lib/kolejka/task/results/4/log/209_checker_exec_run_stderr.txt]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/4
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/4, SHELL: /bin/bash}
+      stdout: !file '4/log/210_logs_zip_stdout.txt'
+      stderr: !file '4/log/210_logs_zip_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    logs: !file '4/log.zip'
+  satori: {status: OK, checker_log: '-- The C compiler identification is GNU 7.5.0
+
+      -- The CXX compiler identification is GNU 7.5.0
+
+      -- Check for working C compiler: /usr/bin/cc
+
+      -- Check for working C compiler: /usr/bin/cc -- works
+
+      -- Detecting C compiler ABI info
+
+      -- Detecting C compiler ABI info - done
+
+      -- Detecting C compile features
+
+      -- Detecting C compile features - done
+
+      -- Check for working CXX compiler: /usr/bin/c++
+
+      -- Check for working CXX compiler: /usr/bin/c++ -- works
+
+      -- Detecting CXX compiler ABI info
+
+      -- Detecting CXX compiler ABI info - done
+
+      -- Detecting CXX compile features
+
+      -- Detecting CXX compile features - done
+
+      -- Configuring done
+
+      -- Generating done
+
+      -- Build files have been written to: /var/lib/kolejka/task/results/4/tools/build/checker
+
+
+      Scanning dependencies of target checker
+
+      [ 50%] Building CXX object CMakeFiles/checker.dir/checker.cpp.o
+
+      [100%] Linking CXX executable checker
+
+      [100%] Built target checker
+
+      ', compile_log: '', execute_memory: 1179648b, execute_time_cpu: 0.018123s, execute_time_real: 0.0s,
+    logs: !file '4/satori/logs/log.zip'}

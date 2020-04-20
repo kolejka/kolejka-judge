@@ -1,0 +1,107 @@
+'1':
+  status: OK
+  builder:
+    compile:
+      args: [g++, -std=c++14, -Wall, -O2, /var/lib/kolejka/task/results/1/solution/src/hello.cpp,
+        -o, /var/lib/kolejka/task/results/1/solution/build/a.out]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/1/solution/build
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild,
+        KOLEJKA_RUNNER_SECRET: c1f96480129b81232ea6eb72b8fa39405e806138, KOLEJKA_RUNNER_SESSION: e3289e8eecaa4430a4aaa83983dff828,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1/solution/build, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild}
+      stdout: !file '1/log/027_builder_compile_stdout.txt'
+      stderr: !file '1/log/027_builder_compile_stderr.txt'
+      cpu_time: 0.262786s
+      real_time: 0.0s
+      memory: 36601856b
+    chown:
+      args: [chgrp, kolejkajudgerun, --recursive, /var/lib/kolejka/task/results/1/solution/build]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild}
+      stdout: !file '1/log/028_builder_chown_stdout.txt'
+      stderr: !file '1/log/028_builder_chown_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    chmod:
+      args: [chmod, 'o-rwx,g-w+r,u+rw', -R, /var/lib/kolejka/task/results/1/solution/build]
+      returncode: 0
+      user: kolejkajudgebuild
+      group: kolejkajudgebuild
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild,
+        LANG: en_US.UTF-8, LOGNAME: kolejkajudgebuild, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash, USER: kolejkajudgebuild,
+        USERNAME: kolejkajudgebuild, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgebuild}
+      stdout: !file '1/log/029_builder_chmod_stdout.txt'
+      stderr: !file '1/log/029_builder_chmod_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+  executor:
+    run:
+      args: [/var/lib/kolejka/task/results/1/solution/exec]
+      returncode: 0
+      user: kolejkajudgeexec
+      group: kolejkajudgeexec
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {HOME: /var/lib/kolejka/task/results/1/home_kolejkajudgeexec, KOLEJKA_RUNNER_SECRET: 719b08feee971e6ed804e8926740c50ef1044126,
+        KOLEJKA_RUNNER_SESSION: c57bdd02493f40788a60f2a0710da719, LANG: en_US.UTF-8,
+        LOGNAME: kolejkajudgeexec, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash, USER: kolejkajudgeexec,
+        USERNAME: kolejkajudgeexec, XDG_RUNTIME_DIR: /var/lib/kolejka/task/results/1/home_kolejkajudgeexec}
+      limits: {cpu_time: 1.0s, real_time: 1.5s, memory: 536870912b, cores: 1}
+      stdin: null
+      stdout: !file '1/test/answer'
+      stderr: !file '1/log/030_executor_run_stderr.txt'
+      cpu_time: 0.020168s
+      real_time: 0.0s
+      memory: 1179648b
+  checker:
+    diff:
+      args: [diff, -q, -w, -B, /var/lib/kolejka/task/tests/002/1.out, /var/lib/kolejka/task/results/1/test/answer]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash}
+      stdout: !file '1/log/031_checker_diff_stdout.txt'
+      stderr: !file '1/log/031_checker_diff_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+  logs:
+    zip:
+      args: [zip, --junk-paths, --no-wild, --symlinks, '-9', /var/lib/kolejka/task/results/1/log.zip,
+        /var/lib/kolejka/task/results/1/log/024_source_source_install_cmd.txt, /var/lib/kolejka/task/results/1/log/024_source_source_install_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/024_source_source_install_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/025_source_chown_cmd.txt, /var/lib/kolejka/task/results/1/log/025_source_chown_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/025_source_chown_stderr.txt, /var/lib/kolejka/task/results/1/log/026_source_chmod_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/026_source_chmod_stdout.txt, /var/lib/kolejka/task/results/1/log/026_source_chmod_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/027_builder_compile_cmd.txt, /var/lib/kolejka/task/results/1/log/027_builder_compile_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/027_builder_compile_stderr.txt, /var/lib/kolejka/task/results/1/log/028_builder_chown_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/028_builder_chown_stdout.txt, /var/lib/kolejka/task/results/1/log/028_builder_chown_stderr.txt,
+        /var/lib/kolejka/task/results/1/log/029_builder_chmod_cmd.txt, /var/lib/kolejka/task/results/1/log/029_builder_chmod_stdout.txt,
+        /var/lib/kolejka/task/results/1/log/029_builder_chmod_stderr.txt, /var/lib/kolejka/task/results/1/log/030_executor_run_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/030_executor_run_stderr.txt, /var/lib/kolejka/task/results/1/log/031_checker_diff_cmd.txt,
+        /var/lib/kolejka/task/results/1/log/031_checker_diff_stdout.txt, /var/lib/kolejka/task/results/1/log/031_checker_diff_stderr.txt]
+      returncode: 0
+      work_directory: /var/lib/kolejka/task/results/1
+      environment: {LANG: en_US.UTF-8, PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+        PWD: /var/lib/kolejka/task/results/1, SHELL: /bin/bash}
+      stdout: !file '1/log/032_logs_zip_stdout.txt'
+      stderr: !file '1/log/032_logs_zip_stderr.txt'
+      cpu_time: 0.0s
+      real_time: 0.0s
+      memory: 0b
+    logs: !file '1/log.zip'
+  satori: {status: OK}

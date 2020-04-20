@@ -1,0 +1,86 @@
+{
+  "files": {
+    "console_stderr.txt": {
+      "path": "console_stderr.txt",
+      "reference": "8ec1ff6971fb48208321d3d935409978"
+    },
+    "console_stdout.txt": {
+      "path": "console_stdout.txt",
+      "reference": "37fcca6f185d4c44b3deff35a5fc3d0f"
+    },
+    "results/1/log.zip": {
+      "path": "results/1/log.zip",
+      "reference": "9a1eb05119e34455a723d0064a28f91f"
+    },
+    "results/results.yaml": {
+      "path": "results/results.yaml",
+      "reference": "431f68a98acf4866a6a72350149dd303"
+    }
+  },
+  "id": "56007ee8a26647bd8a820585f4026e1f",
+  "limits": {
+    "cpus": 1,
+    "cpus_offset": 0,
+    "image": "1421774939b",
+    "memory": "4294967296b",
+    "network": false,
+    "pids": 256,
+    "storage": "1073741824b",
+    "swap": "0b",
+    "time": "10.0s",
+    "workspace": "2147483648b"
+  },
+  "result": 0,
+  "stats": {
+    "cpus": {
+      "*": {
+        "system": "0.21s",
+        "usage": "1.57456s",
+        "user": "1.36s"
+      },
+      "0": {
+        "usage": "1.566188s"
+      },
+      "1": {
+        "usage": "0.002347s"
+      },
+      "2": {
+        "usage": "0.00067s"
+      },
+      "3": {
+        "usage": "0.002012s"
+      },
+      "4": {
+        "usage": "0.000136s"
+      },
+      "5": {
+        "usage": "0.000283s"
+      },
+      "6": {
+        "usage": "0.002516s"
+      },
+      "7": {
+        "usage": "0.000408s"
+      }
+    },
+    "memory": {
+      "failures": 0,
+      "max_swap": "131072b",
+      "max_usage": "81047552b"
+    },
+    "pids": {
+      "failures": 0,
+      "max_usage": 6
+    },
+    "time": "2.043534s"
+  },
+  "stderr": "console_stderr.txt",
+  "stdout": "console_stdout.txt",
+  "tags": [
+    "test",
+    "cpu:intel",
+    "cpu:xeon e3-1270 v5",
+    "cpus:8",
+    "kolejka.matinf.uj.edu.pl"
+  ]
+}

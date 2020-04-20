@@ -1,0 +1,12 @@
+'1':
+  hint: !file '002/1.out'
+  input: !file '001/1.in'
+  kolejka:
+    collect: [log.zip, satori/**]
+    exclusive: false
+    image: kolejka/satori:judge
+    limits: {cpus: 1, memory: 4G, network: false, pids: 256, storage: 2G, swap: 0,
+      time: 20s, workspace: 2G}
+    requires: ['cpu:xeon e3-1270 v5']
+  memory: 512MB
+  time: 1s

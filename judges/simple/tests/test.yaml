@@ -5,11 +5,11 @@ kolejka:
     requires    : [ 'cpu:xeon e3-1270 v5' ]
     collect     : [ 'log.zip' ]
     limits: 
-        time        : '20s',
-        memory      : '4G',
-        swap        : 0,
-        cpus        : 1,
-        network     : false,
-        pids        : 256,
-        storage     : '2G',
-        workspace   : '2G',
+        time        : '20s'
+        memory      : '4G'
+        swap        : 0
+        cpus        : 1
+        network     : false
+        pids        : 256
+        storage     : '2G'
+        workspace   : '2G'

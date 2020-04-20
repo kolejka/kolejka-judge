@@ -1,0 +1,109 @@
+{
+  "args": [
+    "python3",
+    "judge.py",
+    "--observer",
+    "--tests",
+    "tests/tests.yaml",
+    "--solution",
+    "solution/solution.zip",
+    "--output-directory",
+    "results",
+    "--results",
+    "results.yaml"
+  ],
+  "collect": [
+    {
+      "glob": "results/results.yaml"
+    },
+    {
+      "glob": "results/1/log.zip"
+    },
+    {
+      "glob": "results/1/satori/**"
+    },
+    {
+      "glob": "results/2/log.zip"
+    },
+    {
+      "glob": "results/2/satori/**"
+    },
+    {
+      "glob": "results/3/log.zip"
+    },
+    {
+      "glob": "results/3/satori/**"
+    },
+    {
+      "glob": "results/4/log.zip"
+    },
+    {
+      "glob": "results/4/satori/**"
+    }
+  ],
+  "environment": {},
+  "exclusive": false,
+  "files": {
+    "KolejkaJudge.zip": {
+      "path": "KolejkaJudge.zip"
+    },
+    "judge.py": {
+      "path": "judge.py"
+    },
+    "solution/solution.zip": {
+      "path": "solution/solution.zip"
+    },
+    "tests/001/tools.zip": {
+      "path": "tests/001/tools.zip"
+    },
+    "tests/002/1.in": {
+      "path": "tests/002/1.in"
+    },
+    "tests/003/1.out": {
+      "path": "tests/003/1.out"
+    },
+    "tests/004/2.gen": {
+      "path": "tests/004/2.gen"
+    },
+    "tests/005/generator.cpp": {
+      "path": "tests/005/generator.cpp"
+    },
+    "tests/006/hinter.cpp": {
+      "path": "tests/006/hinter.cpp"
+    },
+    "tests/007/3.gen": {
+      "path": "tests/007/3.gen"
+    },
+    "tests/008/verifier.zip": {
+      "path": "tests/008/verifier.zip"
+    },
+    "tests/009/checker.zip": {
+      "path": "tests/009/checker.zip"
+    },
+    "tests/010/environment.zip": {
+      "path": "tests/010/environment.zip"
+    },
+    "tests/011/4.gen": {
+      "path": "tests/011/4.gen"
+    },
+    "tests/tests.yaml": {
+      "path": "tests/tests.yaml"
+    }
+  },
+  "image": "kolejka/satori:judge",
+  "limits": {
+    "cpus": 1,
+    "memory": "4294967296b",
+    "network": false,
+    "pids": 256,
+    "storage": "8589934592b",
+    "swap": "0b",
+    "time": "81.0s",
+    "workspace": "8589934592b"
+  },
+  "requires": [
+    "cpu:xeon e3-1270 v5"
+  ],
+  "stderr": "console_stderr.txt",
+  "stdout": "console_stdout.txt"
+}

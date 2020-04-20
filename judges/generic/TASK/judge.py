@@ -1,0 +1,1 @@
+/home/gutowski/Sync/kolejka/kolejka-judge/judges/generic/judge.py
