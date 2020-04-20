@@ -106,3 +106,4 @@ venv.bak/
 setup.cfg
 
 judges/*/results
+judges/*/KolejkaJudge.zip

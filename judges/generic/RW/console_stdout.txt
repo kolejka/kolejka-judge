@@ -1,4 +1,0 @@
-Result OK on test 1.
-Result OK on test 2.
-Result OK on test 3.
-Result OK on test 4.
