@@ -3,7 +3,9 @@ import argparse
 import glob
 import logging
 import pathlib
+import subprocess
 import sys
+import tempfile
 import urllib.request
 
 
@@ -31,7 +33,6 @@ def known_systems():
         'psutil': PsutilSystem,
         'observer': ObserverSystem,
         'systemd': SystemdSystem,
-        #'kolejka' : KolejkaTask,
     }
     return known_systems
 
@@ -40,6 +41,7 @@ def argument_parser(description=DEFAULT_JUDGE_DESCRIPTION):
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--update', action='store_true', default=False, help='update Kolejka Judge library')
     parser.add_argument('--task', help='directory for Kolejka Task')
+    parser.add_argument('--client', action='store_true', default=False, help='run using Kolejka Client')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='show more info')
     parser.add_argument('-d', '--debug', action='store_true', default=False, help='show debug info')
     envs = known_systems()
@@ -86,14 +88,8 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
     logging.basicConfig(level=level)
 
     if args.update:
-        with urllib.request.urlopen(config.DISTRIBUTION_ADDRESS) as library_request:
-            if library_request.status == 200 and library_request.reason == 'OK':
-                library_data = library_request.read()
-                library_path = pathlib.Path(runpy).resolve().parent / config.DISTRIBUTION_PATH
-                with library_path.open('wb') as library_file:
-                    library_file.write(library_data)
-                logging.warning('New Kolejka Judge library installed')
-                sys.exit(0)
+        from kolejka.judge.update import kolejka_update
+        kolejka_update(runpy)
 
     if not pathlib.Path(args.tests).is_file():
         parser.error('TESTS file {} does not exist'.format(args.tests))
@@ -148,6 +144,13 @@ def parse_args(runpy, args=None, namespace=None, description=DEFAULT_JUDGE_DESCR
         kolejka_task(args.task, tests, solution, runpy)
         logging.warning('Kolejka Task creasted')
         sys.exit(0)
+
+    if args.client:
+        from kolejka.judge.task import kolejka_task
+        with tempfile.TemporaryDirectory() as temp_dir:
+            kolejka_task(temp_dir, tests, solution, runpy, exist_ok=True)
+            subprocess.run(['kolejka-client', 'execute', temp_dir, output_directory], check=True)
+            sys.exit(0)
 
     return argparse.Namespace(tests=tests, input_paths=input_paths, solution=get_input_path(solution), results=results, system=system, output_directory=output_directory)
 

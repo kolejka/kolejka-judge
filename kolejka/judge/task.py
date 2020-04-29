@@ -16,7 +16,7 @@ def __dir__():
     return __all__
 
 
-def kolejka_task(task_dir, tests, solution, judgepy):
+def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
 
     kolejka_image = None
     kolejka_requires = set()
@@ -65,7 +65,7 @@ def kolejka_task(task_dir, tests, solution, judgepy):
     solution = pathlib.Path(solution).resolve()
     judgepy = pathlib.Path(judgepy).resolve()
     
-    task_dir.mkdir(parents=True)
+    task_dir.mkdir(parents=True, exist_ok=exist_ok)
     test_dir = pathlib.PurePath('tests')
     (task_dir/test_dir).mkdir()
     solution_dir = pathlib.PurePath('solution')
