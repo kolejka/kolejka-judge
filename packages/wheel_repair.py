@@ -3,6 +3,7 @@
 
 
 import argparse
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -33,3 +34,4 @@ if __name__ == '__main__':
                 with first.open('rb') as first_file:
                     second_file.write(first_file.read())
             shutil.move(second, wheel)
+            wheel.chmod(0o755)

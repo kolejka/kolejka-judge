@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 # vim:ts=4:sts=4:sw=4:expandtab
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'KolejkaJudge.zip'))
-from kolejka.judge import *
+if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'kolejka-judge'))
+    from kolejka.judge import main
+    main(__file__)
+from kolejka.judge.commands import *
+from kolejka.judge.parse import *
+from kolejka.judge.tasks import *
 
-args = parse_args(__file__)
-
-results = ResultDict()
-
-for test_id, test in args.tests.items():
-    time_limit = parse_time(test.get('time', '10s'))
+def check(args):
+    time_limit = parse_time(args.test.get('time', '10s'))
     one_second = parse_time('1s')
-    memory_limit = parse_memory(test.get('memory', '1G'))
-    checking = get_checking(args, test_id)
-    checking.add_steps(
+    memory_limit = parse_memory(args.test.get('memory', '1G'))
+    args.add_steps(
         prepare=SystemPrepareTask(default_logs=False),
-        source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=test.get('environment', None), limit_real_time='5s'),
+        source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=args.test.get('environment', None), limit_real_time='5s'),
         source_rules=SolutionSourceRulesTask(max_size='10K'),
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],
@@ -24,36 +24,34 @@ for test_id, test in args.tests.items():
         ], limit_real_time='30s', limit_memory='512M'),
         build_rules=SolutionBuildRulesTask(max_size='10M'),
     )
-    input_path = test.get('input', None)
-    hint_path = test.get('hint', None)
-    tool_override = test.get('tools',None)
-    if 'generator' in test:
-        checking.add_steps(
-            generator=GeneratorTask(source=test['generator'], override=tool_override, input_path=input_path, limit_real_time='10s')
+    input_path = args.test.get('input', None)
+    hint_path = args.test.get('hint', None)
+    tool_override = args.test.get('tools',None)
+    if 'generator' in args.test:
+        args.add_steps(
+            generator=GeneratorTask(source=args.test['generator'], override=tool_override, input_path=input_path, limit_real_time='10s')
         )
-        input_path = checking.generator.output_path
-    if 'verifier' in test:
-        checking.add_steps(
-            verifier=VerifierTask(source=test['verifier'], override=tool_override, input_path=input_path, limit_real_time='10s')
+        input_path = args.generator.output_path
+    if 'verifier' in args.test:
+        args.add_steps(
+            verifier=VerifierTask(source=args.test['verifier'], override=tool_override, input_path=input_path, limit_real_time='10s')
         )
-    checking.add_steps(
+    args.add_steps(
         executor=SolutionExecutableTask(input_path=input_path, limit_cores=1, limit_cpu_time=time_limit, limit_real_time=time_limit+one_second, limit_memory=memory_limit)
     )
-    if 'hinter' in test:
-        checking.add_steps(
-            hinter=HinterTask(source=test['hinter'], override=tool_override, input_path=input_path, limit_real_time=max(time_limit+one_second, parse_time('10s')))
+    if 'hinter' in args.test:
+        args.add_steps(
+            hinter=HinterTask(source=args.test['hinter'], override=tool_override, input_path=input_path, limit_real_time=max(time_limit+one_second, parse_time('10s')))
         )
-        hint_path = checking['hinter'].output_path
-    if 'checker' in test:
-        checking.add_steps(
-            checker=CheckerTask(source=test['checker'], override=tool_override, input_path=input_path, hint_path=hint_path)
+        hint_path = args.hinter.output_path
+    if 'checker' in args.test:
+        args.add_steps(
+            checker=CheckerTask(source=args.test['checker'], override=tool_override, input_path=input_path, hint_path=hint_path)
         )
     else:
-        checking.add_steps(
+        args.add_steps(
             checker=AnswerHintDiffTask(hint_path=hint_path)
         )
-    checking.add_steps(logs=CollectLogsTask())
-    results.set(test_id, checking.run())
-    print('Result {} on test {}.'.format(results[test_id].status, test_id))
-
-write_results(args, results)
+    args.add_steps(logs=CollectLogsTask())
+    result = args.run()
+    print('Result {} on test {}.'.format(result.status, args.id))

@@ -4,8 +4,8 @@ import datetime
 import pathlib
 
 from kolejka.judge import config
-from kolejka.judge.parse import *
-from kolejka.judge.paths import *
+from kolejka.judge.limits import get_limits
+from kolejka.judge.parse import parse_memory, parse_time, unparse_memory, unparse_time
 from kolejka.judge.typing import *
 
 

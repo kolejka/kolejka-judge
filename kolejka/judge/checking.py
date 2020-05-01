@@ -14,9 +14,13 @@ def __dir__():
 
 
 class Checking:
-    def __init__(self, system: SystemBase):
+    def __init__(self, system: SystemBase, id: str, test: dict, solution):
         self.steps: Dict[str, CommandBase or TaskBase] = {}
         self.system = system
+        self.id = id
+        self.test = test
+        self.solution = solution
+        self.result = None
 
     def __getattr__(self, key):
         return self.steps[key]
@@ -41,4 +45,5 @@ class Checking:
             self.steps[name] = func
 
     def run(self):
-        return self.system.run_steps(self.steps)
+        self.result = self.system.run_steps(self.steps)
+        return self.result

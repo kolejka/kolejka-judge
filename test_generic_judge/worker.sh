@@ -3,7 +3,7 @@
 
 pushd "${JUDGE}" >/dev/null 2>&1
     rm -rf TASK
-    ./judge.py "$@" --task TASK
+    ./judge.py task tests/tests.yaml solution/* TASK
     rm -rf /tmp/TASK
     rsync -a TASK /tmp
     rm -rf RESULT-WORKER-STAGE2

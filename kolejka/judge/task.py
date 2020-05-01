@@ -5,10 +5,9 @@ import pathlib
 
 
 from kolejka.judge import config
-from kolejka.judge.ctxyaml import *
-from kolejka.judge.parse import *
-from kolejka.judge.paths import *
-from kolejka.judge.typing import *
+from kolejka.judge.ctxyaml import ctxyaml_load, ctxyaml_dump
+from kolejka.judge.parse import parse_time, parse_memory
+from kolejka.judge.paths import InputPath
 
 
 __all__ = [ 'kolejka_task', ]
@@ -90,7 +89,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
         logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
 
 
-    task_args = [ 'python3', str(judgepy_path), kolejka_system, '--tests', str(tests_yaml), '--solution', str(solution_path), '--output-directory', str(results_dir), '--results', str(results_yaml), ]
+    task_args = [ 'python3', str(judgepy_path), kolejka_system, str(tests_yaml), str(solution_path), str(results_dir), '--results', str(results_yaml), ]
 
     input_map = dict()
     class collect:
