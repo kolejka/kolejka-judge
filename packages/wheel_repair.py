@@ -8,30 +8,33 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import venv
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('wheel', nargs='+', help='Wheel to repair')
+parser.add_argument('wheel', type=Path, help='Wheel to repair')
+parser.add_argument('result', type=Path, help='Result')
 args = parser.parse_args()
 
-for wheel in args.wheel:
-    wheel = Path(wheel).resolve()
-    assert wheel.is_file()
-    with tempfile.TemporaryDirectory() as work_dir:
-        subprocess.run(['unzip', str(wheel)], cwd=work_dir, check=True)
-        with ( Path(work_dir) / '__main__.py' ).open('w') as main_file:
-            main_file.write('''
+args.wheel = args.wheel.resolve()
+args.result = args.result.resolve()
+assert args.wheel.is_file()
+with tempfile.TemporaryDirectory() as work_dir:
+    wheel_dir = Path(work_dir) / 'wheel'
+    wheel_dir.mkdir()
+    subprocess.run(['unzip', str(args.wheel)], cwd=wheel_dir, check=True)
+    with ( wheel_dir / '__main__.py' ).open('w') as main_file:
+        main_file.write('''
 if __name__ == '__main__':
     from kolejka.judge import main
     main()
 ''')
-        with tempfile.TemporaryDirectory() as zip_dir:
-            first = Path(zip_dir) / 'first.zip'
-            subprocess.run(['zip', '-9', str(first), '-r', '.'], cwd=work_dir, check=True)
-            second = Path(zip_dir) / 'second.zip'
-            with second.open('wb') as second_file:
-                second_file.write(bytes('#!/usr/bin/env python3\n', 'utf8'))
-                with first.open('rb') as first_file:
-                    second_file.write(first_file.read())
-            shutil.move(second, wheel)
-            wheel.chmod(0o755)
+    first = Path(work_dir) / 'first.zip'
+    subprocess.run(['zip', '-9', str(first), '-r', '.'], cwd=wheel_dir, check=True)
+    second = Path(work_dir) / 'second.zip'
+    with second.open('wb') as second_file:
+        second_file.write(bytes('#!/usr/bin/env python3\n', 'utf8'))
+        with first.open('rb') as first_file:
+            second_file.write(first_file.read())
+    shutil.move(second, args.result)
+    args.result.chmod(0o755)
