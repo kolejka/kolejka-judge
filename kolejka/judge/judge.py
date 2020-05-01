@@ -35,7 +35,7 @@ class RelativePathAction(argparse.Action):
                 parts.append(part)
         except:
             parser.error('\'{}\' is not a relative path.'.format(values))
-        path = pathlib.Path(parts)
+        path = pathlib.Path(*parts)
         setattr(namespace, self.dest, path)
 
 

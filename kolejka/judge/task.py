@@ -89,7 +89,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
         logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
 
 
-    task_args = [ 'python3', str(judgepy_path), kolejka_system, str(tests_yaml), str(solution_path), str(results_dir), '--results', str(results_yaml), ]
+    task_args = [ 'python3', str(judgepy_path), 'execute', kolejka_system, str(tests_yaml), str(solution_path), str(results_dir), '--results', str(results_yaml), ]
 
     input_map = dict()
     class collect:
