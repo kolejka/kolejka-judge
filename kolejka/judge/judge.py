@@ -5,7 +5,7 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
-import urllib
+import urllib.request
 
 
 from kolejka.judge import config
@@ -128,9 +128,11 @@ def config_parser_update(parser, judge_path=None):
                 library_path = args.judge.resolve().parent / config.DISTRIBUTION_PATH
                 with library_path.open('wb') as library_file:
                     library_file.write(library_data)
+                library_path.chmod(0o755)
                 logging.warning('Kolejka Judge library updated.')
                 #TODO Different warning on no-change
-            logging.error('Failed to update Kolejka Judge library.')
+            else:
+                logging.error('Failed to update Kolejka Judge library: {} ({}).'.format(library_request.reason, library_request.status))
     parser.set_defaults(execute=execute)
 
 def config_parser_task(parser, judge_path=None):
