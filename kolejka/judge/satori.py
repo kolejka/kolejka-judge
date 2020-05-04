@@ -61,7 +61,7 @@ def result_access(result, val):
     return vs
 
 def satori_result_path(key, res, result_dir):
-    new = result_dir / key / res.name
+    new = result_dir.resolve() / key / res.name
     new.parent.mkdir(parents=True)
     new.symlink_to(res)
     return new
