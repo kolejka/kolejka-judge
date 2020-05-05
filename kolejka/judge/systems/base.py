@@ -149,7 +149,8 @@ class SystemBase(AbstractSystem):
                 result.set(name, step_result)
                 if result.status is None and step_result and step_result.status is not None:
                     result.set_status(step_result.status)
-        result.set_status('OK')
+        if result.status is None:
+            result.set_status('OK')
         return result
 
     def run_command(self, command: AbstractCommand, name: str):

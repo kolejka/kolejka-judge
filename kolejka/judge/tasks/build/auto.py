@@ -28,7 +28,7 @@ class BuildAutoTask(BuildTask):
             kw = deepcopy(kwargs)
             kw.update(k)
             self.build_tasks += [ Class(*a, **kw) ]
-        self.build_task_chosen = False
+        self._build_task = None
 
     def set_system(self, system):
         super().set_system(system)
@@ -42,31 +42,33 @@ class BuildAutoTask(BuildTask):
             task.set_name('%s_%02d'%(name, task_counter))
             task_counter += 1
 
+    @property
+    def build_task(self):
+        return self.get_build_task()
     def get_build_task(self):
-        if not self.build_task_chosen:
-            self.build_task = None
+        if not self._build_task:
             for task in self.build_tasks:
                 if task.ok():
-                    self.build_task = task
+                    self._build_task = task
                     break
-        return self.build_task
+        return self._build_task
 
     def ok(self):
-        return self.get_build_task() is not None
+        return self.build_task is not None and self.build_task.ok()
 
     def get_execution_command(self):
-        task = self.get_build_task()
+        task = self.build_task
         if task:
             return task.get_execution_command()
 
     def execute_build(self):
-        task = self.get_build_task()
+        task = self.build_task
         if not task:
             return self.result_on_error, self.result
         return task.execute_build()
 
     def get_result(self):
-        task = self.get_build_task()
+        task = self.build_task
         if not task:
             return super().get_result()
         return task.get_result()

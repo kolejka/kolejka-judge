@@ -17,6 +17,7 @@ def __dir__():
 class CollectLogsTask(TaskBase):
     DEFAULT_SOURCE=config.LOG
     DEFAULT_TARGET=config.COLLECTED_LOG
+    DEFAULT_OBLIGATORY=True
     @default_kwargs
     def __init__(self, source, target, **kwargs):
         super().__init__(**kwargs)
