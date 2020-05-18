@@ -113,3 +113,5 @@ setup.cfg
 
 judges/*/results
 judges/*/kolejka-judge
+test_generic_judge/*task*
+test_generic_judge/*result*

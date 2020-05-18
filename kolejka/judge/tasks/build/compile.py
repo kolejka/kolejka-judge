@@ -23,6 +23,7 @@ def __dir__():
 
 
 class BuildCompilerTask(BuildTask):
+    @default_kwargs
     def __init__(self, compiler=None, build_arguments=None, source_globs=None, libraries=None, **kwargs):
         super().__init__(**kwargs)
         self.compiler = compiler or CompileCommand

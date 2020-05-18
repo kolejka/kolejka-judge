@@ -9,7 +9,6 @@ import os
 import pathlib
 import pwd
 import shutil
-import subprocess
 import tempfile
 import threading
 import time
@@ -256,60 +255,45 @@ class SystemBase(AbstractSystem):
     def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
-        return path.open('r')
+        return path.open('rb')
     def write_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
         path.parent.mkdir(exist_ok=True, parents=True)
-        mode = 'w'
+        mode = 'wb'
         if append:
             mode += 'a'
         return path.open(mode)
 
-    def get_uid_gid_groups(self, user=None, group=None):
+    def get_user_group_groups(self, user=None, group=None):
         if not self.superuser:
+            return None, None, None
+        if os.getuid() != 0:
             return None, None, None
         uid = None
         gid = None
         groups = None
-        try:
-            uid = pwd.getpwnam(user).pw_uid if user is not None else None
-        except:
-            pass
-        try:
-            gid = grp.getgrnam(group).gr_gid if group is not None else None
-        except:
-            pass
-        try:
-            groups = [ gid ] if group is not None else None
-        except:
-            pass
         if user:
             try:
-                groups = os.getgrouplist(user, gid) if gid is not None else os.getgrouplist(user)
+                pw = pwd.getpwuid(int(user))
+            except:
+                pw = pwd.getpwnam(str(user))
+            uid = pw.pw_uid
+            user = pw.pw_name
+            gid = pw.pw_gid
+        if group:
+            try:
+                gr = grp.getgrgid(int(group))
+            except:
+                gr = grp.getgrnam(group)
+            gid = gr.gr_gid
+        groups = [ gid ] if gid is not None else None
+        if user is not None:
+            try:
+                groups = os.getgrouplist(user, gid)
             except:
                 pass
         return (uid, gid, groups)
-
-    def get_change_user_function(self, user=None, group=None):
-        if os.getuid() != 0:
-            return None
-        if user is None and group is None:
-            return None
-
-        uid, gid, groups = self.get_uid_gid_groups(user=user, group=group)
-        def change_user():
-            try:
-                if groups is not None:
-                    os.setgroups(groups)
-                if gid is not None:
-                    os.setgid(gid)
-                if uid is not None:
-                    os.setuid(uid)
-                os.setsid()
-            except OSError:
-                pass
-        return change_user
 
     def get_home(self, user=None):
         if user is None:
@@ -366,11 +350,16 @@ class SystemBase(AbstractSystem):
 
         def file_does_not_match(self, path, regexes) -> bool:
             path = self.resolve_path(path)
-            with path.open() as path_file:
-                for line in path_file:
-                    for regex in regexes:
-                        if regex.fullmatch(line):
-                            return False
+            if not path.is_file():
+                return True
+            try:
+                with path.open() as path_file:
+                    for line in path_file:
+                        for regex in regexes:
+                            if regex.fullmatch(line):
+                                return False
+            except:
+                pass
             return True
 
         def system_group_exists(self, group):

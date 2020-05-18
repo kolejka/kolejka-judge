@@ -11,6 +11,8 @@ class ObserverSystem(LocalSystem):
         from kolejka import observer
         from kolejka.common import KolejkaLimits
 
+        change_user, change_group, change_groups = self.get_user_group_groups(user, group)
+
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
             stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
@@ -28,7 +30,9 @@ class ObserverSystem(LocalSystem):
                     pids=limits.pids,
                     time=limits.real_time
                     ),
-                preexec_fn=self.get_change_user_function(user=user, group=group),
+                user=change_user,
+                group=change_group,
+                groups=change_groups,
                 cwd=work_path,
             )
             result.set_returncode(process.returncode)

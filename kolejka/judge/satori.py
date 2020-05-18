@@ -31,8 +31,11 @@ def plain_result(result, prefix='/'):
 
 def str_operator(v):
     if isinstance(v, pathlib.Path):
-        with v.open('r') as vf:
-            return str(vf.read(config.SATORI_STRING_LENGTH))
+        with v.open('rb') as vf:
+            try:
+                return str(vf.read(config.SATORI_STRING_LENGTH), 'utf8')
+            except:
+                return 'BINARY CONTENT'
     if isinstance(v, list):
         return '\n'.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH]
     return str(v)[:config.SATORI_STRING_LENGTH]
@@ -70,7 +73,7 @@ def satori_result(test, result, result_dir):
     satori = ResultDict()
     satori.set_status(result.status)
     presult = plain_result(result)
-    for key,val in test.get('satori', dict()).get('result', dict()).items():
+    for key,val in test.get('kolejka', dict()).get('satori', dict()).get('result', dict()).items():
         res = result_access(presult, val)
         if res is not None:
             if isinstance(res, pathlib.Path):

@@ -8,6 +8,8 @@ import time
 from kolejka.judge import config
 from kolejka.judge.systems.local import LocalSystem
 
+import kolejka.common.subprocess
+
 def monitor_process(process, limits, result):
     import psutil
     try:
@@ -44,17 +46,22 @@ class PsutilSystem(LocalSystem):
             stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
             stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
 
-            process = psutil.Popen(
+            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
+
+            process = kolejka.common.subprocess.start(
                 command,
+                user=change_user,
+                group=change_group,
+                groups=change_groups,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
                 env=environment,
-                preexec_fn=self.get_change_user_function(user=user, group=group),
                 cwd=work_path,
             )
+            process = psutil.Process(process.pid)
             monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
             monitoring_thread.start()
-            process.wait()
+            returncode = process.wait()
             monitoring_thread.join()
-            result.set_returncode(process.returncode)
+            result.set_returncode(returncode)

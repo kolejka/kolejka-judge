@@ -285,6 +285,7 @@ class CommandBase(AbstractCommand):
 
 
 class ExecutableCommand(CommandBase):
+    @default_kwargs
     def __init__(self, executable, executable_arguments=None, verbose_arguments=None, quiet_arguments=None, **kwargs):
         super().__init__(**kwargs)
         self._executable = get_output_path(executable)
@@ -332,6 +333,7 @@ class ExecutableCommand(CommandBase):
 
 
 class ProgramCommand(CommandBase):
+    @default_kwargs
     def __init__(self, program, program_arguments=None, verbose_arguments=None, quiet_arguments=None, **kwargs):
         super().__init__(**kwargs)
         self._program = str(pathlib.Path(program))

@@ -1,0 +1,31 @@
+small:
+  !include : test.yaml
+  generator: !file gen.cpp
+  input    : !file small.gen
+  hinter   : !file sol.cpp
+  verifier : !file ver.cpp
+  time     : 12s
+
+large-uniform:
+  !include : test.yaml
+  generator: !file gen.cpp
+  input    : !file large-uniform.gen
+  hinter   : !file sol.cpp
+  verifier : !file ver.cpp
+  time     : 12s
+
+large-skewed:
+  !include : test.yaml
+  generator: !file gen.cpp
+  input    : !file large-skewed.gen
+  hinter   : !file sol.cpp
+  verifier : !file ver.cpp
+  time     : 12s
+
+large-snek:
+  !include : test.yaml
+  generator: !file gen.cpp
+  input    : !file large-snek.gen
+  hinter   : !file sol.cpp
+  verifier : !file ver.cpp
+  time     : 12s

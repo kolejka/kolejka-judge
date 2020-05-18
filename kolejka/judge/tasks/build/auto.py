@@ -21,6 +21,7 @@ def __dir__():
 
 
 class BuildAutoTask(BuildTask):
+    @default_kwargs
     def __init__(self, builders, **kwargs):
         super().__init__(**kwargs)
         self.build_tasks = list()

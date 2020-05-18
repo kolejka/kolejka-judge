@@ -48,6 +48,7 @@ class ToolBuildMixin:
 
 
 class BuildTask(TaskBase):
+    @default_kwargs
     def __init__(self, source_directory, build_directory, execution_script=None, build_options=None, build_target=None, user_name=None, group_name=None, **kwargs):
         super().__init__(**kwargs)
         self.source_directory = get_output_path(source_directory)
@@ -98,7 +99,9 @@ class BuildTask(TaskBase):
         self.write_execution_script()
         if self.user_name or self.group_name:
             self.run_command('chown', ChownDirCommand, target=self.build_directory, recursive=True, user_name=self.user_name, group_name=self.group_name)
-            self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.build_directory], safe=True) #TODO: upgrade to Command
+            self.run_command('chmod_d', ProgramCommand, program='find', program_arguments=[self.build_directory, '-type', 'f', '-exec', 'chmod', 'o-rwx,g-w+rx,u+rwx', '{}', '+'], safe=True)
+            self.run_command('chmod_f', ProgramCommand, program='find', program_arguments=[self.build_directory, '-type', 'f', '-exec', 'chmod', 'o-rwx,g-w+r,u+rw', '{}', '+'], safe=True)
+            #self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+r,u+rw', '-R', self.build_directory], safe=True) #TODO: upgrade to Command
 
 class SolutionBuildTask(SolutionBuildMixin, BuildTask):
     pass

@@ -3,7 +3,7 @@ from contextlib import ExitStack
 import datetime
 import os
 import resource
-import subprocess
+import signal
 import tempfile
 import threading
 import traceback
@@ -14,6 +14,8 @@ from kolejka.judge.systems.base import *
 from kolejka.judge.parse import *
 
 from kolejka.judge.systems.proc import *
+
+import kolejka.common.subprocess
 
 
 def monitor_safe_process(process, limits, result):
@@ -46,35 +48,33 @@ class LocalSystem(SystemBase):
             stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
             stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
 
-            change_user = self.get_change_user_function(user=user, group=group)
-            def preexec():
-                try:
-                    if limits.cpu_time:
-                        resource.setrlimit(resource.RLIMIT_CPU, (limits.cpu_time,limits.cpu_time))
-                    if limits.memory:
-                        resource.setrlimit(resource.RLIMIT_RSS, (limits.memory,limits.memory))
-                    resource.setrlimit(resource.RLIMIT_CORE, (0,0))
-                    resource.setrlimit(resource.RLIMIT_NPROC, (1,1))
-                    if change_user is not None:
-                        change_user()
-                except:
-                    traceback.print_exc()
-                    pass
+            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            process = subprocess.Popen(
+            resources = dict()
+            if limits.cpu_time:
+                resources[resource.RLIMIT_CPU] = (limits.cpu_time,limits.cpu_time)
+            if limits.memory:
+                resources[resource.RLIMIT_RSS] = (limits.memory,limits.memory)
+            resources[resource.RLIMIT_CORE] = (0,0)
+            resources[resource.RLIMIT_NPROC] = (1,1)
+
+            process = kolejka.common.subprocess.start(
                 command,
+                user=change_user,
+                group=change_group,
+                groups=change_groups,
+                resources=resources,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
                 env=environment,
-                preexec_fn=preexec,
                 cwd=work_path,
             )
             monitoring_thread = threading.Thread(target=monitor_safe_process, args=(process, limits, result))
             monitoring_thread.start()
-            process.wait()
+            returncode = process.wait()
             monitoring_thread.join()
-            result.set_returncode(process.returncode)
+            result.set_returncode(returncode)
 
 
     def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
@@ -85,18 +85,22 @@ class LocalSystem(SystemBase):
             stdin_file = stack.enter_context(self.read_file(stdin_path))
             stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
             stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
+            
+            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
             command = ['/usr/bin/time', '-f', 'mem=%M\nreal=%e\nsys=%S\nuser=%U', '-o', stats_file.name] + command
-            process = subprocess.run(
+            completed = kolejka.common.subprocess.run(
                 command,
+                user=change_user,
+                group=change_group,
+                groups=change_groups,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
                 env=environment,
-                preexec_fn=self.get_change_user_function(user=user, group=group),
                 cwd=work_path,
             )
-            result.set_returncode(process.returncode)
+            result.set_returncode(completed.returncode)
 
             sys_cpu_time = datetime.timedelta()
             user_cpu_time = datetime.timedelta()

@@ -251,7 +251,7 @@ def config_parser_execute(parser, judge_path=None):
         judge = module_from_spec(spec)
         spec.loader.exec_module(judge)
         for checking in args.checkings.values():
-            judge.check(checking)
+            judge.judge(checking)
         args.finalize(args)
     parser.set_defaults(execute=execute)
 

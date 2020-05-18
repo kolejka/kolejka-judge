@@ -77,13 +77,13 @@ class SystemdSystem(LocalSystem):
                 systemd += [ '-p', 'TasksMax=%d'%(limits.pids,), ]
             if limits.cores:
                 systemd += [ '-p', 'CPUAffinity=%s'%(' '.join([ '%d'%(c,) for c in range(limits.cores)]),), ]
-            uid, gid, groups = self.get_uid_gid_groups(user=user, group=group)
-            if uid:
-                systemd += [ '-p', 'User=%d'%(uid,), ]
-            if gid:
-                systemd += [ '-p', 'Group=%d'%(gid,), ]
-            if groups:
-                systemd += [ '-p', 'SupplementaryGroups=%s'%(' '.join([ '%d'%(g,) for g in groups ])), ]
+            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
+            if change_user:
+                systemd += [ '-p', 'User=%d'%(change_user,), ]
+            if change_group:
+                systemd += [ '-p', 'Group=%d'%(change_group,), ]
+            if change_groups:
+                systemd += [ '-p', 'SupplementaryGroups=%s'%(' '.join([ '%d'%(g,) for g in change_groups ])), ]
             if self.superuser:
                 systemd += [ '-p', 'PassEnvironment=', ]
                 systemd += [ '-p', 'UnsetEnvironment=INVOCATION_ID LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT LC_IDENTIFICATION LC_ALL', ]

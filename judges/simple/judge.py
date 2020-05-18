@@ -9,7 +9,7 @@ from kolejka.judge.commands import *
 from kolejka.judge.parse import *
 from kolejka.judge.tasks import *
 
-def check(args):
+def judge(args):
     time_limit = parse_time(args.test['time'])
     memory_limit = parse_memory(args.test['memory'])
     args.add_steps(

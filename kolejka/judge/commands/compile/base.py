@@ -14,6 +14,7 @@ def __dir__():
 
 
 class CompileCommand(ProgramCommand):
+    @default_kwargs
     def __init__(self, build_directory=None, build_arguments=None, build_target=None, source_files=None, libraries=None, **kwargs):
         super().__init__(**kwargs)
         self._build_directory = build_directory and get_output_path(build_directory) or super().get_work_directory()

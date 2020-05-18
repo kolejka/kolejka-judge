@@ -15,6 +15,7 @@ class RenameJavaFile(TaskBase):
     Taken and adapted from 0ccb87c2bca477080337d9918af853e8.py judge
     """
 
+    @default_kwargs
     def __init__(self, source_file, target_directory='.'):
         self.source_file = Path(source_file)
         self.target_directory = Path(target_directory)
