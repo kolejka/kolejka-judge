@@ -164,7 +164,7 @@ class SystemBase(AbstractSystem):
         command.verify_prerequirements()
         command_line = command.resolved_command
         if command_line:
-            with self.write_file(command.get_log_path('cmd')) as command_file:
+            with self.write_file(command.get_log_path('cmd'), text=True) as command_file:
                 command_file.write('Command:\n')
                 command_file.write(repr(command)+'\n')
                 command_file.write('\n\nCommand line:\n')
@@ -252,15 +252,20 @@ class SystemBase(AbstractSystem):
         result = task.execute()
         return result
 
-    def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None):
+    def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None, text =False):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
-        return path.open('rb')
-    def write_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None):
+        mode = 'rb'
+        if text:
+            mode = 'r'
+        return path.open(mode)
+    def write_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None, text =False):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
         path.parent.mkdir(exist_ok=True, parents=True)
         mode = 'wb'
+        if text:
+            mode = 'w'
         if append:
             mode += 'a'
         return path.open(mode)
