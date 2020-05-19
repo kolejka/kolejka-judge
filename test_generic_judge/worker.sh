@@ -17,14 +17,14 @@ pushd "${OFFICE}" >/dev/null 2>&1
         rm -rf "${TD}_result_worker_stage2"
         mkdir -p "${TD}_result_worker_stage2"
         TR="$(mktemp -d)"
-        kolejka-worker stage2 "${TT}" "${TR}"
+        kolejka-worker stage2 "${TT}" "${TR}" "$@"
         rsync -a "${TR}/" "${TD}_result_worker_stage2/" 
         rm -rf "${TR}"
 
         rm -rf "${TD}_result_worker_stage0"
         mkdir -p "${TD}_result_worker_stage0"
         TR="$(mktemp -d)"
-        kolejka-worker execute "${TT}" "${TR}"
+        kolejka-worker execute "${TT}" "${TR}" "$@"
         rsync -a "${TR}/" "${TD}_result_worker_stage0/" 
         rm -rf "${TR}"
 
