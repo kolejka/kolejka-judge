@@ -1,4 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from collections import OrderedDict
 import datetime
 import fnmatch
@@ -18,6 +20,7 @@ __all__ = [ 'satori_result', ]
 def __dir__():
     return __all__
 
+
 def plain_result(result, prefix='/'):
     ret = dict()
     for k,v in result.items():
@@ -32,10 +35,11 @@ def plain_result(result, prefix='/'):
 def str_operator(v):
     if isinstance(v, pathlib.Path):
         with v.open('rb') as vf:
+            content = vf.read(config.SATORI_STRING_LENGTH)
             try:
-                return str(vf.read(config.SATORI_STRING_LENGTH), 'utf8')
-            except:
-                return 'BINARY CONTENT'
+                return str(content, 'utf8')
+            except UnicodeDecodeError:
+                return repr(content)[2:-1][:config.SATORI_STRING_LENGTH]
     if isinstance(v, list):
         return '\n'.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH]
     return str(v)[:config.SATORI_STRING_LENGTH]

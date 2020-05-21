@@ -3,7 +3,7 @@ import pathlib
 
 
 from kolejka.judge import config
-from kolejka.judge.exceptions import *
+from kolejka.judge.exceptions import PrerequirementException
 from kolejka.judge.limits import *
 from kolejka.judge.paths import *
 from kolejka.judge.result import *

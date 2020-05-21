@@ -1,11 +1,13 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 import datetime
 import logging
 import pathlib
 
 
 from kolejka.judge import config
-from kolejka.judge.ctxyaml import ctxyaml_load, ctxyaml_dump
+from kolejka.judge.ctxyaml import ctxyaml_dump
 from kolejka.judge.parse import parse_time, parse_memory
 from kolejka.judge.paths import InputPath
 
@@ -115,7 +117,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
                 return dict( [ (self(k), self(v)) for k,v in a.items() ] )
             return a
     tests = collect(input_map)(tests)
-    ctxyaml_dump(tests, task_dir, task_dir/tests_yaml)
+    ctxyaml_dump(tests, task_dir/tests_yaml)
 
     task = KolejkaTask(
             str(task_dir),

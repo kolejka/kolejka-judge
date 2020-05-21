@@ -1,7 +1,10 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from collections import OrderedDict
 import datetime
 import pathlib
+
 
 from kolejka.judge import config
 from kolejka.judge.limits import get_limits
@@ -74,9 +77,6 @@ class Result(AbstractResult):
         yaml['real_time'] = unparse_time(self.real_time)
         yaml['memory'] = unparse_memory(self.memory)
         return OrderedDict(yaml)
-    @yaml.setter
-    def yaml(self, value):
-        raise NotImplementedError #TODO: Need/Want?
 
     @property
     def args(self) -> List[str]:
@@ -214,9 +214,6 @@ class ResultDict:
             else:
                 yaml[key] = val.yaml or None
         return OrderedDict(yaml)
-    @yaml.setter
-    def yaml(self, value):
-        raise NotImplementedError #TODO: Need/Want?
     def items(self):
         ret = list()
         ret.append(('status', self.status))

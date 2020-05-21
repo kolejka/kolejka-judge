@@ -1,11 +1,15 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 import os
 import pathlib
 import time
 
+
 __all__ = [ 'proc_info', ]
 def __dir__():
     return __all__
+
 
 page_size = int(os.sysconf("SC_PAGE_SIZE"))
 clock_ticks = int(os.sysconf("SC_CLK_TCK"))

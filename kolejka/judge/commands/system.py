@@ -12,6 +12,7 @@ __all__ = [ 'GroupAddCommand', 'GroupDelCommand', 'UserAddCommand', 'UserDelComm
 def __dir__():
     return __all__
 
+
 class GroupAddCommand(ProgramCommand):
     DEFAULT_PROGRAM='groupadd'
     DEFAULT_SAFE=True

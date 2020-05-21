@@ -21,5 +21,6 @@ def main(judge_path=None):
     logging.basicConfig(level = level)
     args.execute(args)
 
+
 if __name__ == '__main__':
     main()

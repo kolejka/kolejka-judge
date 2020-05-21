@@ -1,4 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 import argparse
 import logging
 import pathlib
@@ -33,7 +35,7 @@ class RelativePathAction(argparse.Action):
                 if part == '..':
                     parts.pop()
                 parts.append(part)
-        except:
+        except (IndexError, TypeError):
             parser.error('\'{}\' is not a relative path.'.format(values))
         path = pathlib.Path(*parts)
         setattr(namespace, self.dest, path)
@@ -71,8 +73,6 @@ class TestsFileAction(argparse.Action):
             setattr(namespace, self.dest, tests)
         except:
             #TODO: give some hints on error in the tests file
-            import traceback
-            traceback.print_exc()
             parser.error('{} \'{}\' is not a valid tests specification.'.format(self.dest.title(), path))
 
 
@@ -235,12 +235,29 @@ def config_parser_execute(parser, judge_path=None):
         from kolejka.judge.result import ResultDict
         results = ResultDict()
         for id, checking in args.checkings.items():
-            if checking.result:
+            if checking.result is not None:
                 results.set(id, checking.result)
                 satori_result(checking.test, results[id], args.result / id )
+            else:
+                r = ResultDict()
+                r.set_status('INT')
+                r.set('message', 'Checking did not set result.')
+                results.set(id, r)
         result_file = args.result / args.results
         result_file.parent.mkdir(parents=True, exist_ok=True)
-        ctxyaml_dump(results.yaml, args.result, result_file)
+        result_dir = args.result.resolve()
+        def path_filter(v):
+            if isinstance(v, list):
+                return [ e for e in [ path_filter(e) for e in v ] if e is not None ]
+            if isinstance(v, dict):
+                return dict([ (k,e) for k,e in [ (path_filter(k),path_filter(e)) for k,e in v.items() ] if k is not None and e is not None ])
+            if isinstance(v, pathlib.Path):
+                try:
+                    v.relative_to(result_dir)
+                except ValueError:
+                    return None
+            return v
+        ctxyaml_dump(path_filter(results.yaml), result_file)
     parser.set_defaults(finalize=finalize)
     
     def execute(args):

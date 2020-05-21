@@ -3,5 +3,6 @@
 
 from kolejka.judge import config
 
+
 class PrerequirementException(Exception):
     pass

@@ -48,10 +48,13 @@ class Un7zCommand(ExtractCommand):
     def get_program_arguments(self):
         return [ 'x', '-y', '-aoa', '-bso0', '-bse2', '-bsp0', '-bb0', '-bd', ['-o', self.target], self.source ]
     #TODO: quiet/verbose
+
 class UnzipCommand(Un7zCommand):
     pass
+
 class UnrarCommand(Un7zCommand):
     pass
+
 class UntarCommand(ExtractCommand):
     DEFAULT_PROGRAM='tar'
     @default_kwargs

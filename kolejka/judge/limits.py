@@ -1,6 +1,9 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from collections import OrderedDict
 import datetime
+
 
 from kolejka.judge import config
 from kolejka.judge.parse import *
@@ -53,9 +56,6 @@ class Limits(AbstractLimits):
         yaml['cores'] = self.cores
         yaml['pids'] = self.pids
         return OrderedDict(yaml)
-    @yaml.setter
-    def yaml(self, value):
-        raise NotImplementedError #TODO: Need/Want?
 
     @property
     def cpu_time(self) -> datetime.timedelta:

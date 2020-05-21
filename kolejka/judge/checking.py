@@ -2,7 +2,6 @@
 
 
 from kolejka.judge import config
-from kolejka.judge.typing import *
 from kolejka.judge.systems.base import SystemBase
 from kolejka.judge.commands.base import CommandBase
 from kolejka.judge.tasks.base import TaskBase
@@ -14,7 +13,7 @@ def __dir__():
 
 
 class Checking:
-    def __init__(self, system: SystemBase, id: str, test: dict, solution):
+    def __init__(self, system: SystemBase, id, test, solution):
         self.steps: Dict[str, CommandBase or TaskBase] = {}
         self.system = system
         self.id = id
@@ -39,10 +38,11 @@ class Checking:
 
         for name, func in steps.items():
             if name in self.steps:
-                raise TypeError("Step {} has already been added".format(name))
+                raise ValueError("Step {} has already been added.".format(name))
+            if not isinstance(func, (CommandBase, TaskBase)):
+                raise ValueError("Step {} is neither a Command nor a Task.".format(name))
 
-        for name, func in steps.items():
-            self.steps[name] = func
+        self.steps.update(steps)
 
     def run(self):
         self.result = self.system.run_steps(self.steps)

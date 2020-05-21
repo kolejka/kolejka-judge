@@ -1,4 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from contextlib import ExitStack
 from copy import deepcopy
 import datetime
@@ -133,7 +135,7 @@ class SystemBase(AbstractSystem):
     def update_limits(self, limits: Optional[AbstractLimits] =None) -> AbstractLimits:
         return limits
 
-    def run_step(self, step, name):
+    def run_step(self, name, step):
         if isinstance(step, AbstractCommand):
             return self.run_command(step, name=name)
         if isinstance(step, AbstractTask):
@@ -144,7 +146,7 @@ class SystemBase(AbstractSystem):
         result = ResultDict()
         for name, step in steps.items():
             if result.status is None or step.obligatory:
-                step_result = self.run_step(step, name)
+                step_result = self.run_step(name, step)
                 result.set(name, step_result)
                 if result.status is None and step_result and step_result.status is not None:
                     result.set_status(step_result.status)

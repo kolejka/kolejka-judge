@@ -1,4 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from contextlib import ExitStack
 import datetime
 import os
@@ -9,13 +11,14 @@ import threading
 import traceback
 
 
+import kolejka.common.subprocess
+
+
 from kolejka.judge import config
 from kolejka.judge.systems.base import *
 from kolejka.judge.parse import *
 
 from kolejka.judge.systems.proc import *
-
-import kolejka.common.subprocess
 
 
 def monitor_safe_process(process, limits, result):

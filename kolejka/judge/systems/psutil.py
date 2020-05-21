@@ -1,14 +1,18 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 from contextlib import ExitStack
 import os
 import threading
 import time
 
 
+import kolejka.common.subprocess
+
+
 from kolejka.judge import config
 from kolejka.judge.systems.local import LocalSystem
 
-import kolejka.common.subprocess
 
 def monitor_process(process, limits, result):
     import psutil

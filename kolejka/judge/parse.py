@@ -1,8 +1,11 @@
 # vim:ts=4:sts=4:sw=4:expandtab
+
+
 import datetime
 
 
 from kolejka.judge import config
+
 
 __all__ = [ 'parse_time', 'unparse_time', 'parse_memory', 'unparse_memory', ]
 def __dir__():
@@ -27,8 +30,9 @@ def parse_time(x) :
         if isinstance(x, datetime.timedelta):
             return x
         return datetime.timedelta(seconds=parse_float_with_modifiers(x, {
-            'D' : 60**2*24,
-            'H' : 60**2,
+            'W' : 60*60*24*7,
+            'D' : 60*60*24,
+            'H' : 60*60,
             'M' : 60,
             's' : 1,
             'm' : 10**-3,
