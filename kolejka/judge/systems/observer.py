@@ -39,4 +39,4 @@ class ObserverSystem(LocalSystem):
             )
             result.set_returncode(process.returncode)
             result.update_memory(process.stats.memory.max_usage)
-            result.update_cpu_time(process.stats.cpus['*'].usage)
+            result.update_cpu_time(process.stats.cpu.usage)
