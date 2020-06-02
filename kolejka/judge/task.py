@@ -17,7 +17,7 @@ def __dir__():
     return __all__
 
 
-def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
+def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False):
 
     kolejka_image = None
     kolejka_requires = set()
@@ -79,6 +79,12 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
     for test_id, collects in kolejka_collects.items():
         for collect in collects:
             kolejka_collect += [{'glob' : str(results_dir / str(test_id) / str(collect))}]
+    if debug:
+        kolejka_collect += [
+                {'glob' : str(test_dir) + '/**'},
+                {'glob' : str(solution_dir) + '/**'},
+                {'glob' : str(results_dir) + '/**'},
+            ]
 
     tests_yaml = test_dir / 'tests.yaml'
     solution_path = solution_dir / solution.name
@@ -91,7 +97,10 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
         logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
 
 
-    task_args = [ 'python3', str(judgepy_path), 'execute', kolejka_system, str(tests_yaml), str(solution_path), str(results_dir), '--results', str(results_yaml), ]
+    task_args = [ 'python3', str(judgepy_path), ]
+    if debug:
+        task_args += [ '--debug', ]
+    task_args += [ 'execute', kolejka_system, str(tests_yaml), str(solution_path), str(results_dir), '--results', str(results_yaml), ]
 
     input_map = dict()
     class collect:
@@ -117,7 +126,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False):
                 return dict( [ (self(k), self(v)) for k,v in a.items() ] )
             return a
     tests = collect(input_map)(tests)
-    ctxyaml_dump(tests, task_dir/tests_yaml)
+    ctxyaml_dump(tests, task_dir/tests_yaml, work_dir=task_dir)
 
     task = KolejkaTask(
             str(task_dir),

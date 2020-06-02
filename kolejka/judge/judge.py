@@ -155,7 +155,7 @@ def config_parser_task(parser, judge_path=None):
             else:
                 parser.error('Task \'{}\' already exists.'.format(args.task))
         filter_tests(parser, args)
-        kolejka_task(args.task, args.tests, args.solution, args.judge)
+        kolejka_task(args.task, args.tests, args.solution, args.judge, debug=args.debug)
     parser.set_defaults(execute=execute)
 
 def config_parser_client(parser, judge_path=None):
@@ -179,7 +179,7 @@ def config_parser_client(parser, judge_path=None):
                 parser.error('Result \'{}\' already exists.'.format(args.result))
         filter_tests(parser, args)
         with tempfile.TemporaryDirectory() as temp_dir:
-            kolejka_task(temp_dir, args.tests, args.solution, args.judge, exist_ok=True)
+            kolejka_task(temp_dir, args.tests, args.solution, args.judge, exist_ok=True, debug=args.debug)
             subprocess.run(['kolejka-client', 'execute', temp_dir, args.result], check=True)
             #TODO: maybe, use kolejka.client instead?
     parser.set_defaults(execute=execute)
