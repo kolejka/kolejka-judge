@@ -5,7 +5,7 @@ pushd "${OFFICE}" >/dev/null 2>&1
     for TD in $(ls -1 "${JUDGE}/tests"); do
         echo " === ${TD} === "
         rm -rf "${TD}_task_worker"
-        "${JUDGE}/judge.py" task "${JUDGE}/tests/${TD}/tests/tests.yaml" "${JUDGE}/tests/${TD}/solution/"* "${TD}_task_worker"
+        "${JUDGE}/judge.py" --debug task "${JUDGE}/tests/${TD}/tests/tests.yaml" "${JUDGE}/tests/${TD}/solution/"* "${TD}_task_worker"
         TT="$(mktemp -d)"
         rsync -a "${TD}_task_worker/" "${TT}/"
         find "${TT}" -type l -xtype f |while read link; do
