@@ -10,19 +10,22 @@ from kolejka.judge.parse import *
 from kolejka.judge.tasks import *
 
 def judge(args):
+    source_size_limit = parse_memory(args.test.get('source_size', '100K'))
+    binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
+    cpp_standard = args.test.get('cpp_standard', 'c++14')
     time_limit = parse_time(args.test.get('time', '10s'))
-    one_second = parse_time('1s')
     memory_limit = parse_memory(args.test.get('memory', '1G'))
+    one_second = parse_time('1s')
     args.add_steps(
         prepare=SystemPrepareTask(default_logs=False),
         source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=args.test.get('environment', None), limit_real_time='5s'),
-        source_rules=SolutionSourceRulesTask(max_size='10K'),
+        source_rules=SolutionSourceRulesTask(max_size=source_size_limit),
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],
             [SolutionBuildMakeTask, [], {}],
-            [SolutionBuildGXXTask, [], {'standard': 'c++14',}],
+            [SolutionBuildGXXTask, [], {'standard': cpp_standard,}],
         ], limit_real_time='30s', limit_memory='512M'),
-        build_rules=SolutionBuildRulesTask(max_size='10M'),
+        build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
     input_path = args.test.get('input', None)
     hint_path = args.test.get('hint', None)
