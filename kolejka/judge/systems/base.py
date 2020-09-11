@@ -139,7 +139,13 @@ class SystemBase(AbstractSystem):
         if isinstance(step, AbstractCommand):
             return self.run_command(step, name=name)
         if isinstance(step, AbstractTask):
-            return self.run_task(step, name=name)
+            result = self.run_task(step, name=name)
+            if (result is not None) and (result.status is not None):
+                return result
+            if step.record_result:
+                return result
+            else:
+                return None
         raise RuntimeError('Step is neither Command nor Task')
 
     def run_steps(self, steps):
@@ -188,6 +194,12 @@ class SystemBase(AbstractSystem):
                 logging.info(debug_line)
                 command_file.write('\n\nResolved command line:\n')
                 command_file.write(debug_line+'\n')
+                command_file.write('\n\nPrerequirements:\n')
+                for prerequirement in command.prerequirements:
+                    command_file.write(str(prerequirement)+'\n')
+                command_file.write('\n\nPostconditions:\n')
+                for postcondition in command.postconditions:
+                    command_file.write(str(postcondition)+'\n')
                 limits = self.update_limits(command.limits)
                 environment = command.update_environment(self.environment)
                 result = Result(

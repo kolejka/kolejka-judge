@@ -183,7 +183,7 @@ class ResultDict:
         self._status = None
         pass
     def __repr__(self):
-        return f'{self.__class__.__name__}: {self._dict}'
+        return f'{self.__class__.__name__}: {self._status} {self._dict}'
 
     def __getattr__(self, key):
         return self._dict[key]

@@ -76,6 +76,12 @@ class BuildAutoTask(BuildTask):
             return super().get_result()
         return task.get_result()
 
+    def set_result(self, *args, **kwargs):
+        task = self.build_task
+        if not task:
+            return super().set_result(*args, **kwargs)
+        return task.set_result(*args, **kwargs)
+
 
 class SolutionBuildAutoTask(SolutionBuildMixin, BuildAutoTask):
     pass

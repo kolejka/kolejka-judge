@@ -167,8 +167,7 @@ class TaskBase(AbstractTask):
     def result(self) -> ResultDict:
         return self.get_result()
     def get_result(self):
-        if self.record_result:
-            return self._result
+        return self._result
     def set_result(self, status =None, name: Optional[str] =None, value: Optional[Any] =None):
         if status is not None:
             self._result.set_status(status)
