@@ -55,9 +55,10 @@ def judge(args):
             checker=CheckerTask(source=args.test['checker'], override=tool_override, input_path=input_path, hint_path=hint_path)
         )
     else:
-        args.add_steps(
-            checker=AnswerHintDiffTask(hint_path=hint_path)
-        )
+        if hint_path:
+            args.add_steps(
+                checker=AnswerHintDiffTask(hint_path=hint_path)
+            )
     args.add_steps(logs=CollectLogsTask())
     result = args.run()
     print('Result {} on test {}.'.format(result.status, args.id))
