@@ -49,7 +49,6 @@ class PrepareTask(TaskBase):
             status = status or self.run_command('chmod_d', ProgramCommand, program='find', program_arguments=[self.target, '-type', 'd', '-exec', 'chmod', 'o-rwx,g-w+rx,u+rwx', '{}', '+'])
             status = status or self.run_command('chmod_f', ProgramCommand, program='find', program_arguments=[self.target, '-type', 'f', '-exec', 'chmod', 'o-rwx,g-w+r,u+rw', '{}', '+'])
 #            status = status or self.run_command('chmod', ProgramCommand, program='chmod', program_arguments=['o-rwx,g-w+rx,u+rwx', '-R', self.target], safe=True)
-        print(status)
         self.set_result(status)
         return self.result
 
