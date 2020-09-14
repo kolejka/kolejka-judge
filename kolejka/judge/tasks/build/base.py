@@ -30,6 +30,7 @@ class SolutionBuildMixin:
     DEFAULT_GROUP=config.USER_BUILD
     DEFAULT_GROUP_NAME=config.GROUP_ALL
     DEFAULT_RESULT_ON_ERROR='CME'
+    DEFAULT_RESULT_ON_UNKNOWN='EXT'
     @default_kwargs
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,6 +42,7 @@ class ToolBuildMixin:
     DEFAULT_USER=config.USER_TEST
     DEFAULT_GROUP=config.USER_TEST
     DEFAULT_RESULT_ON_ERROR='INT'
+    DEFAULT_RESULT_ON_UNKNOWN='INT'
     @default_kwargs
     def __init__(self, *args, tool_name, **kwargs):
         for arg in [ 'source_directory', 'build_directory', 'execution_script' ]:
@@ -51,7 +53,7 @@ class ToolBuildMixin:
 
 class BuildTask(TaskBase):
     @default_kwargs
-    def __init__(self, source_directory, build_directory, execution_script=None, build_options=None, build_target=None, user_name=None, group_name=None, **kwargs):
+    def __init__(self, source_directory, build_directory, execution_script=None, build_options=None, build_target=None, user_name=None, group_name=None, result_on_unknown=None, **kwargs):
         super().__init__(**kwargs)
         self.source_directory = get_output_path(source_directory)
         self.build_directory = get_output_path(build_directory)
@@ -60,6 +62,13 @@ class BuildTask(TaskBase):
         self.build_target = build_target and get_relative_path(build_target)
         self.user_name = user_name
         self.group_name = group_name
+        self._result_on_unknown = result_on_unknown
+
+    @property
+    def result_on_unknown(self) -> Optional[str]:
+        return self.get_result_on_unknown()
+    def get_result_on_unknown(self):
+        return self._result_on_unknown
 
     def write_execution_script(self):
         if self.execution_script:
@@ -89,8 +98,11 @@ class BuildTask(TaskBase):
 
     def execute(self):
         status = None
-        status = status or self.execute_build()
-        status = status or self.execute_post_build()
+        if self.ok():
+            status = status or self.execute_build()
+            status = status or self.execute_post_build()
+        else:
+            status = self.result_on_unknown
         self.set_result(status)
         return self.result
 
