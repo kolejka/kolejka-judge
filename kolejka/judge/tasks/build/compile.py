@@ -108,6 +108,7 @@ class BuildGXXTask(BuildGCCTask):
     DEFAULT_COMPILER = GXXCommand
     DEFAULT_SOURCE_GLOBS = [
         '*.[Cc][Pp][Pp]',
+        '*.[Cc][Cc]',
         ]
     @default_kwargs
     def __init__(self, **kwargs):
