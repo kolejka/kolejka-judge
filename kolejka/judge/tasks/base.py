@@ -287,3 +287,6 @@ class TaskBase(AbstractTask):
 
     def find_files(self, path: AbstractPath) -> Generator[AbstractPath, None, None]:
         return self.system.find_files(path, work_directory=self.work_directory)
+
+    def file_contents(self, path: AbstractPath) -> Optional[bytes]:
+        return self.system.file_contents(path, work_directory=self.work_directory)

@@ -29,9 +29,8 @@ def judge(args):
         ], limit_real_time=compile_time, limit_memory='512M'),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
-    args.add_steps(io=SingleIOTask(
-        input_path=args.test.get('input', None),
-        hint_path=args.test.get('hint', None),
+    args.add_steps(io=MultipleIOTask(
+        input_path=args.test.get('io', None),
         tool_override=args.test.get('tools', None),
         tool_time=tool_time,
         generator_source=args.test.get('generator', None),

@@ -29,6 +29,22 @@ TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
 
+MULTITEST = TEST + '/tests'
+MULTITEST_INPUT_GLOB = '**/*.in'
+MULTITEST_INPUT_NAME = (r'^.*/(.*)[.]in$', r'\1')
+MULTITEST_INPUT_HINT = (r'^(.*)[.]in$', r'\1.out')
+MULTITEST_INPUT_CORES = (r'^(.*)[.]in$', r'\1.cores')
+MULTITEST_INPUT_TIME = (r'^(.*)[.]in$', r'\1.time')
+MULTITEST_INPUT_CPU_TIME = (r'^(.*)[.]in$', r'\1.cpu_time')
+MULTITEST_INPUT_REAL_TIME = (r'^(.*)[.]in$', r'\1.real_time')
+MULTITEST_INPUT_MEMORY = (r'^(.*)[.]in$', r'\1.mem')
+MULTITEST_INPUT_SCORE = (r'^(.*)[.]in$', r'\1.score')
+
+MULTITEST_SINGLE = TEST + '/multi/{test_name}'
+MULTITEST_INPUT = MULTITEST_SINGLE + '/input'
+MULTITEST_HINT = MULTITEST_SINGLE + '/hint'
+MULTITEST_ANSWER = MULTITEST_SINGLE + '/answer'
+
 GROUP_ALL  = 'kolejkajudgerun'
 
 USER_TEST = 'kolejkajudgetest'

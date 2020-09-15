@@ -3,8 +3,8 @@
 
 from collections import OrderedDict
 import datetime
-import fnmatch
 import pathlib
+import re
 import traceback
 
 
@@ -37,12 +37,33 @@ def str_operator(v):
         with v.open('rb') as vf:
             content = vf.read(config.SATORI_STRING_LENGTH)
             try:
-                return str(content, 'utf8')
+                content = str(content, 'utf8').rstrip()
+                if content:
+                    content += '\n'
+                return content
             except UnicodeDecodeError:
                 return repr(content)[2:-1][:config.SATORI_STRING_LENGTH]
     if isinstance(v, list):
-        return '\n'.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH]
+        return ' '.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH].rstrip('\n')
     return str(v)[:config.SATORI_STRING_LENGTH]
+
+def path_match(pattern, path):
+    rep = ''
+    i=0;
+    while i < len(pattern):
+        if pattern[i] == '*' and i+1 < len(pattern) and pattern[i+1] == '*':
+            rep += '.*'
+            i += 2;
+        else:
+            if pattern[i] == '*':
+                rep += '[^/]*'
+            elif pattern[i] == '?':
+                rep += '[^/]'
+            else:
+                rep += '['+pattern[i]+']'
+            i += 1;
+    #TODO: match []?
+    return bool(re.match(rep, path))
 
 def result_access(result, val):
     operator = None
@@ -56,7 +77,7 @@ def result_access(result, val):
     vs = list()
     for k,v in result.items():
         for m in val:
-            if fnmatch.fnmatch(k, m):
+            if path_match(m, k):
                 vs.append(v)
     if len(vs) == 0:
         return None

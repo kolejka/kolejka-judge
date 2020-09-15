@@ -112,6 +112,8 @@ class SystemBase(AbstractSystem):
 
     def find_files(self, path: AbstractPath, work_directory: Optional[OutputPath] =None) -> Generator[AbstractPath, None, None]:
         rpath = self.resolve_path(path, work_directory=work_directory)
+        if not rpath.exists():
+            return
         stack = [ rpath ]
         dev = rpath.stat().st_dev
         while stack:
@@ -124,6 +126,12 @@ class SystemBase(AbstractSystem):
                 stack += cpath.iterdir()
             elif cpath.is_file():
                 yield path / (cpath.relative_to(rpath))
+
+    def file_contents(self, path: AbstractPath, work_directory: Optional[OutputPath] =None) -> Optional[bytes]:
+        rpath = self.resolve_path(path, work_directory=work_directory)
+        if not rpath.is_file():
+            return None
+        return rpath.read_bytes()
 
     def resolve(self, obj: Resolvable, work_directory: Optional[OutputPath] =None) -> str:
         if isinstance(obj, AbstractPath):
