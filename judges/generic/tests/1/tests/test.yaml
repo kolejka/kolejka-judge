@@ -20,6 +20,6 @@ kolejka:
             execute_time_cpu  : '/io/executor/run/cpu_time'
             execute_memory    : '/io/executor/run/memory'
             compile_log       : 'str:/builder/**/stdout,/builder/**/stderr'
-            tool_log          : 'str:/io/generator/**/stdout,/io/generator/**/stderr,/io/verifier/**/stdout,/io/verifier/**/stderr,/io/hinter/**/stdout,/io/hinter/**/stderr,'
+            tool_log          : 'str:/io/generator/**/stdout,/io/generator/**/stderr,/io/verifier/**/stdout,/io/verifier/**/stderr,/io/hinter/**/stdout,/io/hinter/**/stderr'
             checker_log       : 'str:/io/checker/**/stdout,/io/checker/**/stderr'
             logs              : '/logs/logs'
