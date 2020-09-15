@@ -19,8 +19,10 @@ def __dir__():
 class AnswerHintDiffTask(TaskBase):
     DEFAULT_RESULT_ON_ERROR='ANS'
     DEFAULT_ANSWER_PATH=config.TEST_ANSWER
+    DEFAULT_CASE_SENSITIVE=True
+    DEFAULT_SPACE_SENSITIVE=False
     @default_kwargs
-    def __init__(self, hint_path, answer_path, case_sensitive=True, space_sensitive=False, **kwargs):
+    def __init__(self, hint_path, answer_path, case_sensitive, space_sensitive, **kwargs):
         super().__init__(**kwargs)
         self.hint_path = get_output_path(hint_path)
         self.answer_path = get_output_path(answer_path)
