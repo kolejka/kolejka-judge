@@ -2,7 +2,9 @@
 
 
 from contextlib import ExitStack
+import math
 import os
+import resource
 import threading
 import time
 
@@ -52,11 +54,20 @@ class PsutilSystem(LocalSystem):
 
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
+            resources = dict()
+            if limits.cpu_time:
+                seconds = int(math.ceil(limits.cpu_time.total_seconds()))
+                resources[resource.RLIMIT_CPU] = (seconds, seconds)
+            if limits.memory:
+                resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
+            resources[resource.RLIMIT_CORE] = (0,0)
+
             process = kolejka.common.subprocess.start(
                 command,
                 user=change_user,
                 group=change_group,
                 groups=change_groups,
+                resources=resources,
                 stdin=stdin_file,
                 stdout=stdout_file,
                 stderr=stderr_file,
