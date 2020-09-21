@@ -200,23 +200,27 @@ class MultipleIOTask(IOTask):
         prepare_result = prepare.execute()
         if prepare_result.status:
             self.set_result(prepare_result.status, 'prepare', prepare_result)
-        singles = []
-        for path in self.find_files(prepare.target):
-            if path.match(config.MULTITEST_INPUT_GLOB):
-                singles.append(self.create_single(path))
-        singles = sorted(singles)
+        else:
+            singles = []
+            for path in self.find_files(prepare.target):
+                if path.match(config.MULTITEST_INPUT_GLOB):
+                    singles.append(self.create_single(path))
+            singles = sorted(singles)
 
-        score = 0.0
-        max_score = 0.0
-        for step_name, step, step_score in singles:
-            step_result = step.execute()
-            self.set_result(name='test_'+step_name, value=step_result)
-            if not step_result.status:
-                step_result.set_status('OK')
-                score += step_score
-            max_score += step_score
+            score = 0.0
+            max_score = 0.0
+            for step_name, step, step_score in singles:
+                step_result = step.execute()
+                self.set_result(name='test_'+step_name, value=step_result)
+                if not step_result.status:
+                    step_result.set_status('OK')
+                    score += step_score
+                else:
+                    if not status:
+                        status = step_result.status
+                max_score += step_score
 
-        self.set_result(name='score', value=score)
-        self.set_result(name='max_score', value=max_score)
-        self.set_result(status)
+            self.set_result(name='score', value=score)
+            self.set_result(name='max_score', value=max_score)
+            self.set_result(status)
         return self.result
