@@ -45,6 +45,8 @@ def str_operator(v):
                 return repr(content)[2:-1][:config.SATORI_STRING_LENGTH]
     if isinstance(v, list):
         return ' '.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH].rstrip('\n')
+    if isinstance(v, bytes):
+        return str(v, 'utf8')[:config.SATORI_STRING_LENGTH]
     return str(v)[:config.SATORI_STRING_LENGTH]
 
 def path_match(pattern, path):
@@ -103,5 +105,7 @@ def satori_result(test, result, result_dir):
         if res is not None:
             if isinstance(res, pathlib.Path):
                 res = satori_result_path(key, res, result_dir / config.SATORI_RESULT)
+            else:
+                res = str_operator(res)
             satori.set(key, res)
     result.set('satori', satori)
