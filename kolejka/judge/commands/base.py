@@ -28,7 +28,7 @@ DEFAULT_OUTPUT = CommandDefaultOutput()
 
 
 class CommandBase(AbstractCommand):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stderr=DEFAULT_OUTPUT, stderr_append=False, verbose=False, default_logs=True, obligatory=False, safe=False):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=DEFAULT_OUTPUT, stdout_append=False, stdout_max_bytes=None, stderr=DEFAULT_OUTPUT, stderr_append=False, stderr_max_bytes=None, verbose=False, default_logs=True, obligatory=False, safe=False):
         self._name = name
         self._system = system
         self._work_directory = work_directory or get_output_path('.')
@@ -39,8 +39,10 @@ class CommandBase(AbstractCommand):
         self._stdin = stdin and get_output_path(stdin)
         self._stdout = stdout and get_output_path(stdout)
         self._stdout_append = bool(stdout_append)
+        self._stdout_max_bytes = int(stdout_max_bytes) if stdout_max_bytes is not None else None
         self._stderr = stderr and get_output_path(stderr)
         self._stderr_append = bool(stderr_append)
+        self._stderr_max_bytes = int(stderr_max_bytes) if stderr_max_bytes is not None else None
         self._verbose = bool(verbose)
         self._default_logs = bool(default_logs)
         self._obligatory = bool(obligatory)
@@ -141,6 +143,12 @@ class CommandBase(AbstractCommand):
         return self.get_stdout_append()
     def get_stdout_append(self):
         return self._stdout_append
+    
+    @property
+    def stdout_max_bytes(self) -> Optional[int]:
+        return self.get_stdout_max_bytes()
+    def get_stdout_max_bytes(self):
+        return self._stdout_max_bytes
 
     @property
     def stderr(self) -> Optional[Union[OutputPath, CommandDefaultOutput]]:
@@ -153,6 +161,12 @@ class CommandBase(AbstractCommand):
         return self.get_stderr_append()
     def get_stderr_append(self):
         return self._stderr_append
+
+    @property
+    def stderr_max_bytes(self) -> Optional[int]:
+        return self.get_stderr_max_bytes()
+    def get_stderr_max_bytes(self):
+        return self._stderr_max_bytes
 
     @property
     def verbose(self) -> bool:

@@ -46,11 +46,11 @@ class LocalSystem(SystemBase):
     def get_superuser(self):
         return os.getuid() == 0
 
-    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
+    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
-            stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
-            stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
+            stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
+            stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
 
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
@@ -82,14 +82,14 @@ class LocalSystem(SystemBase):
             result.set_returncode(returncode)
 
 
-    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits, result):
+    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
         with ExitStack() as stack:
             stats_file = tempfile.NamedTemporaryFile(mode='r', delete=False)
             stats_file.close()
             os.chmod(stats_file.name, 0o666) 
             stdin_file = stack.enter_context(self.read_file(stdin_path))
-            stdout_file = stack.enter_context(self.write_file(stdout_path, stdout_append))
-            stderr_file = stack.enter_context(self.write_file(stderr_path, stderr_append))
+            stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
+            stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
             
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 

@@ -5,8 +5,10 @@ from contextlib import ExitStack
 from copy import deepcopy
 import datetime
 import grp
+import io
 import json
 import logging
+import multiprocessing
 import os
 import pathlib
 import pwd
@@ -38,6 +40,7 @@ class SystemBase(AbstractSystem):
         self._groups = set()
         self._paths = set(paths or [])
         self.validators = self.Validators(self)
+        self._writers = list()
 
     @property
     def output_directory(self) -> pathlib.Path:
@@ -188,9 +191,15 @@ class SystemBase(AbstractSystem):
                 if command.stdin:
                     command_file.write(' < '+repr(command.stdin))
                 if command.stdout:
-                    command_file.write(' > '+repr(command.stdout))
+                    command_file.write(' >'+('>' if command.stdout_append else ''))
+                    command_file.write(' '+repr(command.stdout))
+                    if command.stdout_max_bytes is not None:
+                        command_file.write(' ['+str(command.stdout_max_bytes)+']')
                 if command.stderr:
-                    command_file.write(' 2> '+repr(command.stderr))
+                    command_file.write(' 2>'+('>' if command.stderr_append else ''))
+                    command_file.write(' '+repr(command.stderr))
+                    if command.stderr_max_bytes is not None:
+                        command_file.write(' ['+str(command.stderr_max_bytes)+']')
                 command_file.write('\n')
                 debug_line = repr(command_line)
                 if command.stdin:
@@ -227,8 +236,10 @@ class SystemBase(AbstractSystem):
                         command.stdin_path,
                         command.stdout_path,
                         command.stdout_append,
+                        command.stdout_max_bytes,
                         command.stderr_path,
                         command.stderr_append,
+                        command.stderr_max_bytes,
                         environment,
                         command.work_path,
                         command.user,
@@ -242,8 +253,10 @@ class SystemBase(AbstractSystem):
                         command.stdin_path,
                         command.stdout_path,
                         command.stdout_append,
+                        command.stdout_max_bytes,
                         command.stderr_path,
                         command.stderr_append,
+                        command.stderr_max_bytes,
                         environment,
                         command.work_path,
                         command.user,
@@ -261,10 +274,10 @@ class SystemBase(AbstractSystem):
         self.validators.set_work_directory(None)
         return result
 
-    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits):
-        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits)
+    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
+        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits)
 
-    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stderr_path, stderr_append, environment, work_path, user, group, limits):
+    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
         raise NotImplementedError
 
     def run_task(self, task: AbstractTask, name: str):
@@ -291,6 +304,34 @@ class SystemBase(AbstractSystem):
         if append:
             mode += 'a'
         return path.open(mode)
+    def file_writer(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None, max_bytes =None):
+        if not isinstance(path, pathlib.Path):
+            path = self.resolve_path(path, work_directory)
+        path.parent.mkdir(exist_ok=True, parents=True)
+        mode = 'wb'
+        if append:
+            mode += 'a'
+        fd_read, fd_write = os.pipe()
+        def writer():
+            bytes = 0
+            os.close(fd_write)
+            with path.open(mode) as output:
+                while True:
+                    data = os.read(fd_read, 4096)
+                    if not data:
+                        break
+                    if max_bytes is not None:
+                        if bytes < max_bytes:
+                            data = data[0:max_bytes-bytes]
+                        else:
+                            data = b''
+                    bytes += len(data)
+                    output.write(data)
+        w = multiprocessing.Process(target=writer)
+        self._writers.append(w)
+        w.start()
+        os.close(fd_read)
+        return io.FileIO(fd_write, mode='wb', closefd=True)
 
     def get_user_group_groups(self, user=None, group=None):
         if not self.superuser:

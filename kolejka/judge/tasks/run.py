@@ -17,15 +17,17 @@ def __dir__():
 
 class ExecutableTask(TaskBase):
     @default_kwargs
-    def __init__(self, executable, executable_arguments=None, stdin=None, stdout=None, stdout_append=None, stderr=None, stderr_append=None, **kwargs):
+    def __init__(self, executable, executable_arguments=None, stdin=None, stdout=None, stdout_append=None, stdout_max_bytes=None, stderr=None, stderr_append=None, stderr_max_bytes=None, **kwargs):
         super().__init__(**kwargs)
         self._executable = str(executable)
         self._executable_arguments = executable_arguments or []
         self._stdin = stdin
         self._stdout = stdout
         self._stdout_append = stdout_append
+        self._stdout_max_bytes = stdout_max_bytes
         self._stderr = stderr
         self._stderr_append = stderr_append
+        self._stderr_max_bytes = stderr_max_bytes
 
     @property
     def executable(self) -> OutputPath:
@@ -56,6 +58,12 @@ class ExecutableTask(TaskBase):
         return self.get_stdout_append()
     def get_stdout_append(self):
         return self._stdout_append
+    
+    @property
+    def stdout_max_bytes(self) -> Optional[int]:
+        return self.get_stdout_max_bytes()
+    def get_stdout_max_bytes(self):
+        return self._stdout_max_bytes
 
     @property
     def stderr(self) -> Optional[OutputPath]:
@@ -69,6 +77,12 @@ class ExecutableTask(TaskBase):
     def get_stderr_append(self):
         return self._stderr_append
 
+    @property
+    def stderr_max_bytes(self) -> Optional[int]:
+        return self.get_stderr_max_bytes()
+    def get_stderr_max_bytes(self):
+        return self._stderr_max_bytes
+
     def get_command_kwargs(self):
         kwargs = super().get_command_kwargs()
         if self.stdin is not None:
@@ -77,10 +91,14 @@ class ExecutableTask(TaskBase):
             kwargs['stdout'] = self.stdout
         if self.stdout_append is not None:
             kwargs['stdout_append'] = self.stdout_append
+        if self.stdout_max_bytes is not None:
+            kwargs['stdout_max_bytes'] = self.stdout_max_bytes
         if self.stderr is not None:
             kwargs['stderr'] = self.stderr
         if self.stderr_append is not None:
             kwargs['stderr_append'] = self.stderr_append
+        if self.stderr_max_bytes is not None:
+            kwargs['stderr_max_bytes'] = self.stderr_max_bytes
         return kwargs
 
     def execute(self):
