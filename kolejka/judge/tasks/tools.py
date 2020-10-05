@@ -60,6 +60,9 @@ class ToolTask(TaskBase):
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],
             [ToolBuildGXXTask, [], sub_kwargs],
+            [ToolBuildGCCTask, [], sub_kwargs],
+            [ToolBuildPython3ScriptTask, [], sub_kwargs],
+            [ToolBuildBashScriptTask, [], sub_kwargs],
             ], **build_kwargs)
         
         executable_kwargs = deepcopy(kwargs)

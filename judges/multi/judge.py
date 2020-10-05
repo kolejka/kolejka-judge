@@ -26,6 +26,8 @@ def judge(args):
             [SolutionBuildCMakeTask, [], {}],
             [SolutionBuildMakeTask, [], {}],
             [SolutionBuildGXXTask, [], {'standard': cpp_standard,}],
+            [SolutionBuildGCCTask, [], {}],
+            [SolutionBuildPython3ScriptTask, [], {}],
         ], limit_real_time=compile_time, limit_memory='512M'),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )

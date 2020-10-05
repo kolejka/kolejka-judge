@@ -72,10 +72,12 @@ class BuildTask(TaskBase):
 
     def write_execution_script(self):
         if self.execution_script:
-            execution_command = self.get_execution_command()
-            if execution_command:
+            execution_commands = self.get_execution_commands()
+            if execution_commands:
                 execution_script_path = self.resolve_path(self.execution_script)
-                execution_script_body = '#!/bin/sh\nexec ' + ' '.join([ shlex.quote(self.system.resolve(a)) for a in execution_command ]) + ' "$@" \n'
+                execution_script_body = '#!/bin/sh\n'
+                execution_script_body += ''.join([ ' '.join([ shlex.quote(self.system.resolve(a)) for a in command ])+'\n' for command in execution_commands[:-1] ])
+                execution_script_body += 'exec ' + ' '.join([ shlex.quote(self.system.resolve(a)) for a in execution_commands[-1] ]) + ' "$@"\n'
                 with execution_script_path.open('w') as execution_script_file:
                     execution_script_file.write(execution_script_body)
                 execution_script_path.chmod(0o755)
@@ -92,6 +94,12 @@ class BuildTask(TaskBase):
 
     def ok(self):
         return False
+
+    def get_execution_commands(self):
+        command = self.get_execution_command()
+        if command:
+            return [ command ]
+        return []
 
     def get_execution_command(self):
         return [ self.find_binary(self.build_directory) ]
