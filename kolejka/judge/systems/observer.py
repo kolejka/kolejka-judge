@@ -2,6 +2,7 @@
 
 
 from contextlib import ExitStack
+import resource
 
 
 from kolejka.judge import config
@@ -15,16 +16,16 @@ class ObserverSystem(LocalSystem):
 
         change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
+        resources = dict()
+        resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
+        resources[resource.RLIMIT_CORE] = (0,0)
+
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
             stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
             stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
             process = observer.run(
                 command,
-                stdin=stdin_file,
-                stdout=stdout_file,
-                stderr=stderr_file,
-                env=environment,
                 limits=KolejkaLimits(
                     cpus=limits.cores,
                     memory=limits.memory,
@@ -35,6 +36,11 @@ class ObserverSystem(LocalSystem):
                 user=change_user,
                 group=change_group,
                 groups=change_groups,
+                resources=resources,
+                stdin=stdin_file,
+                stdout=stdout_file,
+                stderr=stderr_file,
+                env=environment,
                 cwd=work_path,
             )
             result.set_returncode(process.returncode)
