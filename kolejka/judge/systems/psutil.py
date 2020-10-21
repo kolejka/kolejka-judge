@@ -60,6 +60,7 @@ class PsutilSystem(LocalSystem):
                 resources[resource.RLIMIT_CPU] = (seconds, seconds)
             if limits.memory:
                 resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
+            resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
             resources[resource.RLIMIT_CORE] = (0,0)
 
             process = kolejka.common.subprocess.start(
