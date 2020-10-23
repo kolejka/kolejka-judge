@@ -46,6 +46,40 @@ class LocalSystem(SystemBase):
     def get_superuser(self):
         return os.getuid() == 0
 
+    def get_resources(self, limits):
+        resources = dict()
+        for limit in [
+                resource.RLIMIT_CORE,
+                resource.RLIMIT_CPU,
+#                resource.RLIMIT_FSIZE,
+                resource.RLIMIT_DATA,
+                resource.RLIMIT_STACK,
+#                resource.RLIMIT_RSS,
+#                resource.RLIMIT_NPROC,
+#                resource.RLIMIT_NOFILE,
+#                resource.RLIMIT_MEMLOCK,
+#                resource.RLIMIT_AS,
+#                resource.RLIMIT_MSGQUEUE,
+#                resource.RLIMIT_NICE,
+#                resource.RLIMIT_RTPRIO,
+#                resource.RLIMIT_RTTIME,
+#                resource.RLIMIT_SIGPENDING,
+                ]:
+            resources[limit] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
+
+        resources[resource.RLIMIT_CORE] = (0,0)
+
+        if limits.cpu_time:
+            seconds = int(math.ceil((limits.cpu_time + parse_time('1s')).total_seconds()))
+            resources[resource.RLIMIT_CPU] = (seconds, seconds)
+
+        if limits.memory:
+            memory = int(math.ceil(limits.memory + parse_memory('1mb')))
+            resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
+
+        return resources
+
+
     def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
@@ -54,14 +88,7 @@ class LocalSystem(SystemBase):
 
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            resources = dict()
-            if limits.cpu_time:
-                seconds = int(math.ceil(limits.cpu_time.total_seconds()))
-                resources[resource.RLIMIT_CPU] = (seconds, seconds)
-            if limits.memory:
-                resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
-            resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
-            resources[resource.RLIMIT_CORE] = (0,0)
+            resources = self.get_resources(limits)
             resources[resource.RLIMIT_NPROC] = (1,1)
 
             process = kolejka.common.subprocess.start(
@@ -94,14 +121,7 @@ class LocalSystem(SystemBase):
             
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            resources = dict()
-            if limits.cpu_time:
-                seconds = int(math.ceil(limits.cpu_time.total_seconds()))
-                resources[resource.RLIMIT_CPU] = (seconds, seconds)
-            if limits.memory:
-                resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
-            resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
-            resources[resource.RLIMIT_CORE] = (0,0)
+            resources = self.get_resources(limits)
 
             command = ['/usr/bin/time', '-f', 'mem=%M\nreal=%e\nsys=%S\nuser=%U', '-o', stats_file.name] + command
             completed = kolejka.common.subprocess.run(

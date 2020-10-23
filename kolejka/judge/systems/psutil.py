@@ -54,14 +54,7 @@ class PsutilSystem(LocalSystem):
 
             change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            resources = dict()
-            if limits.cpu_time:
-                seconds = int(math.ceil(limits.cpu_time.total_seconds()))
-                resources[resource.RLIMIT_CPU] = (seconds, seconds)
-            if limits.memory:
-                resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
-            resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
-            resources[resource.RLIMIT_CORE] = (0,0)
+            resources = self.get_resources(limits)
 
             process = kolejka.common.subprocess.start(
                 command,

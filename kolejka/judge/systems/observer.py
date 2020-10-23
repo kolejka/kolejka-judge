@@ -7,6 +7,7 @@ import resource
 
 from kolejka.judge import config
 from kolejka.judge.systems.local import LocalSystem
+from kolejka.judge.parse import *
 
 
 class ObserverSystem(LocalSystem):
@@ -16,9 +17,15 @@ class ObserverSystem(LocalSystem):
 
         change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-        resources = dict()
-        resources[resource.RLIMIT_STACK] = (resource.RLIM_INFINITY, resource.RLIM_INFINITY)
-        resources[resource.RLIMIT_CORE] = (0,0)
+        resources = self.get_resources(limits)
+        limits=KolejkaLimits(
+                    cpus=limits.cores,
+                    memory=limits.memory,
+                    swap=0,
+                    pids=limits.pids,
+                    time=limits.real_time,
+                )
+        #TODO: cpu_time !!!!!
 
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
@@ -26,13 +33,7 @@ class ObserverSystem(LocalSystem):
             stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
             process = observer.run(
                 command,
-                limits=KolejkaLimits(
-                    cpus=limits.cores,
-                    memory=limits.memory,
-                    swap=0,
-                    pids=limits.pids,
-                    time=limits.real_time
-                    ),
+                limits=limits,
                 user=change_user,
                 group=change_group,
                 groups=change_groups,
