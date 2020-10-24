@@ -15,7 +15,7 @@ def judge(args):
     source_size_limit = parse_memory(args.test.get('source_size', '100K'))
     binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
-    cpp_standard = args.test.get('cpp_standard', 'c++14')
+    cpp_standard = args.test.get('cpp_standard', 'c++17')
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     args.add_steps(
@@ -36,6 +36,7 @@ def judge(args):
         hint_path=args.test.get('hint', None),
         tool_override=args.test.get('tools', None),
         tool_time=tool_time,
+        tool_cpp_standard=cpp_standard,
         generator_source=args.test.get('generator', None),
         verifier_source=args.test.get('verifier', None),
         hinter_source=args.test.get('hinter', None),

@@ -24,11 +24,13 @@ class ToolTask(TaskBase):
     DEFAULT_RESULT_ON_ERROR='INT'
     DEFAULT_USER_NAME=config.USER_TEST
     DEFAULT_GROUP_NAME=config.USER_TEST
+    DEFAULT_CPP_STANDARD=config.TOOL_BUILD_CPP_STANDARD
     @default_kwargs
     def __init__(self, tool_name,
             user_name, group_name,
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
+            cpp_standard=None,
             **kwargs):
 
         super().__init__(**kwargs)
@@ -50,6 +52,8 @@ class ToolTask(TaskBase):
         self.source = ToolPrepareTask(**source_kwargs)
         
         sub_kwargs = { 'tool_name' : self.tool_name }
+        gxx_kwargs = deepcopy(sub_kwargs)
+        gxx_kwargs['standard'] = cpp_standard
         build_kwargs = deepcopy(kwargs)
         build_kwargs['result_on_error'] = 'INT'
         build_kwargs['tool_name'] = self.tool_name
@@ -59,7 +63,7 @@ class ToolTask(TaskBase):
         self.build = ToolBuildAutoTask([
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],
-            [ToolBuildGXXTask, [], sub_kwargs],
+            [ToolBuildGXXTask, [], gxx_kwargs],
             [ToolBuildGCCTask, [], sub_kwargs],
             [ToolBuildPython3ScriptTask, [], sub_kwargs],
             [ToolBuildBashScriptTask, [], sub_kwargs],

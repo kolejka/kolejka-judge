@@ -23,6 +23,7 @@ TOOL = 'tools'
 TOOL_SOURCE = TOOL + '/src/{tool_name}'
 TOOL_BUILD = TOOL + '/build/{tool_name}'
 TOOL_EXEC = TOOL + '/{tool_name}'
+TOOL_BUILD_CPP_STANDARD = 'c++17' 
 
 TEST = 'test'
 TEST_INPUT = TEST + '/input'

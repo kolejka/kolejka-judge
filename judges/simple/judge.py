@@ -16,7 +16,7 @@ def judge(args):
         prepare=SystemPrepareTask(default_logs=False),
         source=SolutionPrepareTask(source=args.solution),
         source_rules=SolutionSourceRulesTask(max_size='10K'),
-        builder=SolutionBuildGXXTask(standard='c++14'),
+        builder=SolutionBuildGXXTask(standard='c++17'),
         build_rules=SolutionBuildRulesTask(max_size='10M'),
         executor=SolutionExecutableTask(
             input_path=args.test['input'],
