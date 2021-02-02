@@ -54,7 +54,7 @@ def float_operator(v):
     return float(str_operator(v))
 
 def int_operator(v):
-    return int(math.round(float_operator(v)))
+    return int(math.floor(float_operator(v)+0.5))
 
 def path_match(pattern, path):
     rep = ''
