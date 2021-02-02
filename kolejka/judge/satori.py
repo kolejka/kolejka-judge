@@ -3,6 +3,7 @@
 
 from collections import OrderedDict
 import datetime
+import math
 import pathlib
 import re
 import traceback
@@ -49,6 +50,12 @@ def str_operator(v):
         return str(v, 'utf8')[:config.SATORI_STRING_LENGTH]
     return str(v)[:config.SATORI_STRING_LENGTH]
 
+def float_operator(v):
+    return float(str_operator(v))
+
+def int_operator(v):
+    return int(math.round(float_operator(v)))
+
 def path_match(pattern, path):
     rep = ''
     i=0;
@@ -85,6 +92,10 @@ def result_access(result, val):
         return None
     if operator == 'str':
         return str_operator(vs)
+    elif operator == 'float':
+        return float_operator(vs)
+    elif operator == 'int':
+        return int_operator(vs)
     if len(vs) > 1:
         raise ValueError
     vs = vs[0]
@@ -107,5 +118,8 @@ def satori_result(test, result, result_dir):
                 res = satori_result_path(key, res, result_dir / config.SATORI_RESULT)
             else:
                 res = str_operator(res)
-            satori.set(key, res)
+            if key == 'status':
+                satori.set_status(res)
+            else:
+                satori.set(key, res)
     result.set('satori', satori)
