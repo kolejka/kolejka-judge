@@ -13,6 +13,7 @@ import kolejka.common.subprocess
 
 
 from kolejka.judge import config
+from kolejka.judge.result import Result
 from kolejka.judge.systems.local import LocalSystem
 
 
@@ -45,7 +46,7 @@ def monitor_process(process, limits, result):
 
 
 class PsutilSystem(LocalSystem):
-    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
+    def start_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
         import psutil
         with ExitStack() as stack:
             stdin_file = stack.enter_context(self.read_file(stdin_path))
@@ -69,8 +70,20 @@ class PsutilSystem(LocalSystem):
                 cwd=work_path,
             )
             process = psutil.Process(process.pid)
+            result = Result() 
             monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
             monitoring_thread.start()
-            returncode = process.wait()
-            monitoring_thread.join()
-            result.set_returncode(returncode)
+            return (process, monitoring_thread, result)
+
+    def terminate_command(self, process):
+        process, monitoring_thread, monitor_result = process
+        process.terminate()
+
+    def wait_command(self, process, result):
+        process, monitoring_thread, monitor_result = process
+        returncode = process.wait()
+        monitoring_thread.join()
+        result.update_memory(monitor_result.memory)
+        result.update_real_time(monitor_result.real_time)
+        result.update_cpu_time(monitor_result.cpu_time)
+        result.set_returncode(returncode)

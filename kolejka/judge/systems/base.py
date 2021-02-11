@@ -41,6 +41,7 @@ class SystemBase(AbstractSystem):
         self._paths = set(paths or [])
         self.validators = self.Validators(self)
         self._writers = list()
+        self._background = dict()
 
     @property
     def output_directory(self) -> pathlib.Path:
@@ -67,6 +68,12 @@ class SystemBase(AbstractSystem):
     def superuser(self) -> bool:
         return self.get_superuser()
     def get_superuser(self):
+        raise NotImplementedError
+
+    @property
+    def current_user(self) -> str:
+        return self.get_current_user()
+    def get_current_user(self):
         raise NotImplementedError
 
     @property
@@ -171,7 +178,25 @@ class SystemBase(AbstractSystem):
             result.set_status('OK')
         return result
 
-    def run_command(self, command: AbstractCommand, name: str):
+    def terminate_background(self, background):
+        if background in self._background:
+            thread, process = self._background[background]
+            self.terminate_command(process)
+
+    def wait_background(self, background):
+        if background in self._background:
+            thread, process = self._background[background]
+            del self._background[background]
+            thread.join()
+
+    def clear_background(self):
+        backgrounds = list(self._background.keys())
+        for background in backgrounds:
+            self.terminate_background(background)
+        for background in backgrounds:
+            self.wait_background(background)
+
+    def run_command(self, command: AbstractCommand, name: str, background=False ):
         self.validators.set_work_directory(command.work_directory)
         command.set_name(name)
         command.set_system(self)
@@ -183,7 +208,8 @@ class SystemBase(AbstractSystem):
         command.verify_prerequirements()
         command_line = command.resolved_command
         if command_line:
-            with self.write_file(command.get_log_path('cmd'), text=True) as command_file:
+            command_file = self.write_file(command.get_log_path('cmd'), text=True)
+            try:
                 command_file.write('Command:\n')
                 command_file.write(repr(command)+'\n')
                 command_file.write('\n\nCommand line:\n')
@@ -230,7 +256,8 @@ class SystemBase(AbstractSystem):
                         stdout = command.stdout_path,
                         stderr = command.stderr_path,
                     )
-                if command.safe:
+                command_file.flush()
+                if command.safe and not background:
                     self.execute_safe_command(
                         command_line,
                         command.stdin_path,
@@ -248,7 +275,7 @@ class SystemBase(AbstractSystem):
                         result,
                     )
                 else:
-                    self.execute_command(
+                    process = self.start_command(
                         command_line,
                         command.stdin_path,
                         command.stdout_path,
@@ -262,10 +289,23 @@ class SystemBase(AbstractSystem):
                         command.user,
                         command.group,
                         limits,
-                        result,
                     )
+                    if background:
+                        def finalize():
+                            self.wait_command(process, result)
+                            command_file.write('\n\nResult:\n')
+                            command_file.write(repr(result)+'\n')
+                            command_file.close()
+                        thread = threading.Thread(target=finalize)
+                        thread.start()
+                        self._background[background] = thread, process
+                        return result
+                    self.wait_command(process, result)
                 command_file.write('\n\nResult:\n')
                 command_file.write(repr(result)+'\n')
+            finally:
+                if not background:
+                    command_file.close()
 
             command.set_result(result)
             exit_status = command.verify_postconditions()
@@ -274,10 +314,20 @@ class SystemBase(AbstractSystem):
         self.validators.set_work_directory(None)
         return result
 
-    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
-        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits)
+    def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
+        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result)
 
-    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
+    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
+        process = self.start_command(command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits)
+        return self.wait_command(process, result)
+
+    def start_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
+        raise NotImplementedError
+
+    def terminate_command(self, process):
+        raise NotImplementedError
+
+    def wait_command(self, process, result):
         raise NotImplementedError
 
     def run_task(self, task: AbstractTask, name: str):

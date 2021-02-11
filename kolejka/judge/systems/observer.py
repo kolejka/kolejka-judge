@@ -11,8 +11,9 @@ from kolejka.judge.parse import *
 
 
 class ObserverSystem(LocalSystem):
-    def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
-        from kolejka import observer
+
+    def start_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
+        import kolejka.observer.runner
         from kolejka.common import KolejkaLimits
 
         change_user, change_group, change_groups = self.get_user_group_groups(user, group)
@@ -31,7 +32,7 @@ class ObserverSystem(LocalSystem):
             stdin_file = stack.enter_context(self.read_file(stdin_path))
             stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
             stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
-            process = observer.run(
+            process = kolejka.observer.runner.start(
                 command,
                 limits=limits,
                 user=change_user,
@@ -44,6 +45,14 @@ class ObserverSystem(LocalSystem):
                 env=environment,
                 cwd=work_path,
             )
-            result.set_returncode(process.returncode)
-            result.update_memory(process.stats.memory.max_usage)
-            result.update_cpu_time(process.stats.cpu.usage)
+        return process
+
+    def terminate_command(self, process):
+        process.terminate()
+
+    def wait_command(self, process, result):
+        import kolejka.observer.runner
+        completed = kolejka.observer.runner.wait(process)
+        result.set_returncode(completed.returncode)
+        result.update_memory(completed.stats.memory.max_usage)
+        result.update_cpu_time(completed.stats.cpu.usage)

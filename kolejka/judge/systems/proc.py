@@ -6,7 +6,7 @@ import pathlib
 import time
 
 
-__all__ = [ 'proc_info', ]
+__all__ = [ 'info', 'ppid', 'pids', 'ppids', 'children', 'descendants' ]
 def __dir__():
     return __all__
 
@@ -14,10 +14,8 @@ def __dir__():
 page_size = int(os.sysconf("SC_PAGE_SIZE"))
 clock_ticks = int(os.sysconf("SC_CLK_TCK"))
 
-def proc_info(pid):
+def info(pid):
     proc = pathlib.Path('/proc/'+str(pid))
-    if not proc.is_dir():
-        return None
     with pathlib.Path('/proc/uptime').open() as uptime_file:
         uptime = float(uptime_file.read().strip().split()[0])
     try:
@@ -29,6 +27,7 @@ def proc_info(pid):
             io = dict( [ (k.strip().lower(), int(v.strip())) for k,v in [ l.split(':') for l in io_file.read().strip().split('\n') ] ] )
 
         result = dict()
+        result['ppid'] = int(stat[3])
         result['cpu_user'] = int(stat[13]) / clock_ticks
         result['cpu_sys'] = int(stat[14]) / clock_ticks
         result['rss'] = int(statm[1]) * page_size
@@ -39,3 +38,42 @@ def proc_info(pid):
         return result
     except:
         return None
+
+def ppid(pid):
+    proc = pathlib.Path('/proc/'+str(pid))
+    try:
+        with ( proc / 'stat' ).open() as stat_file:
+            stat = stat_file.read().strip().split()
+            return int(stat[3])
+    except:
+        return None
+
+def pids():
+    proc = pathlib.Path('/proc')
+    return [ int(p.name) for p in proc.iterdir() if p.is_dir() and not p.is_symlink() and p.name.isdigit() ] 
+
+def ppids():
+    result = dict()
+    for p in pids():
+        pp = ppid(p)
+        if pp is not None:
+            result[p] = pp
+    return result
+
+def children(pid):
+    return [ p for p in pids() if ppid(p) == pid ]
+
+def descendants(pid):
+    parents = ppids()
+    children = dict([ (p,list()) for p in parents.values() ])
+    for child, parent in parents.items():
+        children[parent].append(child)
+    new_descendants = [ pid ]
+    all_descendants = []
+    while new_descendants:
+        active = new_descendants
+        new_descendants = []
+        for p in active:
+            all_descendants += children.get(p,[])
+            new_descendants += children.get(p,[])
+    return all_descendants
