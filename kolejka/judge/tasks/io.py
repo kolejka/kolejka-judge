@@ -85,7 +85,7 @@ class SingleIOTask(IOTask):
             hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
         if self.checker_source and input_path and hint_path and answer_path:
-            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path, cpp_standard=self.tool_cpp_standard)
+            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard)
             self.steps.append(('checker', checker))
         else:
             if hint_path and answer_path:

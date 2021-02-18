@@ -196,7 +196,7 @@ class SystemBase(AbstractSystem):
         for background in backgrounds:
             self.wait_background(background)
 
-    def run_command(self, command: AbstractCommand, name: str, background=False ):
+    def run_command(self, command: AbstractCommand, name: str):
         self.validators.set_work_directory(command.work_directory)
         command.set_name(name)
         command.set_system(self)
@@ -257,7 +257,7 @@ class SystemBase(AbstractSystem):
                         stderr = command.stderr_path,
                     )
                 command_file.flush()
-                if command.safe and not background:
+                if command.safe and not command.background:
                     self.execute_safe_command(
                         command_line,
                         command.stdin_path,
@@ -290,7 +290,7 @@ class SystemBase(AbstractSystem):
                         command.group,
                         limits,
                     )
-                    if background:
+                    if command.background:
                         def finalize():
                             self.wait_command(process, result)
                             command_file.write('\n\nResult:\n')
@@ -298,13 +298,13 @@ class SystemBase(AbstractSystem):
                             command_file.close()
                         thread = threading.Thread(target=finalize)
                         thread.start()
-                        self._background[background] = thread, process
+                        self._background[command.name] = thread, process
                         return result
                     self.wait_command(process, result)
                 command_file.write('\n\nResult:\n')
                 command_file.write(repr(result)+'\n')
             finally:
-                if not background:
+                if not command.background:
                     command_file.close()
 
             command.set_result(result)
@@ -378,7 +378,7 @@ class SystemBase(AbstractSystem):
                     bytes += len(data)
                     output.write(data)
         w = multiprocessing.Process(target=writer)
-        self._writers.append(w)
+        #self._writers.append(w)
         w.start()
         os.close(fd_read)
         return io.FileIO(fd_write, mode='wb', closefd=True)

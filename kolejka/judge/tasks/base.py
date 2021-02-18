@@ -280,7 +280,7 @@ class TaskBase(AbstractTask):
     def verify_prerequirements(self):
         for requirement in self.prerequirements:
             if not requirement(self.system):
-                raise PrerequirementException("Prerequirement `{}` not satisfied for {}".format(prerequirement, self.name))
+                raise PrerequirementException("Prerequirement `{}` not satisfied for {}".format(requirement, self.name))
 
     def resolve_path(self, path: Optional[AbstractPath]) -> pathlib.Path:
         return self.system.resolve_path(path, work_directory=self.work_directory)

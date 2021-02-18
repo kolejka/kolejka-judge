@@ -25,66 +25,76 @@ class ToolTask(TaskBase):
     DEFAULT_USER_NAME=config.USER_TEST
     DEFAULT_GROUP_NAME=config.USER_TEST
     DEFAULT_CPP_STANDARD=config.TOOL_BUILD_CPP_STANDARD
+    DEFAULT_PREPARE_TASK=None
+    DEFAULT_BUILD_TASK=None
+    DEFAULT_EXECUTE_TASK=None
     @default_kwargs
     def __init__(self, tool_name,
             user_name, group_name,
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
             cpp_standard=None,
+            prepare_task=None,
+            build_task=None,
+            execute_task=None,
             **kwargs):
 
         super().__init__(**kwargs)
         self._tool_name = tool_name
         self._user_name = user_name
         self._group_name = group_name
+        self._source = source
+        self._override = override
+        self._source_directory = source_directory
+        self._build_directory = build_directory
+        self._prepare_kwargs = kwargs
+        self._build_kwargs = kwargs
+        self._execute_kwargs = kwargs
+        self._prepare_task = prepare_task
+        self._build_task = build_task
+        self._execute_task = execute_task
+        self.arguments = arguments
+        self.input_path = input_path
+        self.output_path = output_path
+        self.error_path = error_path
+        self.cpp_standard = cpp_standard
 
-        source_kwargs = deepcopy(kwargs)
-        source_kwargs['result_on_error'] = 'INT'
-        source_kwargs['tool_name'] = self.tool_name
-        source_kwargs['user_name'] = user_name
-        source_kwargs['group_name'] = group_name
-        if source:
-            source_kwargs['source'] = source
-        if override:
-            source_kwargs['override'] = override
-        if source_directory:
-            source_kwargs['target'] = source_directory
-        self.source = ToolPrepareTask(**source_kwargs)
+        self.prepare_task = self.prepare_task_factory()
+        self.build_task = self.build_task_factory()
+        self.execute_task = self.execute_task_factory()
+
+        self.input_path = self.execute_task.stdin
+        self.output_path = self.execute_task.stdout
+        self.error_path = self.execute_task.stderr
+
+    def prepare_task_factory(self):
+        if self._prepare_task is None:
+            return ToolPrepareTask(**self.prepare_kwargs)
+        else:
+            return self._prepare_task(**self.prepare_kwargs)
         
-        sub_kwargs = { 'tool_name' : self.tool_name }
-        gxx_kwargs = deepcopy(sub_kwargs)
-        gxx_kwargs['standard'] = cpp_standard
-        build_kwargs = deepcopy(kwargs)
-        build_kwargs['result_on_error'] = 'INT'
-        build_kwargs['tool_name'] = self.tool_name
-        build_kwargs['source_directory'] = self.source.target
-        if build_directory:
-            build_kwargs['build_directory'] = build_directory
-        self.build = ToolBuildAutoTask([
+    def build_task_factory(self):
+        if self._build_task is None:
+            sub_kwargs = { 'tool_name' : self.tool_name }
+            gxx_kwargs = deepcopy(sub_kwargs)
+            gxx_kwargs['standard'] = self.cpp_standard
+            return ToolBuildAutoTask([
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],
             [ToolBuildGXXTask, [], gxx_kwargs],
             [ToolBuildGCCTask, [], sub_kwargs],
             [ToolBuildPython3ScriptTask, [], sub_kwargs],
             [ToolBuildBashScriptTask, [], sub_kwargs],
-            ], **build_kwargs)
-        
-        executable_kwargs = deepcopy(kwargs)
-        executable_kwargs['result_on_error'] = self.result_on_error
-        executable_kwargs['tool_name'] = self.tool_name
-        if input_path:
-            executable_kwargs['stdin'] = input_path
-        if output_path:
-            executable_kwargs['stdout'] = output_path
-        if error_path:
-            executable_kwargs['stderr'] = error_path
-        executable_kwargs['executable'] = self.build.execution_script
-        executable_kwargs['executable_arguments'] = arguments
-        self.executable = ToolExecutableTask(**executable_kwargs)
-        self.input_path = self.executable.stdin
-        self.output_path = self.executable.stdout
-        self.error_path = self.executable.stderr
+            ], **self.build_kwargs)
+        else:
+            return self._build_task(**self.build_kwargs)
 
+    def execute_task_factory(self):
+        if self._execute_task is None:
+            return ToolExecutableTask(**self.execute_kwargs)
+        else:
+            return self._execute_task(**self.execute_kwargs)
+    
     @property
     def tool_name(self):
         return self.get_tool_name()
@@ -100,35 +110,98 @@ class ToolTask(TaskBase):
         return self.get_group_name()
     def get_group_name(self):
         return self._group_name
+    @property
+    def source(self):
+        return self.get_source()
+    def get_source(self):
+        return self._source
+    @property
+    def override(self):
+        return self.get_override()
+    def get_override(self):
+        return self._override
+    @property
+    def source_directory(self):
+        return self.get_source_directory()
+    def get_source_directory(self):
+        return self._source_directory
+    @property
+    def build_directory(self):
+        return self.get_build_directory()
+    def get_build_directory(self):
+        return self._build_directory
+    @property
+    def prepare_kwargs(self):
+        return self.get_prepare_kwargs()
+    def get_prepare_kwargs(self):
+        prepare_kwargs = deepcopy(self._prepare_kwargs)
+        prepare_kwargs['result_on_error'] = 'INT'
+        prepare_kwargs['tool_name'] = self.tool_name
+        prepare_kwargs['user_name'] = self.user_name
+        prepare_kwargs['group_name'] = self.group_name
+        if self.source:
+            prepare_kwargs['source'] = self.source
+        if self.override:
+            prepare_kwargs['override'] = self.override
+        if self.source_directory:
+            prepare_kwargs['target'] = self.source_directory
+        return prepare_kwargs
+    @property
+    def build_kwargs(self):
+        return self.get_build_kwargs()
+    def get_build_kwargs(self):
+        build_kwargs = deepcopy(self._build_kwargs)
+        build_kwargs['result_on_error'] = 'INT'
+        build_kwargs['tool_name'] = self.tool_name
+        build_kwargs['source_directory'] = self.prepare_task.target
+        if self.build_directory:
+            build_kwargs['build_directory'] = self.build_directory
+        return build_kwargs
+    @property
+    def execute_kwargs(self):
+        return self.get_execute_kwargs()
+    def get_execute_kwargs(self):
+        kwargs = deepcopy(self._execute_kwargs)
+        kwargs['result_on_error'] = self.result_on_error
+        kwargs['tool_name'] = self.tool_name
+        if self.input_path:
+            kwargs['stdin'] = self.input_path
+        if self.output_path:
+            kwargs['stdout'] = self.output_path
+        if self.error_path:
+            kwargs['stderr'] = self.error_path
+        kwargs['executable'] = self.build_task.execution_script
+        kwargs['executable_arguments'] = self.arguments
+        return kwargs
 
     def set_system(self, system):
         super().set_system(system)
-        self.source.set_system(system)
-        self.build.set_system(system)
-        self.executable.set_system(system)
+        self.prepare_task.set_system(system)
+        self.build_task.set_system(system)
+        self.execute_task.set_system(system)
 
     def set_name(self, name):
         super().set_name(name)
-        self.source.set_name(name+'_source')
-        self.build.set_name(name+'_build')
-        self.executable.set_name(name+'_exec')
+        self.prepare_task.set_name(name+'_prepare')
+        self.build_task.set_name(name+'_build')
+        self.execute_task.set_name(name+'_exec')
 
     def execute(self):
         status = None
-        tool_exists = len(list(self.find_files(self.build.execution_script))) > 0
+        tool_exists = len(list(self.find_files(self.build_task.execution_script))) > 0
         if not tool_exists:
-            self.run_command('dir_source', DirectoryAddCommand, path=self.source.target, user_name=self.user_name, group_name=self.group_name, mode=0o2750)
-            self.run_command('dir_build', DirectoryAddCommand, path=self.build.build_directory, user_name=self.user_name, group_name=self.group_name, mode=0o2750)
+            self.run_command('dir_source', DirectoryAddCommand, path=self.prepare_task.target, user_name=self.user_name, group_name=self.group_name, mode=0o2750)
+            self.run_command('dir_build', DirectoryAddCommand, path=self.build_task.build_directory, user_name=self.user_name, group_name=self.group_name, mode=0o2750)
             if not status:
-                result = self.source.execute()
+                result = self.prepare_task.execute()
                 status = result and result.status
-                self.set_result(status, 'source', result)
+                self.set_result(status, 'prepare', result)
             if not status:
-                result = self.build.execute()
+                result = self.build_task.execute()
                 status = result and result.status
                 self.set_result(status, 'build', result)
         if not status:
-            result = self.executable.execute()
+            result = self.execute_task.execute()
             status = result and result.status
             self.set_result(status, 'exec', result)
         return self.result

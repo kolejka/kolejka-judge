@@ -7,7 +7,7 @@ import datetime
 from kolejka.judge import config
 
 
-__all__ = [ 'parse_time', 'unparse_time', 'parse_memory', 'unparse_memory', ]
+__all__ = [ 'parse_time', 'unparse_time', 'parse_memory', 'unparse_memory', 'parse_bool', 'unparse_bool' ]
 def __dir__():
     return __all__
 
@@ -67,3 +67,14 @@ def unparse_memory(x):
     if x is not None:
         assert isinstance(x, int)
         return str(x)+'b'
+
+def parse_bool(x):
+    if x is not None:
+        if isinstance(x, bool):
+            return x
+        return str(x).lower().strip() not in [ 'false', 'no', '0' ]
+
+def unparse_bool(x):
+    if x is not None:
+        assert isinstance(x, bool)
+        return ('true' if x else 'false')

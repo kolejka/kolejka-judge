@@ -116,3 +116,35 @@ SYSTEM_DIRECTORIES = [
         'mode' : 0o2750,
     }
 ]
+
+POSTGRES_VERSION = 12
+POSTGRES_LOCALE = 'en_US.UTF-8'
+POSTGRES_DATA_DIR = 'postgresdata'
+POSTGRES_SOCKET_DIR = 'postgressocket'
+POSTGRES_DB = 'kolejkajudge'
+POSTGRES_DB_ADMIN = 'kolejkajudgeadmin'
+POSTGRES_DB_USER  = 'kolejkajudgeuser'
+
+USER_POSTGRES = 'kolejkajudgepostgres'
+
+POSTGRES_GROUPS = []
+POSTGRES_USERS = [
+    {
+        'user_name' : USER_POSTGRES,
+        'home' : 'home_'+USER_POSTGRES,
+        'groups' : [ GROUP_ALL, ],
+    }
+]
+POSTGRES_DIRECTORIES = [
+    {
+        'path' : POSTGRES_DATA_DIR,
+        'user_name': USER_POSTGRES,
+        'group_name': USER_POSTGRES,
+        'mode': 0o2700,
+    } , {
+        'path' : POSTGRES_SOCKET_DIR,
+        'user_name': USER_POSTGRES,
+        'group_name': GROUP_ALL,
+        'mode': 0o2750,
+    }
+]
