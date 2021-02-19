@@ -1,0 +1,5 @@
+1:
+  !include :   test.yaml
+  generator:   !file generator.cpp
+  hinter:      !file hinter.cpp
+  time:        1s
