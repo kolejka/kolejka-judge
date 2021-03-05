@@ -56,6 +56,10 @@ def float_operator(v):
 def int_operator(v):
     return int(math.floor(float_operator(v)+0.5))
 
+def milisec_operator(v):
+    s = str_operator(v)
+    return int(parse_time(str_operator(v)).total_seconds() * 1000)
+
 def path_match(pattern, path):
     rep = ''
     i=0;
@@ -96,6 +100,8 @@ def result_access(result, val):
         return float_operator(vs)
     elif operator == 'int':
         return int_operator(vs)
+    elif operator == 'milisec':
+        return milisec_operator(vs)
     if len(vs) > 1:
         raise ValueError
     vs = vs[0]

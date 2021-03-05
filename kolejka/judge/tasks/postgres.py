@@ -3,6 +3,7 @@
 import copy
 import re
 import shlex
+import shutil
 import time
 
 from kolejka.judge import config
@@ -77,6 +78,8 @@ class PostgresPrepareTask(PostgresTask):
                 if not self.system.superuser:
                     ident_file.write('default %s %s\n' % (self.system.current_user, self.db_admin))
                     ident_file.write('default %s %s\n' % (self.system.current_user, self.db_user))
+                ident_file.write('default %s %s\n' % (config.USER_POSTGRES, self.db_admin))
+                ident_file.write('default %s %s\n' % (config.USER_POSTGRES, self.db_user))
                 ident_file.write('default %s %s\n' % (config.USER_TEST, self.db_admin))
                 ident_file.write('default %s %s\n' % (config.USER_TEST, self.db_user))
                 ident_file.write('default %s %s\n' % (config.USER_BUILD, self.db_user))
@@ -157,8 +160,12 @@ class BuildPostgresTask(PostgresTask, BuildTask):
             sql_script_body = source_file.read()
             if self.task:
                 sql_script_body = re.sub(r'.*^\s*--\s*'+self.task+'\s*$(.*?)^\s*----\s*$.*',r'\1', sql_script_body, flags=re.MULTILINE|re.IGNORECASE|re.DOTALL)
-            with self.resolve_path(self.sql_script).open('w') as exec_file:
+            exec_path = self.resolve_path(self.sql_script)
+            with exec_path.open('w') as exec_file:
                 exec_file.write(sql_script_body)
+            if self.system.superuser:
+                shutil.chown(exec_path, self.user, self.group)
+            exec_path.chmod(0o644)
 
 class SolutionBuildPostgresTask(SolutionBuildMixin, BuildPostgresTask):
     pass
@@ -242,14 +249,16 @@ class BuildIOPostgresTask(TaskBase):
     DEFAULT_SOLUTION_EXEC=config.SOLUTION_EXEC
     DEFAULT_ANSWER_PATH=config.TEST_ANSWER
     DEFAULT_HINTER_OUTPUT_PATH=config.TEST_HINT
+    DEFAULT_IGNORE_ERRORS=False
     DEFAULT_TUPLES_ONLY=False
     DEFAULT_ALIGN=True
     DEFAULT_CASE_SENSITIVE=True
     DEFAULT_SPACE_SENSITIVE=False
     DEFAULT_ROW_SORT=False
     DEFAULT_COLUMN_SORT=False
+    DEFAULT_CHECKER_IGNORE_ERRORS=False
     @default_kwargs
-    def __init__(self, solution_source, solution_build, solution_exec, answer_path, hinter_output_path, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, task=None, max_size=None, regex_count=None, hint_path=None, tool_time=None, generator_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
+    def __init__(self, solution_source, solution_build, solution_exec, answer_path, hinter_output_path, ignore_errors, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, checker_ignore_errors, task=None, max_size=None, regex_count=None, hint_path=None, tool_time=None, generator_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
         super().__init__(**kwargs)
         self.solution_source = solution_source
         self.solution_build = solution_build
@@ -261,6 +270,7 @@ class BuildIOPostgresTask(TaskBase):
         self.hinter_source = hinter_source
         self.hinter_output_path = hinter_output_path
         self.checker_source = checker_source
+        self.checker_ignore_errors = checker_ignore_errors
         self.limit_cores = limit_cores
         self.limit_cpu_time = limit_time
         self.limit_real_time = None
@@ -274,6 +284,7 @@ class BuildIOPostgresTask(TaskBase):
         self.task = task
         self.max_size = max_size
         self.regex_count = regex_count
+        self.ignore_errors = ignore_errors
         self.tuples_only = tuples_only
         self.align = align
         self.case_sensitive = case_sensitive
@@ -284,12 +295,14 @@ class BuildIOPostgresTask(TaskBase):
 
 
 class SingleBuildIOPostgresTask(BuildIOPostgresTask):
+    DEFAULT_SCORE=1.0
     @default_kwargs
-    def __init__(self, **kwargs):
+    def __init__(self, score, **kwargs):
         super().__init__(**kwargs)
+        self.score = score
 
         self.steps = []
-        builder = SolutionBuildPostgresTask(source_directory=self.solution_source, build_directory=self.solution_build, execution_script=self.solution_exec, task=self.task, tuples_only=self.tuples_only, align=self.align) #TODO:version,...
+        builder = SolutionBuildPostgresTask(source_directory=self.solution_source, build_directory=self.solution_build, execution_script=self.solution_exec, task=self.task, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
         self.steps.append(('builder', builder))
         if self.regex_count or self.max_size:
             self.steps.append(('rules', SolutionBuildRulesTask(regex_count=self.regex_count, max_size=self.max_size)))
@@ -309,14 +322,14 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
             hinter_time=self.tool_time
             if hinter_time and self.limit_real_time and hinter_time < self.limit_real_time:
                 hinter_time = self.limit_real_time
-            hinter = HinterPostgresTask(task=self.task, source=self.hinter_source, output_path=self.hinter_output_path, limit_real_time=hinter_time, tuples_only=self.tuples_only, align=self.align) #TODO:version,...
+            hinter = HinterPostgresTask(task=self.task, source=self.hinter_source, output_path=self.hinter_output_path, limit_real_time=hinter_time, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
             hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
         if hint_path and answer_path:
             check = AnswerHintTableDiffTask(hint_path=hint_path, answer_path=answer_path, case_sensitive=self.case_sensitive, space_sensitive=self.space_sensitive, row_delimeter=r'\n', column_delimeter=r'\|', row_sort=self.row_sort, column_sort=self.column_sort, empty_row=False, empty_column=False)
             self.steps.append(('check', check))
         if self.checker_source:
-            checker = CheckerPostgresTask(source=self.checker_source, limit_real_time=self.tool_time) #TODO:version,...
+            checker = CheckerPostgresTask(task=self.task, source=self.checker_source, limit_real_time=self.tool_time, ignore_errors=self.checker_ignore_errors) #TODO:version,...
             self.steps.append(('checker', checker))
 
     def set_system(self, system):
@@ -331,12 +344,17 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
 
     def execute(self):
         status = None
+        if self.task:
+            self.set_result(name='task', value=self.task)
         for name, step in self.steps:
             step_result = step.execute()
             self.set_result(name=name, value=step_result)
             if step_result.status:
                 status = step_result.status
                 break
+        if self.score:
+            self.set_result(name='max_score', value=self.score)
+            self.set_result(name='score', value=(self.score if not status else 0))
         self.set_result(status)
         return self.result
 

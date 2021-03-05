@@ -73,22 +73,26 @@ class SystemPrepareTask(TaskBase):
 
     def execute(self):
         for name in self.users.keys():
-            self.run_command('usr_del_'+name, UserDelCommand, user_name=name)
+            if not name in self.system.users:
+                self.run_command('usr_del_'+name, UserDelCommand, user_name=name)
         for name in self.groups.keys():
-            self.run_command('grp_del_'+name, GroupDelCommand, group_name=name)
+            if not name in self.system.groups:
+                self.run_command('grp_del_'+name, GroupDelCommand, group_name=name)
         for group in self.groups.values():
             name = group['group_name']
-            cmd_name = 'grp_'+name
-            self.run_command(cmd_name, GroupAddCommand, **group)
-            self.system.add_group(name)
+            if not name in self.system.groups:
+                cmd_name = 'grp_'+name
+                self.run_command(cmd_name, GroupAddCommand, **group)
+                self.system.add_group(name)
         for user in self.users.values():
             name = user['user_name']
-            cmd_name = 'usr_'+name
-            home = user.get('home', None)
-            if home:
-                home = str(self.resolve_path(get_output_path(home)))
-            self.run_command(cmd_name, UserAddCommand, **user)
-            self.system.add_user(name, home)
+            if not name in self.system.users:
+                cmd_name = 'usr_'+name
+                home = user.get('home', None)
+                if home:
+                    home = str(self.resolve_path(get_output_path(home)))
+                self.run_command(cmd_name, UserAddCommand, **user)
+                self.system.add_user(name, home)
         for directory in self.directories.values():
             cmd_name = 'dir_'+str(directory['path']).replace('/', '_')
             self.run_command(cmd_name, DirectoryAddCommand, **directory)
