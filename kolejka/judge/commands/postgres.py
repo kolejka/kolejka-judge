@@ -178,20 +178,33 @@ class PostgresCommand(PVersionedCommand):
     DEFAULT_PROGRAM='postgres'
     DEFAULT_DATA_DIR=config.POSTGRES_DATA_DIR
     DEFAULT_SOCKET_DIR=config.POSTGRES_SOCKET_DIR
-    DEFAULT_STATISTICS=True
+    DEFAULT_STATISTICS=False
+    DEFAULT_AUTO_EXPLAIN=True
     DEFAULT_USER=config.USER_POSTGRES
     DEFAULT_GROUP=config.USER_POSTGRES
     DEFAULT_BACKGROUND=True
+
     @default_kwargs
-    def __init__(self, data_dir, socket_dir, statistics, **kwargs):
+    def __init__(self, data_dir, socket_dir, statistics, auto_explain, **kwargs):
         super().__init__(**kwargs)
         self.data_dir = data_dir and get_output_path(data_dir)
         self.socket_dir = socket_dir and get_output_path(socket_dir)
         self.statistics = bool(statistics)
+        self.auto_explain = bool(auto_explain)
     def get_program_arguments(self):
         args = [ '-D', self.data_dir ]
         args += [ '-c', ['unix_socket_directories=',self.socket_dir] ]
         args += [ '-c', 'listen_addresses=' ]
+        args += [ '-c', 'logging_collector=true' ]
+        args += [ '-c', 'log_destination=csvlog' ]
+        args += [ '-c', 'log_directory=log' ]
+        args += [ '-c', 'log_filename=log' ]
+        args += [ '-c', 'log_connections=true' ]
+        if self.auto_explain:
+            args += [ '-c', 'shared_preload_libraries=auto_explain' ]
+            args += [ '-c', 'auto_explain.log_analyze=true' ]
+            args += [ '-c', 'auto_explain.log_format=json' ]
+            args += [ '-c', 'auto_explain.log_min_duration=0' ]
         if self.statistics:
             args += [ '-s' ]
         return args
@@ -202,6 +215,7 @@ class PSQLCommand(PVersionedCommand):
     DEFAULT_SOCKET_DIR=config.POSTGRES_SOCKET_DIR
     DEFAULT_DB=config.POSTGRES_DB
     DEFAULT_DB_USER=config.POSTGRES_DB_USER
+    DEFAULT_APPLICATION_NAME='psql'
     DEFAULT_QUIET=True
     DEFAULT_TUPLES_ONLY=False
     DEFAULT_ALIGN=True
@@ -209,11 +223,12 @@ class PSQLCommand(PVersionedCommand):
     DEFAULT_COMMANDS=[]
     DEFAULT_FILES=[]
     @default_kwargs
-    def __init__(self, socket_dir, db, db_user, quiet, tuples_only, align, ignore_errors, commands, files, **kwargs):
+    def __init__(self, socket_dir, db, db_user, application_name, quiet, tuples_only, align, ignore_errors, commands, files, **kwargs):
         super().__init__(**kwargs)
         self.socket_dir = socket_dir and get_output_path(socket_dir)
         self.db_user = db_user and str(db_user)
         self.db = db and str(db)
+        self.application_name = application_name and str(application_name)
         self.quiet = bool(quiet)
         self.tuples_only = bool(tuples_only)
         self.align = bool(align)
@@ -224,7 +239,10 @@ class PSQLCommand(PVersionedCommand):
         args = []
         args += [ '--no-psqlrc', '--no-readline' ]
         args += [ '--host', self.socket_dir ]
-        args += [ '--dbname', self.db ]
+        dbname = 'dbname=%s'%(self.db,)
+        if self.application_name:
+            dbname += ' application_name=%s'%(self.application_name,)
+        args += [ '--dbname', dbname ]
         args += [ '--username', self.db_user, '--no-password' ]
         if self.quiet:
             args += [ '--quiet' ]

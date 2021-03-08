@@ -1,6 +1,10 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 import copy
+import csv
+import json
+import os
+import pathlib
 import re
 import shlex
 import shutil
@@ -23,6 +27,51 @@ from kolejka.judge.tasks.tools import *
 __all__ = [ 'PostgresPrepareTask', 'PostgresResetTask', 'BuildPostgresTask', 'SolutionBuildPostgresTask', 'ToolBuildPostgresTask', 'ToolPostgresTask', 'GeneratorPostgresTask', 'HinterPostgresTask', 'CheckerPostgresTask', 'SingleBuildIOPostgresTask', 'MultipleBuildIOPostgresTask' ]
 def __dir__():
     return __all__
+
+LOG_FIELDS = [ 'log_time', 'user_name', 'database_name', 'process_id', 'connection_from', 'session_id', 'session_line_num', 'command_tag', 'session_start_time', 'virtual_transaction_id', 'transaction_id', 'error_severity', 'sql_state_code', 'message', 'detail', 'hint', 'internal_query', 'internal_query_pos', 'context', 'query', 'query_pos', 'location', 'application_name', 'backend_type' ]
+def collect_logs(log_directory, application_name=None):
+    logs = list()
+    for log_path in sorted(pathlib.Path(log_directory).glob('*.csv')):
+        with open(log_path, newline='') as log_file:
+            for row in csv.reader(log_file):
+                logs.append(dict(zip(LOG_FIELDS[:len(row)], row[:len(LOG_FIELDS)])))
+    if application_name is not None:
+        connections = set()
+        for log in logs:
+            m = re.match(r'^connection authorized:.*application_name=([^: ]+).*$', log['message'], flags=re.MULTILINE|re.IGNORECASE|re.DOTALL)
+            if m and m[1] == application_name:
+                connections.add(log['process_id'])
+        logs = [ log for log in logs if log['process_id'] in connections ]
+    return logs
+def collect_auto_explain(log_directory, application_name=None):
+    logs = collect_logs(log_directory, application_name)
+    durations = list()
+    costs = list()
+    startups = list()
+    times = list()
+    for log in logs:
+        m = re.match(r'^duration:([^:]+) plan:(.+)$', log['message'], flags=re.MULTILINE|re.IGNORECASE|re.DOTALL)
+        if m:
+            duration = float(m[1].strip().split(' ')[0])
+            durations.append(duration)
+            try:
+                j = json.loads(m[2])
+                startup = j.get('Plan', {}).get('Startup Cost', 0.0)
+                cost = j.get('Plan', {}).get('Total Cost', 0.0)
+                time = j.get('Plan', {}).get('Actual Total Time', 0.0)
+            except:
+                pass
+            startups.append(startup)
+            costs.append(cost)
+            times.append(time)
+    return {
+        'statements' : len(durations),
+        'durations' : round(sum(durations), 4),
+        'startup_costs' : round(sum(startups), 4),
+        'costs' : round(sum(costs), 4),
+        'times' : round(sum(times), 4),
+    }
+
 
 class PostgresTask(TaskBase):
     DEFAULT_VERSION=config.POSTGRES_VERSION
@@ -121,8 +170,9 @@ class BuildPostgresTask(PostgresTask, BuildTask):
     DEFAULT_TUPLES_ONLY=False
     DEFAULT_ALIGN=True
     DEFAULT_IGNORE_ERRORS=False
+    DEFAULT_APPLICATION_NAME='psql'
     @default_kwargs
-    def __init__(self, task=None, quiet=None, tuples_only=None, align=None, ignore_errors=None, **kwargs):
+    def __init__(self, task=None, quiet=None, tuples_only=None, align=None, ignore_errors=None, application_name=None, **kwargs):
         super().__init__(**kwargs)
         self.task = task
         self.sql_script = self.build_directory / 'exec.sql'
@@ -130,6 +180,7 @@ class BuildPostgresTask(PostgresTask, BuildTask):
         self.tuples_only = tuples_only
         self.align = align
         self.ignore_errors = ignore_errors
+        self.application_name = application_name
 
     def get_source_file(self):
         sqls = []
@@ -152,7 +203,7 @@ class BuildPostgresTask(PostgresTask, BuildTask):
         return self.get_source_file() is not None
 
     def get_execution_command(self):
-        psql = PSQLCommand(files=[self.sql_script], version=self.version, socket_dir=self.socket_dir, db=self.db, db_user=self.db_user, quiet=self.quiet, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors)
+        psql = PSQLCommand(files=[self.sql_script], version=self.version, socket_dir=self.socket_dir, db=self.db, db_user=self.db_user, quiet=self.quiet, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors, application_name=self.application_name)
         return psql.command
 
     def execute_build(self):
@@ -168,6 +219,7 @@ class BuildPostgresTask(PostgresTask, BuildTask):
             exec_path.chmod(0o644)
 
 class SolutionBuildPostgresTask(SolutionBuildMixin, BuildPostgresTask):
+    DEFAULT_EXPLAIN=True
     pass
 class ToolBuildPostgresTask(ToolBuildMixin, BuildPostgresTask):
     pass
@@ -257,8 +309,11 @@ class BuildIOPostgresTask(TaskBase):
     DEFAULT_ROW_SORT=False
     DEFAULT_COLUMN_SORT=False
     DEFAULT_CHECKER_IGNORE_ERRORS=False
+    DEFAULT_DATA_DIR=config.POSTGRES_DATA_DIR
+    DEFAULT_COLLECT_LOGS=True
+    DEFAULT_APPLICATION_NAME='kolejkasolution'
     @default_kwargs
-    def __init__(self, solution_source, solution_build, solution_exec, answer_path, hinter_output_path, ignore_errors, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, checker_ignore_errors, task=None, max_size=None, regex_count=None, hint_path=None, tool_time=None, generator_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
+    def __init__(self, solution_source, solution_build, solution_exec, answer_path, hinter_output_path, ignore_errors, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, checker_ignore_errors, data_dir, collect_logs, application_name, task=None, max_size=None, regex_count=None, hint_path=None, tool_time=None, generator_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
         super().__init__(**kwargs)
         self.solution_source = solution_source
         self.solution_build = solution_build
@@ -269,8 +324,12 @@ class BuildIOPostgresTask(TaskBase):
         self.generator_source = generator_source
         self.hinter_source = hinter_source
         self.hinter_output_path = hinter_output_path
+        self.ignore_errors = ignore_errors
         self.checker_source = checker_source
         self.checker_ignore_errors = checker_ignore_errors
+        self.data_dir = get_output_path(data_dir)
+        self.collect_logs = collect_logs
+        self.application_name = application_name
         self.limit_cores = limit_cores
         self.limit_cpu_time = limit_time
         self.limit_real_time = None
@@ -284,7 +343,6 @@ class BuildIOPostgresTask(TaskBase):
         self.task = task
         self.max_size = max_size
         self.regex_count = regex_count
-        self.ignore_errors = ignore_errors
         self.tuples_only = tuples_only
         self.align = align
         self.case_sensitive = case_sensitive
@@ -296,13 +354,14 @@ class BuildIOPostgresTask(TaskBase):
 
 class SingleBuildIOPostgresTask(BuildIOPostgresTask):
     DEFAULT_SCORE=1.0
+    DEFAULT_APPLICATION_NAME='kolejkasolution'
     @default_kwargs
     def __init__(self, score, **kwargs):
         super().__init__(**kwargs)
         self.score = score
 
         self.steps = []
-        builder = SolutionBuildPostgresTask(source_directory=self.solution_source, build_directory=self.solution_build, execution_script=self.solution_exec, task=self.task, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
+        builder = SolutionBuildPostgresTask(source_directory=self.solution_source, build_directory=self.solution_build, execution_script=self.solution_exec, task=self.task, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors, application_name=self.application_name) #TODO:version,...
         self.steps.append(('builder', builder))
         if self.regex_count or self.max_size:
             self.steps.append(('rules', SolutionBuildRulesTask(regex_count=self.regex_count, max_size=self.max_size)))
@@ -332,6 +391,8 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
             checker = CheckerPostgresTask(task=self.task, source=self.checker_source, limit_real_time=self.tool_time, ignore_errors=self.checker_ignore_errors) #TODO:version,...
             self.steps.append(('checker', checker))
 
+
+
     def set_system(self, system):
         super().set_system(system)
         for name, step in self.steps:
@@ -352,11 +413,18 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
             if step_result.status:
                 status = step_result.status
                 break
+        if self.collect_logs:
+            time.sleep(1)
+            stats = collect_auto_explain(self.resolve_path(self.data_dir)/'log', self.application_name)
+            for name,value in stats.items():
+                self.set_result(name=name, value=value)
+
         if self.score:
             self.set_result(name='max_score', value=self.score)
             self.set_result(name='score', value=(self.score if not status else 0))
         self.set_result(status)
         return self.result
+
 
 
 class MultipleBuildIOPostgresTask(BuildIOPostgresTask):
