@@ -65,7 +65,7 @@ class BuildTask(TaskBase):
         self._result_on_unknown = result_on_unknown
 
     @property
-    def result_on_unknown(self) -> Optional[str]:
+    def result_on_unknown(self):
         return self.get_result_on_unknown()
     def get_result_on_unknown(self):
         return self._result_on_unknown

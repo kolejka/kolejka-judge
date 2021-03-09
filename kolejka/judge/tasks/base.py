@@ -64,125 +64,125 @@ class TaskBase(AbstractTask):
         return rep
 
     @property
-    def name(self) -> str:
+    def name(self):
         name = self.get_name()
         if not name:
             raise RuntimeError('Name not available yet')
         return name
     def get_name(self):
         return self._name
-    def set_name(self, name: str):
+    def set_name(self, name):
         self._name = name
 
     @property
-    def system(self) -> AbstractSystem:
+    def system(self):
         system = self.get_system()
         if not system:
             raise RuntimeError('System not available yet')
         return system
     def get_system(self):
         return self._system
-    def set_system(self, system: AbstractSystem):
+    def set_system(self, system):
         self._system = system
 
     @property
-    def work_directory(self) -> Optional[OutputPath]:
+    def work_directory(self):
         return self.get_work_directory()
     def get_work_directory(self):
         return self._work_directory
 
     @property
-    def environment(self) -> Optional[Dict[str, Optional[Resolvable]]]:
+    def environment(self):
         return self.get_environment()
     def get_environment(self):
         return self._environment
 
     @property
-    def user(self) -> Optional[str]:
+    def user(self):
         return self.get_user()
     def get_user(self):
         return self._user
 
     @property
-    def group(self) -> Optional[str]:
+    def group(self):
         return self.get_group()
     def get_group(self):
         return self._group
 
     @property
-    def limits(self) -> Optional[AbstractLimits]:
+    def limits(self):
         return self.get_limits()
     def get_limits(self):
         return self._limits
 
     @property
-    def verbose(self) -> Optional[bool]:
+    def verbose(self):
         return self.get_verbose()
     def get_verbose(self):
         return self._verbose
 
     @property
-    def default_logs(self) -> Optional[bool]:
+    def default_logs(self):
         return self.get_default_logs()
     def get_default_logs(self):
         return self._default_logs
 
     @property
-    def result_on_error(self) -> Optional[str]:
+    def result_on_error(self):
         return self.get_result_on_error()
     def get_result_on_error(self):
         return self._result_on_error
 
     @property
-    def result_on_time(self) -> Optional[str]:
+    def result_on_time(self):
         return self.get_result_on_time()
     def get_result_on_time(self):
         return self._result_on_time
 
     @property
-    def result_on_memory(self) -> Optional[str]:
+    def result_on_memory(self):
         return self.get_result_on_memory()
     def get_result_on_memory(self):
         return self._result_on_memory
 
     @property
-    def record_result(self) -> bool:
+    def record_result(self):
         return self.get_record_result()
     def get_record_result(self):
         return self._record_result
 
     @property
-    def obligatory(self) -> bool:
+    def obligatory(self):
         return self.get_obligatory()
     def get_obligatory(self):
         return self._obligatory
 
     @property
-    def safe(self) -> bool:
+    def safe(self):
         return self.get_safe()
     def get_safe(self):
         return self._safe
 
     @property
-    def result(self) -> ResultDict:
+    def result(self):
         return self.get_result()
     def get_result(self):
         return self._result
-    def set_result(self, status =None, name: Optional[str] =None, value: Optional[Any] =None):
+    def set_result(self, status =None, name =None, value =None):
         if status is not None:
             self._result.set_status(status)
         if name is not None:
             self._result.set(name, value)
     @property
-    def status(self) -> Optional[str]:
+    def status(self):
         return self.result.status
 
     @property
-    def commands(self) -> Dict[str, AbstractCommand]:
+    def commands(self):
         return self.get_commands()
     def get_commands(self):
         return self._commands
-    def set_command(self, name: str, value):
+    def set_command(self, name, value):
         self._commands[name] = value
 
     @property
@@ -260,11 +260,11 @@ class TaskBase(AbstractTask):
         self.set_command(name, cmd)
         return result and result.status
 
-    def execute(self) -> Tuple[Optional[str], Optional[AbstractResult]]:
+    def execute(self):
         raise NotImplementedError
 
     @property
-    def prerequirements(self) -> List[Callable[[AbstractSystem], bool]]:
+    def prerequirements(self):
         return self.get_prerequirements()
     def get_prerequirements(self):
         requirements = [
@@ -274,7 +274,7 @@ class TaskBase(AbstractTask):
         ]
         requirements += self._prerequirements
         return requirements
-    def add_prerequirement(self, requirement: Callable[[AbstractSystem], bool]):
+    def add_prerequirement(self, requirement):
         self._prerequirements.append(requirement)
 
     def verify_prerequirements(self):
@@ -282,11 +282,11 @@ class TaskBase(AbstractTask):
             if not requirement(self.system):
                 raise PrerequirementException("Prerequirement `{}` not satisfied for {}".format(requirement, self.name))
 
-    def resolve_path(self, path: Optional[AbstractPath]) -> pathlib.Path:
+    def resolve_path(self, path):
         return self.system.resolve_path(path, work_directory=self.work_directory)
 
-    def find_files(self, path: AbstractPath) -> Generator[AbstractPath, None, None]:
+    def find_files(self, path):
         return self.system.find_files(path, work_directory=self.work_directory)
 
-    def file_contents(self, path: AbstractPath) -> Optional[bytes]:
+    def file_contents(self, path):
         return self.system.file_contents(path, work_directory=self.work_directory)

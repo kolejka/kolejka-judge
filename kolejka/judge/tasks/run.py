@@ -30,55 +30,55 @@ class ExecutableTask(TaskBase):
         self._stderr_max_bytes = stderr_max_bytes
 
     @property
-    def executable(self) -> OutputPath:
+    def executable(self):
         return self.get_executable()
     def get_executable(self):
         return self._executable
 
     @property
-    def executable_arguments(self) -> List[Resolvable]:
+    def executable_arguments(self):
         return self.get_executable_arguments()
     def get_executable_arguments(self):
         return self._executable_arguments
 
     @property
-    def stdin(self) -> Optional[AbstractPath]:
+    def stdin(self):
         return self.get_stdin()
     def get_stdin(self):
         return self._stdin
 
     @property
-    def stdout(self) -> Optional[OutputPath]:
+    def stdout(self):
         return self.get_stdout()
     def get_stdout(self):
         return self._stdout
 
     @property
-    def stdout_append(self) -> bool:
+    def stdout_append(self):
         return self.get_stdout_append()
     def get_stdout_append(self):
         return self._stdout_append
     
     @property
-    def stdout_max_bytes(self) -> Optional[int]:
+    def stdout_max_bytes(self):
         return self.get_stdout_max_bytes()
     def get_stdout_max_bytes(self):
         return self._stdout_max_bytes
 
     @property
-    def stderr(self) -> Optional[OutputPath]:
+    def stderr(self):
         return self.get_stderr()
     def get_stderr(self):
         return self._stderr
 
     @property
-    def stderr_append(self) -> bool:
+    def stderr_append(self):
         return self.get_stderr_append()
     def get_stderr_append(self):
         return self._stderr_append
 
     @property
-    def stderr_max_bytes(self) -> Optional[int]:
+    def stderr_max_bytes(self):
         return self.get_stderr_max_bytes()
     def get_stderr_max_bytes(self):
         return self._stderr_max_bytes

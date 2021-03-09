@@ -46,7 +46,7 @@ class BuildCompilerTask(BuildTask):
         return len(self.get_source_files()) > 0
 
     @property
-    def compiler_kwargs(self) -> Dict[str, Any]:
+    def compiler_kwargs(self):
         return self.get_compiler_kwargs()
     def get_compiler_kwargs(self):
         kwargs = dict()

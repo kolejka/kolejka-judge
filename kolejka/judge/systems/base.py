@@ -44,19 +44,19 @@ class SystemBase(AbstractSystem):
         self._background = dict()
 
     @property
-    def output_directory(self) -> pathlib.Path:
+    def output_directory(self):
         return self.get_output_directory()
     def get_output_directory(self):
         return self._output_directory
 
     @property
-    def program_path(self) -> str:
+    def program_path(self):
         return self.get_program_path()
     def get_program_path(self):
         return '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
     @property
-    def environment(self) -> Dict[str, Optional[Resolvable]]:
+    def environment(self):
         return self.get_environment()
     def get_environment(self):
         environment = deepcopy(self._environment)
@@ -65,36 +65,36 @@ class SystemBase(AbstractSystem):
         return environment
 
     @property
-    def superuser(self) -> bool:
+    def superuser(self):
         return self.get_superuser()
     def get_superuser(self):
         raise NotImplementedError
 
     @property
-    def current_user(self) -> str:
+    def current_user(self):
         return self.get_current_user()
     def get_current_user(self):
         raise NotImplementedError
 
     @property
-    def users(self) -> Set[str]:
+    def users(self):
         return self.get_users()
     def get_users(self):
         return self._users
-    def add_user(self, user: str, home: str):
+    def add_user(self, user, home):
         self._users.add(user)
         self._users_homes[user] = home
 
     @property
-    def groups(self) -> Set[str]:
+    def groups(self):
         return self.get_groups()
     def get_groups(self):
         return self._groups
-    def add_group(self, group: str):
+    def add_group(self, group):
         self._groups.add(group)
 
     @property
-    def paths(self) -> Set[str]:
+    def paths(self):
         return self.get_paths()
     def get_paths(self):
         return self._paths
@@ -102,12 +102,12 @@ class SystemBase(AbstractSystem):
         self._paths.add(str(get_input_path(path).path))
 
     @property
-    def log_directory(self) -> OutputPath:
+    def log_directory(self):
         return self.get_log_directory()
     def get_log_directory(self):
         return get_output_path(config.LOG)
 
-    def resolve_path(self, path: Optional[AbstractPath], work_directory: Optional[OutputPath] =None) -> pathlib.Path:
+    def resolve_path(self, path, work_directory =None):
         if not work_directory:
             work_directory = get_output_path('.')
         if not path:
@@ -120,7 +120,7 @@ class SystemBase(AbstractSystem):
             return self.output_directory / work_directory.path / path.path
         return pathlib.Path(path)
 
-    def find_files(self, path: AbstractPath, work_directory: Optional[OutputPath] =None) -> Generator[AbstractPath, None, None]:
+    def find_files(self, path, work_directory =None):
         rpath = self.resolve_path(path, work_directory=work_directory)
         if not rpath.exists():
             return
@@ -137,20 +137,20 @@ class SystemBase(AbstractSystem):
             elif cpath.is_file():
                 yield path / (cpath.relative_to(rpath))
 
-    def file_contents(self, path: AbstractPath, work_directory: Optional[OutputPath] =None) -> Optional[bytes]:
+    def file_contents(self, path, work_directory =None):
         rpath = self.resolve_path(path, work_directory=work_directory)
         if not rpath.is_file():
             return None
         return rpath.read_bytes()
 
-    def resolve(self, obj: Resolvable, work_directory: Optional[OutputPath] =None) -> str:
+    def resolve(self, obj, work_directory =None):
         if isinstance(obj, AbstractPath):
             return str(self.resolve_path(obj, work_directory=work_directory))
         if isinstance(obj, str):
             return obj
         return ''.join([ self.resolve(part, work_directory=work_directory) for part in obj ])
     
-    def update_limits(self, limits: Optional[AbstractLimits] =None) -> AbstractLimits:
+    def update_limits(self, limits =None):
         return limits
 
     def run_step(self, name, step):
@@ -196,7 +196,7 @@ class SystemBase(AbstractSystem):
         for background in backgrounds:
             self.wait_background(background)
 
-    def run_command(self, command: AbstractCommand, name: str):
+    def run_command(self, command, name):
         self.validators.set_work_directory(command.work_directory)
         command.set_name(name)
         command.set_system(self)
@@ -330,21 +330,21 @@ class SystemBase(AbstractSystem):
     def wait_command(self, process, result):
         raise NotImplementedError
 
-    def run_task(self, task: AbstractTask, name: str):
+    def run_task(self, task, name):
         task.set_name(name)
         task.set_system(self)
         task.verify_prerequirements()
         result = task.execute()
         return result
 
-    def read_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], work_directory: Optional[OutputPath] =None, text =False):
+    def read_file(self, path, work_directory =None, text =False):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
         mode = 'rb'
         if text:
             mode = 'r'
         return path.open(mode)
-    def write_file(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None, text =False):
+    def write_file(self, path, append =False, work_directory =None, text =False):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
         path.parent.mkdir(exist_ok=True, parents=True)
@@ -354,7 +354,7 @@ class SystemBase(AbstractSystem):
         if append:
             mode += 'a'
         return path.open(mode)
-    def file_writer(self, path: Optional[Union[pathlib.Path,AbstractPath]], append: Optional[bool] =False, work_directory: Optional[OutputPath] =None, max_bytes =None):
+    def file_writer(self, path, append =False, work_directory =None, max_bytes =None):
         if not isinstance(path, pathlib.Path):
             path = self.resolve_path(path, work_directory)
         path.parent.mkdir(exist_ok=True, parents=True)
@@ -430,43 +430,43 @@ class SystemBase(AbstractSystem):
             self._work_directory = get_output_path(path or '.')
 
         @property
-        def system(self) -> AbstractSystem:
+        def system(self):
             return self.get_system()
         def get_system(self):
             return self._system
 
         @property
-        def work_directory(self) -> OutputPath:
+        def work_directory(self):
             return self.get_work_directory()
         def get_work_directory(self):
             return self._work_directory
         def set_work_directory(self, path):
             self._work_directory = get_output_path(path or '.')
 
-        def resolve_path(self, path: Optional[AbstractPath]) -> pathlib.Path:
+        def resolve_path(self, path):
             return self.system.resolve_path(path, work_directory=self.work_directory)
 
-        def noop_validator(self, *args, **kwargs) -> bool:
+        def noop_validator(self, *args, **kwargs):
             return True
 
-        def file_exists(self, path) -> bool:
+        def file_exists(self, path):
             if isinstance(path, InputPath):
                 return self.system_path_exists(path)
             path = self.resolve_path(path)
             return path.is_file() or path == pathlib.Path('/dev/null')
 
-        def directory_exists(self, path) -> bool:
+        def directory_exists(self, path):
             return self.resolve_path(path).is_dir()
 
-        def program_exists(self, path) -> bool:
+        def program_exists(self, path):
             path = self.resolve_path(path)
             return path.is_file() and ( path.stat().st_mode & 0o111 )
 
-        def file_empty(self, path) -> bool:
+        def file_empty(self, path):
             path = self.resolve_path(path)
             return not path.is_file() or path.stat().st_size < 1
 
-        def file_does_not_match(self, path, regexes) -> bool:
+        def file_does_not_match(self, path, regexes):
             path = self.resolve_path(path)
             if not path.is_file():
                 return True

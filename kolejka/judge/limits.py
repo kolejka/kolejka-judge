@@ -58,7 +58,7 @@ class Limits(AbstractLimits):
         return OrderedDict(yaml)
 
     @property
-    def cpu_time(self) -> datetime.timedelta:
+    def cpu_time(self):
         return self.get_cpu_time()
     def get_cpu_time(self):
         return self._cpu_time
@@ -71,7 +71,7 @@ class Limits(AbstractLimits):
             self._cpu_time = min(self._cpu_time, parse_time(cpu_time))
 
     @property
-    def real_time(self) -> datetime.timedelta:
+    def real_time(self):
         return self.get_real_time()
     def get_real_time(self):
         return self._real_time
@@ -84,7 +84,7 @@ class Limits(AbstractLimits):
             self._real_time = min(self._real_time, parse_time(real_time))
 
     @property
-    def memory(self) -> int:
+    def memory(self):
         return self.get_memory()
     def get_memory(self):
         return self._memory
@@ -97,7 +97,7 @@ class Limits(AbstractLimits):
             self._memory = min(self._memory, parse_memory(memory))
 
     @property
-    def cores(self) -> int:
+    def cores(self):
         return self.get_cores()
     def get_cores(self):
         return self._cores
@@ -110,7 +110,7 @@ class Limits(AbstractLimits):
             self._cores = min(self._cores, int(cores))
 
     @property
-    def pids(self) -> int:
+    def pids(self):
         return self.get_pids()
     def get_pids(self):
         return self._pids

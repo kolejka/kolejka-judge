@@ -79,13 +79,13 @@ class Result(AbstractResult):
         return OrderedDict(yaml)
 
     @property
-    def args(self) -> List[str]:
+    def args(self):
         return self.get_args()
     def get_args(self):
         return self._args
 
     @property
-    def returncode(self) -> int:
+    def returncode(self):
         return self.get_returncode()
     def get_returncode(self):
         return self._returncode
@@ -93,53 +93,53 @@ class Result(AbstractResult):
         self._returncode = returncode and int(returncode) or 0
 
     @property
-    def work_directory(self) -> str:
+    def work_directory(self):
         return self.get_work_directory()
     def get_work_directory(self):
         return self._work_directory
 
     @property
-    def environment(self) -> Dict[str, str]:
+    def environment(self):
         return self.get_environment()
     def get_environment(self):
         return self._environment
 
     @property
-    def user(self) -> Optional[str]:
+    def user(self):
         return self.get_user()
     def get_user(self):
         return self._user
 
     @property
-    def group(self) -> Optional[str]:
+    def group(self):
         return self.get_group()
     def get_group(self):
         return self._group
 
     @property
-    def limits(self) -> AbstractLimits:
+    def limits(self):
         return self.get_limits()
     def get_limits(self):
         return self._limits
 
     @property
-    def stdin(self) -> str:
+    def stdin(self):
         return self.get_stdin()
     def get_stdin(self):
         return self._stdin
     @property
-    def stdout(self) -> str:
+    def stdout(self):
         return self.get_stdout()
     def get_stdout(self):
         return self._stdout
     @property
-    def stderr(self) -> str:
+    def stderr(self):
         return self.get_stderr()
     def get_stderr(self):
         return self._stderr
 
     @property
-    def cpu_time(self) -> datetime.timedelta:
+    def cpu_time(self):
         return self.get_cpu_time()
     def get_cpu_time(self):
         return self._cpu_time
@@ -149,7 +149,7 @@ class Result(AbstractResult):
         self._cpu_time = max(self._cpu_time, parse_time(cpu_time or '0s'))
 
     @property
-    def real_time(self) -> datetime.timedelta:
+    def real_time(self):
         return self.get_real_time()
     def get_real_time(self):
         return self._real_time
@@ -159,7 +159,7 @@ class Result(AbstractResult):
         self._real_time = max(self._real_time, parse_time(real_time or '0s'))
 
     @property
-    def memory(self) -> int:
+    def memory(self):
         return self.get_memory()
     def get_memory(self):
         return self._memory

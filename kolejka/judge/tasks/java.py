@@ -20,7 +20,7 @@ class RenameJavaFile(TaskBase):
         self.source_file = Path(source_file)
         self.target_directory = Path(target_directory)
 
-    def execute(self, environment) -> Tuple[Optional[str], Optional[object]]:
+    def execute(self, environment):
         test_class = ''
         with environment.get_path(self.source_file).open() as file:
             for line in file.readlines():

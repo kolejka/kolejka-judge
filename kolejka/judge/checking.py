@@ -13,7 +13,7 @@ def __dir__():
 
 
 class Checking:
-    def __init__(self, system: SystemBase, id, test, solution):
+    def __init__(self, system, id, test, solution):
         self.steps: Dict[str, CommandBase or TaskBase] = {}
         self.system = system
         self.id = id

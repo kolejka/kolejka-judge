@@ -3,14 +3,12 @@
 
 from collections import OrderedDict
 from copy import deepcopy
-from typing import Any, Callable, Dict, Generator, List, Optional, Sequence, Set, Tuple, Union
 
 
 from kolejka.judge import config
 
 
-__all__ = [ 'AbstractCommand', 'AbstractTask', 'AbstractSystem', 'AbstractLimits', 'AbstractResult', 'AbstractPath', 'Resolvable', 'default_kwargs', 'nononedict', ]
-__all__ += [ 'Any', 'Callable', 'Dict', 'Generator', 'List', 'Optional', 'Sequence', 'Set', 'Tuple', 'Union', ]
+__all__ = [ 'AbstractCommand', 'AbstractTask', 'AbstractSystem', 'AbstractLimits', 'AbstractResult', 'AbstractPath', 'default_kwargs', 'nononedict', ]
 def __dir__():
     return __all__
 
@@ -39,9 +37,6 @@ class AbstractPath:
     pass
 
 
-Resolvable = Union[str, AbstractPath, Sequence[Union[str, AbstractPath]]]
-
-
 class default_kwargs:
     def __init__(self, fn):
         self.fn = fn
@@ -58,6 +53,7 @@ class default_kwargs:
                         kwargs[key] = kwargs.get(key, val)
             return fn(self, *args, **kwargs)
         setattr(owner, name, fun)
+
 
 class nononedict(OrderedDict):
     def __init__(self, *args, **kwargs):

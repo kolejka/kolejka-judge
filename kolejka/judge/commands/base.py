@@ -65,35 +65,35 @@ class CommandBase(AbstractCommand):
         return rep
 
     @property
-    def name(self) -> str:
+    def name(self):
         name = self.get_name()
         if not name:
             raise RuntimeError('Name not available yet')
         return name
     def get_name(self):
         return self._name
-    def set_name(self, name: str):
+    def set_name(self, name):
         self._name = name
 
     @property
-    def system(self) -> AbstractSystem:
+    def system(self):
         system = self.get_system()
         if not system:
             raise RuntimeError('System not available yet')
         return system
     def get_system(self):
         return self._system
-    def set_system(self, system: AbstractSystem):
+    def set_system(self, system):
         self._system = system
 
     @property
-    def work_directory(self) -> OutputPath:
+    def work_directory(self):
         return self.get_work_directory()
     def get_work_directory(self):
         return self._work_directory
 
     @property
-    def environment(self) -> Dict[str, Optional[Resolvable]]:
+    def environment(self):
         return self.get_environment()
     def get_environment(self):
         environment = deepcopy(self._environment)
@@ -110,143 +110,143 @@ class CommandBase(AbstractCommand):
         return environment
 
     @property
-    def user(self) -> Optional[str]:
+    def user(self):
         return self.get_user()
     def get_user(self):
         return self._user
 
     @property
-    def group(self) -> Optional[str]:
+    def group(self):
         return self.get_group()
     def get_group(self):
         return self._group
 
     @property
-    def limits(self) -> AbstractLimits:
+    def limits(self):
         return self.get_limits()
     def get_limits(self):
         return self._limits
 
     @property
-    def stdin(self) -> Optional[AbstractPath]:
+    def stdin(self):
         return self.get_stdin()
     def get_stdin(self):
         return self._stdin
 
     @property
-    def stdout(self) -> Optional[Union[OutputPath, CommandDefaultOutput]]:
+    def stdout(self):
         return self.get_stdout()
     def get_stdout(self):
         return self._stdout
 
     @property
-    def stdout_append(self) -> bool:
+    def stdout_append(self):
         return self.get_stdout_append()
     def get_stdout_append(self):
         return self._stdout_append
     
     @property
-    def stdout_max_bytes(self) -> Optional[int]:
+    def stdout_max_bytes(self):
         return self.get_stdout_max_bytes()
     def get_stdout_max_bytes(self):
         return self._stdout_max_bytes
 
     @property
-    def stderr(self) -> Optional[Union[OutputPath, CommandDefaultOutput]]:
+    def stderr(self):
         return self.get_stderr()
     def get_stderr(self):
         return self._stderr
 
     @property
-    def stderr_append(self) -> bool:
+    def stderr_append(self):
         return self.get_stderr_append()
     def get_stderr_append(self):
         return self._stderr_append
 
     @property
-    def stderr_max_bytes(self) -> Optional[int]:
+    def stderr_max_bytes(self):
         return self.get_stderr_max_bytes()
     def get_stderr_max_bytes(self):
         return self._stderr_max_bytes
 
     @property
-    def verbose(self) -> bool:
+    def verbose(self):
         return self.get_verbose()
     def get_verbose(self):
         return self._verbose
 
     @property
-    def default_logs(self) -> bool:
+    def default_logs(self):
         return self.get_default_logs()
     def get_default_logs(self):
         return self._default_logs
 
     @property
-    def obligatory(self) -> bool:
+    def obligatory(self):
         return self.get_obligatory()
     def get_obligatory(self):
         return self._obligatory
 
     @property
-    def safe(self) -> bool:
+    def safe(self):
         return self.get_safe()
     def get_safe(self):
         return self._safe
 
     @property
-    def background(self) -> bool:
+    def background(self):
         return self.get_background()
     def get_background(self):
         return self._background
 
     @property
-    def result(self) -> AbstractResult:
+    def result(self):
         return self.get_result()
     def get_result(self):
         return self._result
-    def set_result(self, result: AbstractResult):
+    def set_result(self, result):
         self._result = result
 
     @property
-    def command(self) -> Optional[List[Resolvable]]:
+    def command(self):
         return self.get_command()
     def get_command(self):
         raise NotImplementedError
 
     _sequence_id_generator = 0
     @property
-    def sequence_id(self) -> int:
+    def sequence_id(self):
         if self._sequence_id is None:
             CommandBase._sequence_id_generator += 1
             self._sequence_id = CommandBase._sequence_id_generator
         return self._sequence_id
 
-    def get_log_path(self, suffix) -> OutputPath:
+    def get_log_path(self, suffix):
         if self.default_logs:
             file_name = '%03d_%s_%s.txt'%(self.sequence_id, self.name, suffix)
             return self.system.log_directory / file_name
     
     @property
-    def work_path(self) -> pathlib.Path:
+    def work_path(self):
         return self.resolve_path(self.work_directory)
     @property
-    def stdin_path(self) -> pathlib.Path:
+    def stdin_path(self):
         return self.resolve_path(self.stdin)
     @property
-    def stdout_path(self) -> pathlib.Path:
+    def stdout_path(self):
         stdout = self.stdout
         if isinstance(stdout, CommandDefaultOutput):
             stdout = self.get_log_path('stdout')
         return self.resolve_path(stdout)
     @property
-    def stderr_path(self) -> pathlib.Path:
+    def stderr_path(self):
         stderr = self.stderr
         if isinstance(stderr, CommandDefaultOutput):
             stderr = self.get_log_path('stderr')
         return self.resolve_path(stderr)
 
     @property
-    def prerequirements(self) -> List[Callable[[AbstractSystem], bool]]:
+    def prerequirements(self):
         return self.get_prerequirements()
     def get_prerequirements(self):
         requirements = [
@@ -257,17 +257,17 @@ class CommandBase(AbstractCommand):
         ]
         requirements += self._prerequirements
         return requirements
-    def add_prerequirement(self, requirement: Callable[[AbstractSystem], bool]):
+    def add_prerequirement(self, requirement):
         self._prerequirements.append(requirement)
 
     @property
-    def postconditions(self) -> List[Tuple[Callable[[AbstractSystem, AbstractResult], bool], str]]:
+    def postconditions(self):
         return self.get_postconditions()
     def get_postconditions(self):
         conditions = []
         conditions += self._postconditions
         return conditions
-    def add_postcondition(self, condition: Callable[[AbstractSystem, AbstractResult], bool], status: str):
+    def add_postcondition(self, condition, status):
         self._postconditions.append((condition, status))
 
     def verify_prerequirements(self):
@@ -280,23 +280,23 @@ class CommandBase(AbstractCommand):
             if not condition(self.system, self.result):
                 return status
 
-    def resolve_path(self, path: Optional[AbstractPath]) -> pathlib.Path:
+    def resolve_path(self, path):
         return self.system.resolve_path(path, work_directory=self.work_directory)
 
-    def resolve(self, obj: Resolvable) -> str:
+    def resolve(self, obj):
         return self.system.resolve(obj, work_directory=self.work_directory)
 
-    def find_files(self, path: AbstractPath) -> Generator[AbstractPath, None, None]:
+    def find_files(self, path):
         return self.system.find_files(path, work_directory=self.work_directory)
 
     @property
-    def resolved_command(self) -> Optional[List[str]]:
+    def resolved_command(self):
         command = self.command
         if not command:
             return command
         return [ self.resolve(part) for part in command ]
     
-    def update_environment(self, environment: Dict[str, str] =dict()) -> Dict[str, str]:
+    def update_environment(self, environment =dict()):
         env = dict()
         for key, value in environment.items():
             env[key] = self.resolve(value)
@@ -318,25 +318,25 @@ class ExecutableCommand(CommandBase):
         self._quiet_arguments = quiet_arguments or []
 
     @property
-    def executable(self) -> Resolvable:
+    def executable(self):
         return self.get_executable()
     def get_executable(self):
         return self._executable
 
     @property
-    def executable_arguments(self) -> List[Resolvable]:
+    def executable_arguments(self):
         return self.get_executable_arguments()
     def get_executable_arguments(self):
         return self._executable_arguments
 
     @property
-    def verbose_arguments(self) -> List[Resolvable]:
+    def verbose_arguments(self):
         return self.get_verbose_arguments()
     def get_verbose_arguments(self):
         return self._verbose_arguments
 
     @property
-    def quiet_arguments(self) -> List[Resolvable]:
+    def quiet_arguments(self):
         return self.get_quiet_arguments()
     def get_quiet_arguments(self):
         return self._quiet_arguments
@@ -366,25 +366,25 @@ class ProgramCommand(CommandBase):
         self._quiet_arguments = quiet_arguments or []
 
     @property
-    def program(self) -> str:
+    def program(self):
         return self.get_program()
     def get_program(self):
         return self._program
 
     @property
-    def program_arguments(self) -> List[Resolvable]:
+    def program_arguments(self):
         return self.get_program_arguments()
     def get_program_arguments(self):
         return self._program_arguments
 
     @property
-    def verbose_arguments(self) -> List[Resolvable]:
+    def verbose_arguments(self):
         return self.get_verbose_arguments()
     def get_verbose_arguments(self):
         return self._verbose_arguments
 
     @property
-    def quiet_arguments(self) -> List[Resolvable]:
+    def quiet_arguments(self):
         return self.get_quiet_arguments()
     def get_quiet_arguments(self):
         return self._quiet_arguments
