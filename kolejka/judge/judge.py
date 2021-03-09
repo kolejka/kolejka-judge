@@ -185,12 +185,10 @@ def config_parser_client(parser, judge_path=None):
     parser.set_defaults(execute=execute)
 
 def known_systems():
-    from kolejka.judge.systems import LocalSystem, PsutilSystem, ObserverSystem, SystemdSystem
+    from kolejka.judge.systems import LocalSystem, ObserverSystem
     known_systems = {
         'local': LocalSystem,
-        'psutil': PsutilSystem,
         'observer': ObserverSystem,
-        'systemd': SystemdSystem,
     }
     return known_systems
 def default_system():

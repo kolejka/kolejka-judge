@@ -2,7 +2,5 @@
 
 
 from kolejka.judge import config
-from kolejka.judge.systems.local import *
-from kolejka.judge.systems.psutil import *
-from kolejka.judge.systems.observer import *
-from kolejka.judge.systems.systemd import *
+from kolejka.judge.systems.local import LocalSystem
+from kolejka.judge.systems.observer import ObserverSystem
