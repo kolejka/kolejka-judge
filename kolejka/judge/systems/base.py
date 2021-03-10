@@ -1,7 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 
-from contextlib import ExitStack
 from copy import deepcopy
 import datetime
 import grp
@@ -13,6 +12,7 @@ import os
 import pathlib
 import pwd
 import shutil
+import sys
 import tempfile
 import threading
 import time
@@ -40,7 +40,6 @@ class SystemBase(AbstractSystem):
         self._groups = set()
         self._paths = set(paths or [])
         self.validators = self.Validators(self)
-        self._writers = list()
         self._background = dict()
 
     @property
@@ -364,10 +363,9 @@ class SystemBase(AbstractSystem):
         fd_read, fd_write = os.pipe()
         def writer():
             bytes = 0
-            os.close(fd_write)
             with path.open(mode) as output:
                 while True:
-                    data = os.read(fd_read, 4096)
+                    data = os.read(fd_read, 65536)
                     if not data:
                         break
                     if max_bytes is not None:
@@ -377,11 +375,10 @@ class SystemBase(AbstractSystem):
                             data = b''
                     bytes += len(data)
                     output.write(data)
-        w = multiprocessing.Process(target=writer)
-        #self._writers.append(w)
+            os.close(fd_read)
+        w = threading.Thread(target=writer)
         w.start()
-        os.close(fd_read)
-        return io.FileIO(fd_write, mode='wb', closefd=True)
+        return (io.FileIO(fd_write, mode='wb', closefd=True), w)
 
     def get_user_group_groups(self, user=None, group=None):
         if not self.superuser:

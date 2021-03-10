@@ -1,10 +1,10 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 
-from contextlib import ExitStack
 import datetime
 import math
 import os
+import pathlib
 import pwd
 import resource
 import signal
@@ -22,27 +22,98 @@ from kolejka.judge.result import Result
 from kolejka.judge.systems.base import *
 from kolejka.judge.parse import *
 
-import kolejka.judge.systems.proc as proc
 
+__all__ = [ 'LocalSystem' ]
+def __dir__():
+    return __all__
+
+
+page_size = int(os.sysconf("SC_PAGE_SIZE"))
+clock_ticks = int(os.sysconf("SC_CLK_TCK"))
+
+def proc_info(pid):
+    proc = pathlib.Path('/proc/'+str(pid))
+    with pathlib.Path('/proc/uptime').open() as uptime_file:
+        uptime = float(uptime_file.read().strip().split()[0])
+    try:
+        with ( proc / 'stat' ).open() as stat_file:
+            stat = stat_file.read().strip().split()
+        with ( proc / 'statm' ).open() as statm_file:
+            statm = statm_file.read().strip().split()
+        with ( proc / 'io' ).open() as io_file:
+            io = dict( [ (k.strip().lower(), int(v.strip())) for k,v in [ l.split(':') for l in io_file.read().strip().split('\n') ] ] )
+
+        result = dict()
+        result['ppid'] = int(stat[3])
+        result['cpu_user'] = int(stat[13]) / clock_ticks
+        result['cpu_sys'] = int(stat[14]) / clock_ticks
+        result['rss'] = int(statm[1]) * page_size
+        result['threads'] = int(stat[19])
+        result['read'] = io['rchar']
+        result['write'] = io['wchar']
+        result['real_time'] = uptime - int(stat[21]) / clock_ticks
+        return result
+    except:
+        return None
+
+def proc_ppid(pid):
+    proc = pathlib.Path('/proc/'+str(pid))
+    try:
+        with ( proc / 'stat' ).open() as stat_file:
+            stat = stat_file.read().strip().split()
+            return int(stat[3])
+    except:
+        return None
+
+def proc_pids():
+    proc = pathlib.Path('/proc')
+    return [ int(p.name) for p in proc.iterdir() if p.is_dir() and not p.is_symlink() and p.name.isdigit() ] 
+
+def proc_ppids():
+    result = dict()
+    for p in proc_pids():
+        pp = proc_ppid(p)
+        if pp is not None:
+            result[p] = pp
+    return result
+
+def proc_children(pid):
+    return [ p for p in proc_pids() if proc_ppid(p) == pid ]
+
+def proc_descendants(pid):
+    parents = proc_ppids()
+    children = dict([ (p,list()) for p in parents.values() ])
+    for child, parent in parents.items():
+        children[parent].append(child)
+    new_descendants = [ pid ]
+    all_descendants = []
+    while new_descendants:
+        active = new_descendants
+        new_descendants = []
+        for p in active:
+            all_descendants += children.get(p,[])
+            new_descendants += children.get(p,[])
+    return all_descendants
 
 def monitor_safe_process(process, limits, result):
     while True:
-        proc_info = proc.info(process.pid)
-        if proc_info is None:
+        info = proc_info(process.pid)
+        if info is None:
             break
-        result.update_memory(proc_info['rss'])
-        result.update_real_time(proc_info['real_time'])
-        result.update_cpu_time(proc_info['cpu_user'] + proc_info['cpu_sys'])
+        result.update_memory(info['rss'])
+        result.update_real_time(info['real_time'])
+        result.update_cpu_time(info['cpu_user'] + info['cpu_sys'])
         if limits.cpu_time and result.cpu_time > limits.cpu_time:
             process.kill()
         if limits.real_time and result.real_time > limits.real_time:
             process.kill()
         if limits.memory and result.memory > limits.memory:
             process.kill()
+        time.sleep(0.05)
 
 def end_process(process):
     try:
-        pids = proc.descendants(process.pid)
+        pids = proc_descendants(process.pid)
         try:
             process.terminate()
             time.sleep(0.1)
@@ -54,7 +125,7 @@ def end_process(process):
             except:
                 pass
         while True:
-            pids = proc.descendants(process.pid)
+            pids = proc_descendants(process.pid)
             if pids:
                 for pid in pids:
                     try:
@@ -70,15 +141,15 @@ def monitor_process(process, limits, result):
     real_time = dict()
     cpu_time = dict()
     while True:
-        proc_info = proc.info(process.pid)
-        if proc_info is None:
+        info = proc_info(process.pid)
+        if info is None:
             break
-        memory = proc_info['rss']
-        real_time[process.pid] = proc_info['real_time']
-        cpu_time[process.pid] = proc_info['cpu_user'] + proc_info['cpu_sys']
+        memory = info['rss']
+        real_time[process.pid] = info['real_time']
+        cpu_time[process.pid] = info['cpu_user'] + info['cpu_sys']
 
-        proc_info = dict([ (pid, proc.info(pid)) for pid in proc.descendants(process.pid) ])
-        for pid, info in proc_info.items():
+        infos = dict([ (pid, proc_info(pid)) for pid in proc_descendants(process.pid) ])
+        for pid, info in infos.items():
             if info is None:
                 continue
             memory += info['rss']
@@ -94,6 +165,7 @@ def monitor_process(process, limits, result):
             end_process(process)
         if limits.memory and result.memory > limits.memory:
             end_process(process)
+        time.sleep(0.05)
 
 class LocalSystem(SystemBase):
     def __init__(self, *args, **kwargs):
@@ -141,71 +213,85 @@ class LocalSystem(SystemBase):
 
 
     def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
-        with ExitStack() as stack:
-            stdin_file = stack.enter_context(self.read_file(stdin_path))
-            stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
-            stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
+        stdin_file = self.read_file(stdin_path)
+        stdout_file, stdout_writer = self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes)
+        stderr_file, stderr_writer = self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes)
+        writers = (stdout_writer, stderr_writer)
 
-            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
+        change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            resources = self.get_resources(limits)
-            resources[resource.RLIMIT_NPROC] = (1,1)
+        resources = self.get_resources(limits)
+        resources[resource.RLIMIT_NPROC] = (1,1)
 
-            process = kolejka.common.subprocess.start(
-                command,
-                user=change_user,
-                group=change_group,
-                groups=change_groups,
-                resources=resources,
-                stdin=stdin_file,
-                stdout=stdout_file,
-                stderr=stderr_file,
-                env=environment,
-                cwd=work_path,
-            )
-            monitoring_thread = threading.Thread(target=monitor_safe_process, args=(process, limits, result))
-            monitoring_thread.start()
-            returncode = process.wait()
-            monitoring_thread.join()
-            result.set_returncode(returncode)
+        process = kolejka.common.subprocess.start(
+            command,
+            user=change_user,
+            group=change_group,
+            groups=change_groups,
+            resources=resources,
+            stdin=stdin_file,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            env=environment,
+            cwd=work_path,
+        )
+        stdin_file.close()
+        stdout_file.close()
+        stderr_file.close()
+        monitoring_thread = threading.Thread(target=monitor_safe_process, args=(process, limits, result))
+        monitoring_thread.start()
+        returncode = process.wait()
+        monitoring_thread.join()
+        for writer in writers:
+            writer.join()
+        result.set_returncode(returncode)
 
 
     def start_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits):
-        with ExitStack() as stack:
-            stdin_file = stack.enter_context(self.read_file(stdin_path))
-            stdout_file = stack.enter_context(self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes))
-            stderr_file = stack.enter_context(self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes))
-            
-            change_user, change_group, change_groups = self.get_user_group_groups(user, group)
+        stdin_file = self.read_file(stdin_path)
+        stdout_file, stdout_writer = self.file_writer(stdout_path, stdout_append, max_bytes=stdout_max_bytes)
+        stderr_file, stderr_writer = self.file_writer(stderr_path, stderr_append, max_bytes=stderr_max_bytes)
+        writers = (stdout_writer, stderr_writer)
+        
+        change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
-            resources = self.get_resources(limits)
+        resources = self.get_resources(limits)
 
-            process = kolejka.common.subprocess.start(
-                command,
-                user=change_user,
-                group=change_group,
-                groups=change_groups,
-                resources=resources,
-                stdin=stdin_file,
-                stdout=stdout_file,
-                stderr=stderr_file,
-                env=environment,
-                cwd=work_path,
-            )
-            result = Result() 
-            monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
-            monitoring_thread.start()
-            return (process, monitoring_thread, result)
+        process = kolejka.common.subprocess.start(
+            command,
+            user=change_user,
+            group=change_group,
+            groups=change_groups,
+            resources=resources,
+            stdin=stdin_file,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            env=environment,
+            cwd=work_path,
+        )
+        stdin_file.close()
+        stdout_file.close()
+        stderr_file.close()
+        result = Result() 
+        monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
+        monitoring_thread.start()
+        return (process, monitoring_thread, result, writers)
 
     def terminate_command(self, process):
-        process, monitoring_thread, monitor_result = process
+        process, monitoring_thread, monitor_result, writers = process
         process.terminate()
+        for writer in writers:
+            writer.terminate()
+            writer.join()
 
     def wait_command(self, process, result):
-        process, monitoring_thread, monitor_result = process
+        process, monitoring_thread, monitor_result, writers = process
         completed = kolejka.common.subprocess.wait(process)
         monitoring_thread.join()
+        for writer in writers:
+            writer.join()
         result.update_memory(monitor_result.memory)
         result.update_real_time(monitor_result.real_time)
         result.update_cpu_time(monitor_result.cpu_time)
+        result.update_real_time(completed.time)
         result.set_returncode(completed.returncode)
