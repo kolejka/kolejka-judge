@@ -110,7 +110,6 @@ venv.bak/
 
 setup.cfg
 
-judges/*/results
-judges/*/kolejka-judge
+judges/*/tests/results
 test_generic_judge/*task*
 test_generic_judge/*result*

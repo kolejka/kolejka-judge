@@ -10,7 +10,7 @@ for TD in $(ls -1 "${OFFICE}"); do
                 echo "  + ${SOL}"
                 mkdir -p "${OFFICE}/results"
                 rm -rf "${OFFICE}/results/${TD}_${SOL}_execute"
-                "${JUDGEPY}" execute "${OFFICE}/${TD}/tests/tests.yaml" "${OFFICE}/${TD}/solutions/${SOL}" "${OFFICE}/results/${TD}_${SOL}_execute" "$@"
+                "${JUDGEPY}" execute "$@" "${OFFICE}/${TD}/tests/tests.yaml" "${OFFICE}/${TD}/solutions/${SOL}" "${OFFICE}/results/${TD}_${SOL}_execute" "$@"
                 if [ -f "${OFFICE}/results/${TD}_${SOL}_execute/results.yaml" ]; then
                     if [ -x "${OFFICE}/${TD}/check_result" ]; then
                         if "${OFFICE}/${TD}/check_result" "${OFFICE}/results/${TD}_${SOL}_execute/results.yaml"; then

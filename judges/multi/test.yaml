@@ -1,0 +1,27 @@
+memory:       512MB
+kolejka:
+    image       : 'kolejka/satori:judge'
+    exclusive   : false
+    requires    : [ 'cpu:xeon e3-1270 v5' ]
+    collect     : [ 'log.zip' ]
+    limits: 
+        time        : '20s'
+        memory      : '4G'
+        swap        : 0
+        cpus        : 4
+        network     : false
+        pids        : 256
+        storage     : '2G'
+        workspace   : '2G'
+    satori:
+        result:
+            score             : '/io/score'
+            max_score         : '/io/max_score'
+            test_status       : 'str:/io/test_*/status'
+            execute_time_real : 'str:/io/test_*/executor/run/real_time'
+            execute_time_cpu  : 'str:/io/test_*/executor/run/cpu_time'
+            execute_memory    : 'str:/io/test_*/executor/run/memory'
+            compile_log       : 'str:/builder/**/stdout,/builder/**/stderr'
+            tool_log          : 'str:/io/test_*/generator/**/stdout,/io/test_*/generator/**/stderr,/io/test_*/verifier/**/stdout,/io/test_*/verifier/**/stderr,/io/test_*/hinter/**/stdout,/io/test_*/hinter/**/stderr'
+            checker_log       : 'str:/io/test_*/checker/**/stdout,/io/test_*/checker/**/stderr'
+            logs              : '/logs/logs'

@@ -58,7 +58,6 @@ class ObserverSystem(LocalSystem):
         process, writers = process
         process.terminate()
         for writer in writers:
-            writer.terminate()
             writer.join()
 
     def wait_command(self, process, result):

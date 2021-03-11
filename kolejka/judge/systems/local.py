@@ -281,7 +281,6 @@ class LocalSystem(SystemBase):
         process, monitoring_thread, monitor_result, writers = process
         process.terminate()
         for writer in writers:
-            writer.terminate()
             writer.join()
 
     def wait_command(self, process, result):

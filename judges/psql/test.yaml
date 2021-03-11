@@ -1,0 +1,23 @@
+memory:       512MB
+kolejka:
+    image       : 'kolejka/satori:extended'
+    exclusive   : false
+    requires    : [ 'cpu:xeon e3-1270 v5' ]
+    collect     : [ 'log.zip' ]
+    limits: 
+        time        : '20s'
+        memory      : '4G'
+        swap        : 0
+        cpus        : 4
+        network     : false
+        pids        : 256
+        storage     : '2G'
+        workspace   : '2G'
+    satori:
+        result:
+            task  : '/io/task'
+            score : 'int:/io/score'
+            costs : 'float:/io/costs'
+            times : 'float:/io/times'
+            execute_time : '/io/executor/run/real_time'
+            logs         : '/logs/logs'

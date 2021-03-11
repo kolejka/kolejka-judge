@@ -1,0 +1,23 @@
+01:
+  !include        : test.yaml
+  task            : zad1
+  generator       : !file generator.sql
+  regex_count     : "SELECT<10
+                     SELECT>=1"
+  hinter          : !file hinter.sql
+  ignore_errors   : 0
+  checker         : !file checker.sql
+  checker_ignore_errors : 0
+  #checker_output
+  full_output     : 0
+  row_sort        : 1
+  column_sort     : 1
+  time            : 1s
+  score           : 5
+02:
+  !include : test.yaml
+  task     : zad2
+  generator: !file generator.sql
+  hinter   : !file hinter.sql
+  time     : 1s
+  score    : 5
