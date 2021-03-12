@@ -20,7 +20,7 @@ class TaskBase(AbstractTask):
     def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None):
         self._name = name
         self._system = system
-        self._work_directory = work_directory
+        self._work_directory = work_directory and get_output_path(work_directory)
         self._environment = environment
         self._user = user
         self._group = group

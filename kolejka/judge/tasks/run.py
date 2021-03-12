@@ -11,16 +11,16 @@ from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
 
-__all__ = [ 'ExecutableTask', 'SolutionExecutableTask', 'ToolExecutableTask', ]
+__all__ = [ 'ExecutableTask', 'SolutionExecutableTask', 'ToolExecutableTask', 
+            'ProgramTask', 'SolutionProgramTask', 'ToolProgramTask',
+        ]
 def __dir__():
     return __all__
 
-class ExecutableTask(TaskBase):
+class RunTask(TaskBase):
     @default_kwargs
-    def __init__(self, executable, executable_arguments=None, stdin=None, stdout=None, stdout_append=None, stdout_max_bytes=None, stderr=None, stderr_append=None, stderr_max_bytes=None, **kwargs):
+    def __init__(self, stdin=None, stdout=None, stdout_append=None, stdout_max_bytes=None, stderr=None, stderr_append=None, stderr_max_bytes=None, **kwargs):
         super().__init__(**kwargs)
-        self._executable = str(executable)
-        self._executable_arguments = executable_arguments or []
         self._stdin = stdin
         self._stdout = stdout
         self._stdout_append = stdout_append
@@ -28,18 +28,6 @@ class ExecutableTask(TaskBase):
         self._stderr = stderr
         self._stderr_append = stderr_append
         self._stderr_max_bytes = stderr_max_bytes
-
-    @property
-    def executable(self):
-        return self.get_executable()
-    def get_executable(self):
-        return self._executable
-
-    @property
-    def executable_arguments(self):
-        return self.get_executable_arguments()
-    def get_executable_arguments(self):
-        return self._executable_arguments
 
     @property
     def stdin(self):
@@ -101,6 +89,23 @@ class ExecutableTask(TaskBase):
             kwargs['stderr_max_bytes'] = self.stderr_max_bytes
         return kwargs
 
+
+class ExecutableTask(RunTask):
+    @default_kwargs
+    def __init__(self, executable, executable_arguments=None, **kwargs):
+        super().__init__(**kwargs)
+        self._executable = str(executable)
+        self._executable_arguments = executable_arguments or []
+    @property
+    def executable(self):
+        return self.get_executable()
+    def get_executable(self):
+        return self._executable
+    @property
+    def executable_arguments(self):
+        return self.get_executable_arguments()
+    def get_executable_arguments(self):
+        return self._executable_arguments
     def execute(self):
         self.set_result(self.run_command('run', ExecutableCommand, executable=self.executable, executable_arguments=self.executable_arguments))
         return self.result
@@ -131,4 +136,50 @@ class ToolExecutableTask(ExecutableTask):
     def __init__(self, tool_name, **kwargs):
         if isinstance(kwargs['executable'], str):
             kwargs['executable'] = kwargs['executable'].format(tool_name=tool_name)
+        super().__init__(**kwargs)
+
+
+class ProgramTask(RunTask):
+    @default_kwargs
+    def __init__(self, program, program_arguments=None, **kwargs):
+        super().__init__(**kwargs)
+        self._program = str(program)
+        self._program_arguments = program_arguments or []
+    @property
+    def program(self):
+        return self.get_program()
+    def get_program(self):
+        return self._program
+    @property
+    def program_arguments(self):
+        return self.get_program_arguments()
+    def get_program_arguments(self):
+        return self._program_arguments
+    def execute(self):
+        self.set_result(self.run_command('run', ProgramCommand, program=self.program, program_arguments=self.program_arguments))
+        return self.result
+
+class SolutionProgramTask(ProgramTask):
+    DEFAULT_ANSWER_PATH=config.TEST_ANSWER
+    DEFAULT_RESULT_ON_ERROR='RTE'
+    DEFAULT_RESULT_ON_TIME='TLE'
+    DEFAULT_RESULT_ON_MEMORY='MEM'
+    DEFAULT_USER=config.USER_EXEC
+    DEFAULT_GROUP=config.USER_EXEC
+    @default_kwargs
+    def __init__(self, input_path=None, answer_path=None, **kwargs):
+        super().__init__(**kwargs)
+        self.input_path = input_path and get_output_path(input_path) or super().get_stdin()
+        self.answer_path = answer_path and get_output_path(answer_path) or super().get_stdout()
+    def get_stdin(self):
+        return self.input_path
+    def get_stdout(self):
+        return self.answer_path
+
+class ToolProgramTask(ProgramTask):
+    DEFAULT_RESULT_ON_ERROR='INT'
+    @default_kwargs
+    def __init__(self, tool_name, **kwargs):
+        if isinstance(kwargs['program'], str):
+            kwargs['program'] = kwargs['program'].format(tool_name=tool_name)
         super().__init__(**kwargs)
