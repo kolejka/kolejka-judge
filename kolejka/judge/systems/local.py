@@ -221,7 +221,7 @@ class LocalSystem(SystemBase):
         change_user, change_group, change_groups = self.get_user_group_groups(user, group)
 
         resources = self.get_resources(limits)
-        resources[resource.RLIMIT_NPROC] = (1,1)
+        #resources[resource.RLIMIT_NPROC] = (1,1) #This is a very bad idea, read notes in man execv on EAGAIN
 
         process = kolejka.common.subprocess.start(
             command,
