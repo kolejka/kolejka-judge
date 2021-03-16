@@ -30,11 +30,11 @@ class PrepareTask(TaskBase):
     def prepare_source(self, name, source, basename, allow_extract):
         sufs = [ s.lower()[1:] for s in source.suffixes ]
         cmd_name = '%s_extract'%(name,)
-        if allow_extract and sufs[-1] == 'zip':
+        if allow_extract and sufs and sufs[-1] == 'zip':
             return self.run_command(cmd_name, UnzipCommand, source=source, target=self.target)
-        if allow_extract and sufs[-1] == 'rar':
+        if allow_extract and sufs and sufs[-1] == 'rar':
             return self.run_command(cmd_name, UnrarCommand, source=source, target=self.target)
-        if allow_extract and sufs[-1] == '7z':
+        if allow_extract and sufs and sufs[-1] == '7z':
             return self.run_command(cmd_name, Un7zCommand, source=source, target=self.target)
         if allow_extract and 'tar' in sufs:
             return self.run_command(cmd_name, UntarCommand, source=source, target=self.target)
