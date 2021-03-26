@@ -28,8 +28,11 @@ class CollectLogsTask(TaskBase):
     def sources(self):
         return self.get_sources()
 
+    def file_empty(self, path):
+        return self.system.validators.file_empty(self.resolve_path(path))
+
     def get_sources(self):
-        return self.find_files(self.source)
+        return [ path for path in self.find_files(self.source) if not self.file_empty(path) ]
 
     def execute(self):
         self.set_result(self.run_command('zip', ZipCommand, target=self.target, sources=self.sources, store_directories=False))
