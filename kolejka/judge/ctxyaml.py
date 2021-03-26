@@ -52,7 +52,7 @@ Dumper.add_representer(_File, _file_dump)
 def _load(value, root):
     if value is None:
         return value
-    if isinstance(value, (str, int, float, bool, complex,)):
+    if isinstance(value, (str, bytes, int, float, bool, complex, datetime.datetime,)):
         return value
     if isinstance(value, (dict, OrderedDict,)):
         result = dict()
@@ -88,7 +88,7 @@ def ctxyaml_load(path, root=None):
 def _dump(value, work_dir, root):
     if value is None:
         return value
-    if isinstance(value, (str, int, float, bool, complex,)):
+    if isinstance(value, (str, bytes, int, float, bool, complex, datetime.datetime,)):
         return value
     if isinstance(value, (dict, OrderedDict,)):
         result = OrderedDict()
