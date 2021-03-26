@@ -16,7 +16,7 @@ def __dir__():
     return __all__
 
 def regex_count(description, text, flags):
-    m = re.match(r'(.*?)(<|<=|=|>=|>)\s*([0-9]+)\s*', description)
+    m = re.fullmatch(r'(.*?)(<|<=|=|>=|>)\s*([0-9]+)\s*', description)
     if m:
         r = m[1].strip()
         e = m[2]

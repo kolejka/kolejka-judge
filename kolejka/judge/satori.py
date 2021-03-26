@@ -76,7 +76,7 @@ def path_match(pattern, path):
                 rep += '['+pattern[i]+']'
             i += 1;
     #TODO: match []?
-    return bool(re.match(rep, path))
+    return bool(re.fullmatch(rep, path))
 
 def result_access(result, val):
     operator = None

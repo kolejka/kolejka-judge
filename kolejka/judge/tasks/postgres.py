@@ -215,11 +215,11 @@ class BuildPostgresTask(PostgresTask, BuildTask):
                 starter = re.compile(r'\s*--\s*'+re.escape(self.task)+'\s*', flags=re.IGNORECASE)
                 stoper = re.compile(r'\s*----\s*')
                 for line in sql_script_body.splitlines(keepends=True):
-                    if not active and starter.match(line):
+                    if not active and starter.fullmatch(line):
                         active = True
                     if active:
                         new_body.append(line)
-                    if active and stoper.match(line):
+                    if active and stoper.fullmatch(line):
                         active = False
                 if new_body:
                     sql_script_body = ''.join(new_body)
