@@ -26,7 +26,7 @@ class IOTask(TaskBase):
     DEFAULT_SPACE_SENSITIVE=False
     DEFAULT_TOOL_CPP_STANDARD=config.TOOL_BUILD_CPP_STANDARD
     @default_kwargs
-    def __init__(self, executable, answer_path, generator_output_path, hinter_output_path, case_sensitive, space_sensitive, executable_arguments=None, input_path=None, hint_path=None, tool_override=None, tool_time=None, tool_cpp_standard=None, generator_source=None, verifier_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
+    def __init__(self, executable, answer_path, generator_output_path, hinter_output_path, case_sensitive, space_sensitive, executable_arguments=None, input_path=None, hint_path=None, tool_override=None, tool_time=None, tool_cpp_standard=None, tool_libraries=None, generator_source=None, verifier_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
         super().__init__(**kwargs)
         self.executable = executable
         self.executable_arguments = executable_arguments
@@ -36,6 +36,7 @@ class IOTask(TaskBase):
         self.tool_override = tool_override
         self.tool_time = tool_time
         self.tool_cpp_standard = tool_cpp_standard
+        self.tool_libraries = tool_libraries
         self.generator_source = generator_source
         self.generator_output_path = generator_output_path
         self.verifier_source = verifier_source
@@ -68,11 +69,11 @@ class SingleIOTask(IOTask):
         hint_path = self.hint_path
         answer_path = None
         if self.generator_source:
-            generator = GeneratorTask(source=self.generator_source, output_path=self.generator_output_path, override=self.tool_override, input_path=input_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard)
+            generator = GeneratorTask(source=self.generator_source, output_path=self.generator_output_path, override=self.tool_override, input_path=input_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard, libraries=self.tool_libraries)
             input_path = generator.output_path
             self.steps.append(('generator', generator))
         if self.verifier_source:
-            verifier = VerifierTask(source=self.verifier_source, override=self.tool_override, input_path=input_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard)
+            verifier = VerifierTask(source=self.verifier_source, override=self.tool_override, input_path=input_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard, libraries=self.tool_libraries)
             self.steps.append(('verifier', verifier))
         executor = SolutionExecutableTask(executable=self.executable, executable_arguments=self.executable_arguments, input_path=input_path, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory)
         answer_path = executor.answer_path
@@ -81,11 +82,11 @@ class SingleIOTask(IOTask):
             hinter_time=self.tool_time
             if hinter_time and self.limit_real_time and hinter_time < self.limit_real_time:
                 hinter_time = self.limit_real_time
-            hinter = HinterTask(source=self.hinter_source, output_path=self.hinter_output_path, override=self.tool_override, input_path=input_path, limit_real_time=hinter_time, cpp_standard=self.tool_cpp_standard)
+            hinter = HinterTask(source=self.hinter_source, output_path=self.hinter_output_path, override=self.tool_override, input_path=input_path, limit_real_time=hinter_time, cpp_standard=self.tool_cpp_standard, libraries=self.tool_libraries)
             hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
         if self.checker_source and input_path and hint_path and answer_path:
-            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard)
+            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard, libraries=self.tool_libraries)
             self.steps.append(('checker', checker))
         else:
             if hint_path and answer_path:

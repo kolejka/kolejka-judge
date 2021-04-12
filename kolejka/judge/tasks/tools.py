@@ -34,6 +34,7 @@ class ToolTask(TaskBase):
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
             cpp_standard=None,
+            libraries=None,
             prepare_task=None,
             build_task=None,
             execute_task=None,
@@ -58,6 +59,7 @@ class ToolTask(TaskBase):
         self.output_path = output_path
         self.error_path = error_path
         self.cpp_standard = cpp_standard
+        self.libraries = libraries
 
         self.prepare_task = self.prepare_task_factory()
         self.build_task = self.build_task_factory()
@@ -77,12 +79,15 @@ class ToolTask(TaskBase):
         if self._build_task is None:
             sub_kwargs = { 'tool_name' : self.tool_name }
             gxx_kwargs = deepcopy(sub_kwargs)
+            gcc_kwargs = deepcopy(sub_kwargs)
             gxx_kwargs['standard'] = self.cpp_standard
+            gxx_kwargs['libraries'] = self.libraries
+            gcc_kwargs['libraries'] = self.libraries
             return ToolBuildAutoTask([
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],
             [ToolBuildGXXTask, [], gxx_kwargs],
-            [ToolBuildGCCTask, [], sub_kwargs],
+            [ToolBuildGCCTask, [], gcc_kwargs],
             [ToolBuildPython3ScriptTask, [], sub_kwargs],
             [ToolBuildBashScriptTask, [], sub_kwargs],
             ], **self.build_kwargs)
