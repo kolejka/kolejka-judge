@@ -9,11 +9,11 @@ from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import *
 
 
-__all__ = [ 'SharedInstallBinary', 'SharedInstallLibrary' ]
+__all__ = [ 'SharedInstallBinaryTask', 'SharedInstallLibraryTask' ]
 def __dir__():
     return __all__
 
-class SharedInstall(TaskBase):
+class SharedInstallTask(TaskBase):
     @default_kwargs
     def __init__(self, binary =None, user_name =config.USER_TEST, group_name =config.GROUP_ALL, directory =config.SHARED, **kwargs):
         super().__init__(**kwargs)
@@ -48,7 +48,7 @@ class SharedInstall(TaskBase):
                 mode = 0o750
             self.run_command(cmd_name, InstallCommand, source = source , target = target, user_name = self.user_name, group_name = self.group_name, mode = mode)
 
-class SharedInstallBinary(SharedInstall):
+class SharedInstallBinaryTask(SharedInstallTask):
     @default_kwargs
     def __init__(self, source =config.SOLUTION_BUILD, binary = '*', user_name =config.USER_TEST, group_name =config.GROUP_ALL, directory =config.SHARED, **kwargs):
         super().__init__(**kwargs)
@@ -63,7 +63,7 @@ class SharedInstallBinary(SharedInstall):
                     binaries.append( ('bin', f) )
         return binaries
 
-class SharedInstallLibrary(SharedInstall):
+class SharedInstallLibraryTask(SharedInstallTask):
     @default_kwargs
     def __init__(self, source =config.SOLUTION_BUILD, library = '*.so', user_name =config.USER_TEST, group_name =config.GROUP_ALL, directory =config.SHARED, **kwargs):
         super().__init__(**kwargs)
