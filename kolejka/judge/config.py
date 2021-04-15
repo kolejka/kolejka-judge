@@ -30,6 +30,8 @@ TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
 
+SHARED = 'shared'
+
 MULTITEST = TEST + '/tests'
 MULTITEST_INPUT_GLOB = '**/*.in'
 MULTITEST_INPUT_NAME = (r'^.*/(.*)[.]in$', r'\1')
@@ -114,7 +116,12 @@ SYSTEM_DIRECTORIES = [
         'user_name' : USER_TEST,
         'group_name' : USER_TEST,
         'mode' : 0o2750,
-    }
+    } , {
+        'path' : SHARED,
+        'user_name' : USER_TEST,
+        'group_name' : GROUP_ALL,
+        'mode' : 0o2750,
+    } ,
 ]
 
 POSTGRES_VERSION = 12

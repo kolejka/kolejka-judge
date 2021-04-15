@@ -51,7 +51,27 @@ class SystemBase(AbstractSystem):
     def program_path(self):
         return self.get_program_path()
     def get_program_path(self):
-        return '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+        return ':'.join([ path for path in [
+            str(self.resolve_path(get_output_path(config.SHARED)) / 'sbin'),
+            str(self.resolve_path(get_output_path(config.SHARED)) / 'bin'),
+            '/usr/local/sbin','/usr/local/bin','/usr/sbin','/usr/bin','/sbin','/bin'
+        ] if os.path.isdir(path) ])
+
+    @property
+    def program_library_path(self):
+        return self.get_program_library_path()
+    def get_program_library_path(self):
+        return ':'.join([ path for path in [
+            str(self.resolve_path(get_output_path(config.SHARED)) / 'lib'),
+        ] if os.path.isdir(path) ])
+
+    @property
+    def program_include_path(self):
+        return self.get_program_include_path()
+    def get_program_include_path(self):
+        return ':'.join([ path for path in [
+            str(self.resolve_path(get_output_path(config.SHARED)) / 'include'),
+        ] if os.path.isdir(path) ])
 
     @property
     def environment(self):
@@ -59,6 +79,9 @@ class SystemBase(AbstractSystem):
     def get_environment(self):
         environment = deepcopy(self._environment)
         environment['PATH'] = self.program_path
+        environment['LD_LIBRARY_PATH'] = self.program_library_path
+        environment['LIBRARY_PATH'] = self.program_library_path
+        environment['CPATH'] = self.program_include_path
         environment['LANG'] = 'en_US.UTF-8'
         return environment
 
