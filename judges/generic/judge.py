@@ -44,7 +44,8 @@ def judge(args):
         limit_cores=1,
         limit_time=time_limit,
         limit_memory=memory_limit,
-    ))
+        )
+    )
     args.add_steps(logs=CollectLogsTask())
     result = args.run()
     print('Result {} on test {}.'.format(result.status, args.id))

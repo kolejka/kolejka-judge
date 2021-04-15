@@ -16,6 +16,7 @@ def judge(args):
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     full_output = parse_bool(args.test.get('full_output', '0'))
+    regex_count=[ rule.strip() for rule in args.test.get('regex_count', '').split('\n') if rule.strip() ],
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
         postgres=PostgresPrepareTask(default_logs=True),
@@ -27,7 +28,7 @@ def judge(args):
         tool_time=tool_time,
         tuples_only=not full_output,
         align=full_output,
-        regex_count=[ rule.strip() for rule in args.test.get('regex_count', '').split('\n') if rule.strip() ],
+        regex_count=regex_count,
         generator_source=args.test.get('generator', None),
         hint_path=args.test.get('hint', None),
         hinter_source=args.test.get('hinter', None),
