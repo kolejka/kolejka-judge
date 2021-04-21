@@ -19,7 +19,7 @@ class MakeCommand(ProgramCommand):
     def __init__(self, build_directory=None, build_target=None, makefile=None, **kwargs):
         super().__init__(**kwargs)
         self.build_directory = build_directory and get_output_path(build_directory) or super().get_work_directory()
-        self.build_target = get_relative_path(build_target)
+        self.build_target = build_target and str(build_target) or None
         self.makefile = get_relative_path(makefile or 'Makefile')
 
     def get_work_directory(self):
