@@ -85,7 +85,7 @@ class BuildTask(TaskBase):
     def find_binary(self, path):
         if self.build_target is not None:
             target_path = self.resolve_path(path / self.build_target)
-            if target.is_file() and (target.stat().st_mode & 0o111):
+            if target_path.is_file() and (target_path.stat().st_mode & 0o111):
                 return path / self.build_target
         binaries = [ f for f in self.find_files(path) if self.resolve_path(f).stat().st_mode & 0o111 ]
         if len(binaries) > 0:
