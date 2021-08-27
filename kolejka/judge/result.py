@@ -19,7 +19,7 @@ def __dir__():
 
 class Result(AbstractResult):
 
-    def __init__(self, args=None, returncode=None, cpu_time=None, real_time=None, memory=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=None, stderr=None, status=None,):
+    def __init__(self, args=None, returncode=None, cpu_time=None, real_time=None, memory=None, gpu_time=None, gpu_memory=None, work_directory=None, environment=None, user=None, group=None, limits=None, stdin=None, stdout=None, stderr=None, status=None,):
         self._args = args and [str(a) for a in args] or []
         self._returncode = returncode and int(returncode) or 0
         self._cpu_time = None
@@ -28,6 +28,10 @@ class Result(AbstractResult):
         self.set_real_time(real_time)
         self._memory = None
         self.set_memory(memory)
+        self._gpu_time = None
+        self.set_gpu_time(gpu_time)
+        self._gpu_memory = None
+        self.set_gpu_memory(gpu_memory)
         self._work_directory = work_directory and str(pathlib.Path(work_directory))
         self._environment = environment or dict()
         self._user = user and str(user)
@@ -76,6 +80,8 @@ class Result(AbstractResult):
         yaml['cpu_time'] = unparse_time(self.cpu_time)
         yaml['real_time'] = unparse_time(self.real_time)
         yaml['memory'] = unparse_memory(self.memory)
+        yaml['gpu_time'] = unparse_time(self.gpu_time)
+        yaml['gpu_memory'] = unparse_memory(self.gpu_memory)
         return OrderedDict(yaml)
 
     @property
@@ -167,6 +173,26 @@ class Result(AbstractResult):
         self._memory = parse_memory(memory or '0b')
     def update_memory(self, memory):
         self._memory = max(self._memory, parse_memory(memory or '0b'))
+
+    @property
+    def gpu_time(self):
+        return self.get_gpu_time()
+    def get_gpu_time(self):
+        return self._gpu_time
+    def set_gpu_time(self, gpu_time):
+        self._gpu_time = parse_time(gpu_time or '0s')
+    def update_gpu_time(self, gpu_time):
+        self._gpu_time = max(self._gpu_time, parse_time(gpu_time or '0s'))
+
+    @property
+    def gpu_memory(self):
+        return self.get_gpu_memory()
+    def get_gpu_memory(self):
+        return self._gpu_memory
+    def set_gpu_memory(self, gpu_memory):
+        self._gpu_memory = parse_memory(gpu_memory or '0b')
+    def update_gpu_memory(self, gpu_memory):
+        self._gpu_memory = max(self._gpu_memory, parse_memory(gpu_memory or '0b'))
 
     @property
     def status(self):

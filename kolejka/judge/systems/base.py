@@ -54,7 +54,7 @@ class SystemBase(AbstractSystem):
         return ':'.join([ path for path in [
             str(self.resolve_path(get_output_path(config.SHARED)) / 'sbin'),
             str(self.resolve_path(get_output_path(config.SHARED)) / 'bin'),
-            '/usr/local/sbin','/usr/local/bin','/usr/sbin','/usr/bin','/sbin','/bin'
+            '/usr/local/sbin','/usr/local/bin','/usr/local/cuda/bin','/usr/sbin','/usr/bin','/sbin','/bin'
         ] if os.path.isdir(path) ])
 
     @property
@@ -510,7 +510,7 @@ class SystemBase(AbstractSystem):
             return path in self.system.paths or path=='/dev/null'
 
         def system_program_exists(self, path):
-            return shutil.which(path) is not None
+            return shutil.which(path, path=self.system.program_path) is not None
 
         def __getattr__(self, item):
             return self.noop_validator

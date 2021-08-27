@@ -5,6 +5,7 @@ from kolejka.judge import config
 from kolejka.judge.tasks.background import *
 from kolejka.judge.tasks.build import *
 from kolejka.judge.tasks.check import *
+from kolejka.judge.tasks.cuda import *
 from kolejka.judge.tasks.io import *
 from kolejka.judge.tasks.logs import *
 from kolejka.judge.tasks.prepare import *

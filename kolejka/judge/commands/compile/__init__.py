@@ -7,3 +7,4 @@ from kolejka.judge.commands.compile.gcc import *
 from kolejka.judge.commands.compile.ghc import *
 from kolejka.judge.commands.compile.mono import *
 from kolejka.judge.commands.compile.nasm import *
+from kolejka.judge.commands.compile.nvcc import *

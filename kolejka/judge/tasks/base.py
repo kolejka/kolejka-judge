@@ -17,7 +17,7 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_gpu_time=None, limit_gpu_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None):
         self._name = name
         self._system = system
         self._work_directory = work_directory and get_output_path(work_directory)
@@ -34,6 +34,12 @@ class TaskBase(AbstractTask):
         if limit_memory:
             self._limits = self._limits or get_limits()
             self._limits.update_memory(limit_memory)
+        if limit_gpu_time:
+            self._limits = self._limits or get_limits()
+            self._limits.update_gpu_time(limit_gpu_time)
+        if limit_gpu_memory:
+            self._limits = self._limits or get_limits()
+            self._limits.update_gpu_memory(limit_gpu_memory)
         if limit_cores:
             self._limits = self._limits or get_limits()
             self._limits.update_cores(limit_cores)
@@ -231,13 +237,15 @@ class TaskBase(AbstractTask):
         if self.result_on_time is not None:
             cpu_time = self.limits and self.limits.cpu_time
             real_time = self.limits and self.limits.real_time
+            gpu_time = self.limits and self.limits.gpu_time
             conditions += [
-                (TimeLimitPostcondition(cpu_time=cpu_time, real_time=real_time), self.result_on_time)
+                (TimeLimitPostcondition(cpu_time=cpu_time, real_time=real_time, gpu_time=gpu_time), self.result_on_time)
             ]
         if self.result_on_memory is not None:
             memory = self.limits and self.limits.memory
+            gpu_memory = self.limits and self.limits.gpu_memory
             conditions += [
-                (MemoryLimitPostcondition(memory=memory), self.result_on_memory)
+                (MemoryLimitPostcondition(memory=memory, gpu_memory=gpu_memory), self.result_on_memory)
             ]
         if self.result_on_error is not None:
             conditions += [

@@ -21,26 +21,35 @@ class ReturnCodePostcondition:
 
 
 class TimeLimitPostcondition:
-    def __init__(self, cpu_time=None, real_time=None):
-        self.cpu_time = cpu_time or parse_time(cpu_time)
-        self.real_time = real_time or parse_time(real_time)
+    def __init__(self, cpu_time=None, real_time=None, gpu_time=None):
+        self.cpu_time = parse_time(cpu_time)
+        self.real_time = parse_time(real_time)
+        self.gpu_time = parse_time(gpu_time)
 
     def __call__(self, system, result):
-        return ( self.cpu_time is None or result.cpu_time < self.cpu_time ) and ( self.real_time is None or result.real_time < self.real_time )
+        return (
+            ( self.cpu_time is None or result.cpu_time < self.cpu_time ) and
+            ( self.real_time is None or result.real_time < self.real_time ) and
+            ( self.gpu_time is None or result.gpu_time < self.gpu_time )
+        )
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.cpu_time), repr(self.real_time))
+        return '{}({},{},{})'.format(self.__class__.__name__, repr(self.cpu_time), repr(self.real_time), repr(self.gpu_time))
 
 
 class MemoryLimitPostcondition:
-    def __init__(self, memory=None):
+    def __init__(self, memory=None, gpu_memory=None):
         self.memory = parse_memory(memory)
+        self.gpu_memory = parse_memory(gpu_memory)
 
     def __call__(self, system, result):
-        return ( self.memory is None or result.memory < self.memory )
+        return (
+            ( self.memory is None or result.memory < self.memory ) and
+            ( self.gpu_memory is None or result.gpu_memory < self.gpu_memory )
+        )
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, repr(self.memory))
+        return '{}({},{})'.format(self.__class__.__name__, repr(self.memory), repr(self.gpu_memory))
 
 
 class EmptyErrorPostcondition:
