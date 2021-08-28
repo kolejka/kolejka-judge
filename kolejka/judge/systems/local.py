@@ -167,6 +167,59 @@ def monitor_process(process, limits, result):
             end_process(process)
         time.sleep(0.05)
 
+
+def memory_reservation(memory_limit: int) -> None:
+    """
+    Preserves every GPU to have at desired limit
+    """
+    try:
+        import numpy as np
+        from numba import cuda
+        from numba.cuda.cudadrv.driver import CudaAPIError, Device
+    except ImportError:
+        # TODO: Raise unsupported limit
+        pass
+
+    ARRAY_ELEMENT_DTYPE = np.uint8
+    ARRAY_ELEMENT_SIZE  = np.dtype(ARRAY_ELEMENT_DTYPE).itemsize
+
+    preserved_memory = {}
+
+    for gpu_index, gpu in enumerate(cuda.gpus.lst):
+        with gpu:
+            # Initialize CUDA context preserves minor amount of memory to be allocated
+            _ = cuda.device_array((1,))
+
+            # Retrieve current device free memory space (in bytes)
+            bytes_free, bytes_total = cuda.current_context().get_memory_info()
+
+            bytes_to_preserve = bytes_free - memory_limit
+
+            # if bytes_to_preserve < 0:
+            #     raise NotEnoughMemory(gpu, memory_limit, bytes_free, bytes_total)
+
+            if bytes_to_preserve > 0:
+                try:
+                    preserved_memory[gpu_index] = cuda.device_array(
+                        (bytes_to_preserve // ARRAY_ELEMENT_SIZE,),
+                        dtype=ARRAY_ELEMENT_DTYPE
+                    )
+                    # logging.debug(
+                    #     f"Preserved {bytes_to_preserve} bytes on GPU#{gpu.id}({str(gpu.name, 'utf-8')})"
+                    #     f" using array of size {preserved_memory[gpu_index].size}"
+                    #     f" with type of {preserved_memory[gpu_index].dtype}"
+                    # )
+                except CudaAPIError as e:
+                    # logging.error(f"An error occurred on GPU#{gpu.id}({str(gpu.name, 'utf-8')}): {e}")
+                    exit(-1)
+
+    while True:
+        try:
+            pass
+        except KeyboardInterrupt:
+            exit()
+
+
 class LocalSystem(SystemBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -223,6 +276,10 @@ class LocalSystem(SystemBase):
         resources = self.get_resources(limits)
         #resources[resource.RLIMIT_NPROC] = (1,1) #This is a very bad idea, read notes in man execv on EAGAIN
 
+        memory_reservation_thread = None
+        if limits.gpu_memory:
+            memory_reservation_thread = threading.Thread(target=memory_reservation, args=(limits.gpu_memory,))
+            memory_reservation_thread.start()
         process = kolejka.common.subprocess.start(
             command,
             user=change_user,
@@ -244,6 +301,8 @@ class LocalSystem(SystemBase):
         monitoring_thread.join()
         for writer in writers:
             writer.join()
+        if memory_reservation_thread:
+            memory_reservation_thread.join()
         result.set_returncode(returncode)
 
 
