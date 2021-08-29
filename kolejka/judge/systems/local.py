@@ -168,7 +168,7 @@ def monitor_process(process, limits, result):
         time.sleep(0.05)
 
 
-def memory_reservation(memory_limit: int) -> None:
+def memory_reservation(process, memory_limit: int) -> None:
     """
     Preserves every GPU to have at desired limit
     """
@@ -214,10 +214,9 @@ def memory_reservation(memory_limit: int) -> None:
                     exit(-1)
 
     while True:
-        try:
-            pass
-        except KeyboardInterrupt:
-            exit()
+        info = proc_info(process.pid)
+        if info is None:
+            break
 
 
 class LocalSystem(SystemBase):
@@ -276,10 +275,6 @@ class LocalSystem(SystemBase):
         resources = self.get_resources(limits)
         #resources[resource.RLIMIT_NPROC] = (1,1) #This is a very bad idea, read notes in man execv on EAGAIN
 
-        memory_reservation_thread = None
-        if limits.gpu_memory:
-            memory_reservation_thread = threading.Thread(target=memory_reservation, args=(limits.gpu_memory,))
-            memory_reservation_thread.start()
         process = kolejka.common.subprocess.start(
             command,
             user=change_user,
@@ -301,8 +296,6 @@ class LocalSystem(SystemBase):
         monitoring_thread.join()
         for writer in writers:
             writer.join()
-        if memory_reservation_thread:
-            memory_reservation_thread.join()
         result.set_returncode(returncode)
 
 
@@ -331,10 +324,15 @@ class LocalSystem(SystemBase):
         stdin_file.close()
         stdout_file.close()
         stderr_file.close()
-        result = Result() 
+        result = Result()
+        memory_reservation_thread = None
+        if limits.gpu_memory:
+            memory_reservation_thread = threading.Thread(target=memory_reservation, args=(process, limits.gpu_memory,))
+            memory_reservation_thread.start()
         monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
         monitoring_thread.start()
-        return (process, monitoring_thread, result, writers)
+
+        return (process, monitoring_thread, result, writers, memory_reservation_thread)
 
     def terminate_command(self, process):
         process, monitoring_thread, monitor_result, writers = process
@@ -343,9 +341,11 @@ class LocalSystem(SystemBase):
             writer.join()
 
     def wait_command(self, process, result):
-        process, monitoring_thread, monitor_result, writers = process
+        process, monitoring_thread, monitor_result, writers, memory_reservation_thread = process
         completed = kolejka.common.subprocess.wait(process)
         monitoring_thread.join()
+        if memory_reservation_thread:
+            memory_reservation_thread.join()
         for writer in writers:
             writer.join()
         result.update_memory(monitor_result.memory)
