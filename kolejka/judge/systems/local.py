@@ -170,15 +170,14 @@ def monitor_process(process, limits, result):
 
 def memory_reservation(process, memory_limit: int) -> None:
     """
-    Preserves every GPU to have at desired limit
+    Preserves every GPU to have at most desired memory free
     """
     try:
         import numpy as np
         from numba import cuda
         from numba.cuda.cudadrv.driver import CudaAPIError, Device
     except ImportError:
-        # TODO: Raise unsupported limit
-        pass
+        raise RuntimeError("Numba is required to limit GPU memory")
 
     ARRAY_ELEMENT_DTYPE = np.uint8
     ARRAY_ELEMENT_SIZE  = np.dtype(ARRAY_ELEMENT_DTYPE).itemsize
@@ -195,8 +194,8 @@ def memory_reservation(process, memory_limit: int) -> None:
 
             bytes_to_preserve = bytes_free - memory_limit
 
-            # if bytes_to_preserve < 0:
-            #     raise NotEnoughMemory(gpu, memory_limit, bytes_free, bytes_total)
+            if bytes_to_preserve < 0:
+                raise RuntimeError(f"Not enough memory on {repr(gpu)} requested {bytes_to_preserve}")
 
             if bytes_to_preserve > 0:
                 try:
@@ -204,14 +203,8 @@ def memory_reservation(process, memory_limit: int) -> None:
                         (bytes_to_preserve // ARRAY_ELEMENT_SIZE,),
                         dtype=ARRAY_ELEMENT_DTYPE
                     )
-                    # logging.debug(
-                    #     f"Preserved {bytes_to_preserve} bytes on GPU#{gpu.id}({str(gpu.name, 'utf-8')})"
-                    #     f" using array of size {preserved_memory[gpu_index].size}"
-                    #     f" with type of {preserved_memory[gpu_index].dtype}"
-                    # )
                 except CudaAPIError as e:
-                    # logging.error(f"An error occurred on GPU#{gpu.id}({str(gpu.name, 'utf-8')}): {e}")
-                    exit(-1)
+                    raise RuntimeError("CUDA operation failure")
 
     while True:
         info = proc_info(process.pid)
