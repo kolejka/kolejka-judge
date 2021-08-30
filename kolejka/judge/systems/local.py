@@ -15,7 +15,7 @@ import traceback
 
 
 import kolejka.common.subprocess
-
+from kolejka.common.gpu import gpu_stats
 
 from kolejka.judge import config
 from kolejka.judge.result import Result
@@ -147,6 +147,8 @@ def monitor_process(process, limits, result):
         memory = info['rss']
         real_time[process.pid] = info['real_time']
         cpu_time[process.pid] = info['cpu_user'] + info['cpu_sys']
+
+        info['gpus'] = gpu_stats().dump()
 
         infos = dict([ (pid, proc_info(pid)) for pid in proc_descendants(process.pid) ])
         for pid, info in infos.items():
