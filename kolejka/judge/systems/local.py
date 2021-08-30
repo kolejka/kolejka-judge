@@ -12,6 +12,7 @@ import tempfile
 import time
 import threading
 import traceback
+import multiprocessing
 
 
 import kolejka.common.subprocess
@@ -168,7 +169,7 @@ def monitor_process(process, limits, result):
         time.sleep(0.05)
 
 
-def memory_reservation(process, memory_limit: int) -> None:
+def memory_reservation(memory_limit: int) -> None:
     """
     Preserves every GPU to have at most desired memory free
     """
@@ -207,8 +208,9 @@ def memory_reservation(process, memory_limit: int) -> None:
                     raise RuntimeError("CUDA operation failure")
 
     while True:
-        info = proc_info(process.pid)
-        if info is None:
+        try:
+            pass
+        except KeyboardInterrupt:
             break
 
 
@@ -320,7 +322,10 @@ class LocalSystem(SystemBase):
         result = Result()
         memory_reservation_thread = None
         if limits.gpu_memory:
-            memory_reservation_thread = threading.Thread(target=memory_reservation, args=(process, limits.gpu_memory,))
+            memory_reservation_thread = multiprocessing.Process(
+                target=memory_reservation,
+                args=(limits.gpu_memory,)
+            )
             memory_reservation_thread.start()
         monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
         monitoring_thread.start()
@@ -328,8 +333,10 @@ class LocalSystem(SystemBase):
         return (process, monitoring_thread, result, writers, memory_reservation_thread)
 
     def terminate_command(self, process):
-        process, monitoring_thread, monitor_result, writers = process
+        process, monitoring_thread, monitor_result, writers, memory_reservation_thread = process
         process.terminate()
+        if memory_reservation_thread:
+            memory_reservation_thread.terminate()
         for writer in writers:
             writer.join()
 
@@ -338,7 +345,7 @@ class LocalSystem(SystemBase):
         completed = kolejka.common.subprocess.wait(process)
         monitoring_thread.join()
         if memory_reservation_thread:
-            memory_reservation_thread.join()
+            memory_reservation_thread.terminate()
         for writer in writers:
             writer.join()
         result.update_memory(monitor_result.memory)
