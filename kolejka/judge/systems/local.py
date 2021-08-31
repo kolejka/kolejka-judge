@@ -149,8 +149,6 @@ def monitor_process(process, limits, result):
         real_time[process.pid] = info['real_time']
         cpu_time[process.pid] = info['cpu_user'] + info['cpu_sys']
 
-        info['gpus'] = gpu_stats().dump()
-
         infos = dict([ (pid, proc_info(pid)) for pid in proc_descendants(process.pid) ])
         for pid, info in infos.items():
             if info is None:
@@ -159,14 +157,22 @@ def monitor_process(process, limits, result):
             real_time[pid] = max(real_time.get(pid,0), info['real_time'])
             cpu_time[pid] = max(cpu_time.get(pid,0), info['cpu_user'] + info['cpu_sys'])
 
+        gpu_memory = 0
+        for gpu, stats in gpu_stats().dump().get('gpus').items():
+            gpu_memory += parse_memory(stats.get('memory_usage'))
+
         result.update_memory(memory)
         result.update_real_time(sum(real_time.values()))
         result.update_cpu_time(sum(cpu_time.values()))
+        result.update_gpu_memory(gpu_memory)
+
         if limits.cpu_time and result.cpu_time > limits.cpu_time:
             end_process(process)
         if limits.real_time and result.real_time > limits.real_time:
             end_process(process)
         if limits.memory and result.memory > limits.memory:
+            end_process(process)
+        if limits.gpu_memory and result.gpu_memory > limits.gpu_memory:
             end_process(process)
         time.sleep(0.05)
 
@@ -214,7 +220,6 @@ def memory_reservation(memory_limit: int) -> None:
             pass
         except KeyboardInterrupt:
             break
-
 
 class LocalSystem(SystemBase):
     def __init__(self, *args, **kwargs):
@@ -331,7 +336,6 @@ class LocalSystem(SystemBase):
             memory_reservation_thread.start()
         monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
         monitoring_thread.start()
-
         return (process, monitoring_thread, result, writers, memory_reservation_thread)
 
     def terminate_command(self, process):
@@ -346,8 +350,6 @@ class LocalSystem(SystemBase):
         process, monitoring_thread, monitor_result, writers, memory_reservation_thread = process
         completed = kolejka.common.subprocess.wait(process)
         monitoring_thread.join()
-        if memory_reservation_thread:
-            memory_reservation_thread.terminate()
         for writer in writers:
             writer.join()
         result.update_memory(monitor_result.memory)
@@ -355,3 +357,5 @@ class LocalSystem(SystemBase):
         result.update_cpu_time(monitor_result.cpu_time)
         result.update_real_time(completed.time)
         result.set_returncode(completed.returncode)
+        if memory_reservation_thread:
+            memory_reservation_thread.terminate()
