@@ -159,7 +159,7 @@ def monitor_process(process, limits, result):
 
         gpu_memory = 0
         for gpu, stats in gpu_stats().dump().get('gpus').items():
-            gpu_memory += parse_memory(stats.get('memory_usage'))
+            gpu_memory = max(gpu_memory, parse_memory(stats.get('memory_usage')))
 
         result.update_memory(memory)
         result.update_real_time(sum(real_time.values()))
