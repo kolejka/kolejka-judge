@@ -16,7 +16,7 @@ import multiprocessing
 
 
 import kolejka.common.subprocess
-
+from kolejka.common.gpu import gpu_stats
 
 from kolejka.judge import config
 from kolejka.judge.result import Result
@@ -160,64 +160,31 @@ def monitor_process(process, limits, result):
         result.update_memory(memory)
         result.update_real_time(sum(real_time.values()))
         result.update_cpu_time(sum(cpu_time.values()))
+
+        if limits.gpu_memory:
+            gpu_memory = 0
+            for gpu, stats in gpu_stats().dump().get('gpus').items():
+                total = parse_memory(stats.get('memory_total'))
+                usage = parse_memory(stats.get('memory_usage'))
+                gpu_memory = max(gpu_memory, limits.gpu_memory - (total - usage))
+
+            result.update_gpu_memory(gpu_memory)
+
         if limits.cpu_time and result.cpu_time > limits.cpu_time:
             end_process(process)
         if limits.real_time and result.real_time > limits.real_time:
             end_process(process)
         if limits.memory and result.memory > limits.memory:
             end_process(process)
+        if limits.gpu_memory and result.gpu_memory > limits.gpu_memory:
+            end_process(process)
         time.sleep(0.05)
-
-
-def memory_reservation(memory_limit: int) -> None:
-    """
-    Preserves every GPU to have at most desired memory free
-    """
-    try:
-        import numpy as np
-        from numba import cuda
-        from numba.cuda.cudadrv.driver import CudaAPIError, Device
-    except ImportError:
-        raise RuntimeError("Numba is required to limit GPU memory")
-
-    ARRAY_ELEMENT_DTYPE = np.uint8
-    ARRAY_ELEMENT_SIZE  = np.dtype(ARRAY_ELEMENT_DTYPE).itemsize
-
-    preserved_memory = {}
-
-    for gpu_index, gpu in enumerate(cuda.gpus.lst):
-        with gpu:
-            # Initialize CUDA context preserves minor amount of memory to be allocated
-            _ = cuda.device_array((1,))
-
-            # Retrieve current device free memory space (in bytes)
-            bytes_free, bytes_total = cuda.current_context().get_memory_info()
-
-            bytes_to_preserve = bytes_free - memory_limit
-
-            if bytes_to_preserve < 0:
-                raise RuntimeError(f"Not enough memory on {repr(gpu)} requested {bytes_to_preserve}")
-
-            if bytes_to_preserve > 0:
-                try:
-                    preserved_memory[gpu_index] = cuda.device_array(
-                        (bytes_to_preserve // ARRAY_ELEMENT_SIZE,),
-                        dtype=ARRAY_ELEMENT_DTYPE
-                    )
-                except CudaAPIError as e:
-                    raise RuntimeError("CUDA operation failure")
-
-    while True:
-        try:
-            pass
-        except KeyboardInterrupt:
-            break
-
 
 class LocalSystem(SystemBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.output_directory.mkdir(parents=True, exist_ok=True)
+        self.preserved_gpu_memory = {}
 
     def get_superuser(self):
         return os.getuid() == 0
@@ -258,6 +225,46 @@ class LocalSystem(SystemBase):
 
         return resources
 
+    def preserve_gpu_memory(self, memory_limit: int) -> None:
+        """
+        Preserves every GPU to have at most desired memory free
+        """
+        try:
+            import numpy as np
+            from numba import cuda
+            from numba.cuda.cudadrv.driver import CudaAPIError, Device
+        except ImportError:
+            raise RuntimeError("Numba is required to limit GPU memory")
+
+        ARRAY_ELEMENT_DTYPE = np.uint8
+        ARRAY_ELEMENT_SIZE = np.dtype(ARRAY_ELEMENT_DTYPE).itemsize
+
+        self.preserved_gpu_memory = {}
+        for gpu_index, gpu in enumerate(cuda.gpus.lst):
+            with gpu:
+                # Initialize CUDA context preserves minor amount of memory to be allocated
+                _ = cuda.device_array((1,))
+
+                # Retrieve current device free memory space (in bytes)
+                bytes_free, bytes_total = cuda.current_context().get_memory_info()
+
+                bytes_to_preserve = bytes_free - memory_limit
+
+                if bytes_to_preserve < 0:
+                    raise RuntimeError(f"Not enough memory on {repr(gpu)} requested {bytes_to_preserve}")
+
+                if bytes_to_preserve > 0:
+                    try:
+                        self.preserved_gpu_memory[gpu_index] = cuda.device_array(
+                            (bytes_to_preserve // ARRAY_ELEMENT_SIZE,),
+                            dtype=ARRAY_ELEMENT_DTYPE
+                        )
+                    except CudaAPIError as e:
+                        raise RuntimeError(f"CUDA operation failure: {e}")
+
+    def release_gpu_memory(self):
+        for gpu, memory in self.preserved_gpu_memory.items():
+            del memory
 
     def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
         stdin_file = self.read_file(stdin_path)
@@ -304,6 +311,9 @@ class LocalSystem(SystemBase):
 
         resources = self.get_resources(limits)
 
+        if limits.gpu_memory:
+            self.preserve_gpu_memory(limits.gpu_memory)
+
         process = kolejka.common.subprocess.start(
             command,
             user=change_user,
@@ -320,32 +330,21 @@ class LocalSystem(SystemBase):
         stdout_file.close()
         stderr_file.close()
         result = Result()
-        memory_reservation_thread = None
-        if limits.gpu_memory:
-            memory_reservation_thread = multiprocessing.Process(
-                target=memory_reservation,
-                args=(limits.gpu_memory,)
-            )
-            memory_reservation_thread.start()
         monitoring_thread = threading.Thread(target=monitor_process, args=(process, limits, result))
         monitoring_thread.start()
-
-        return (process, monitoring_thread, result, writers, memory_reservation_thread)
+        return (process, monitoring_thread, result, writers)
 
     def terminate_command(self, process):
-        process, monitoring_thread, monitor_result, writers, memory_reservation_thread = process
+        process, monitoring_thread, monitor_result, writers = process
         process.terminate()
-        if memory_reservation_thread:
-            memory_reservation_thread.terminate()
         for writer in writers:
             writer.join()
+        self.release_gpu_memory()
 
     def wait_command(self, process, result):
-        process, monitoring_thread, monitor_result, writers, memory_reservation_thread = process
+        process, monitoring_thread, monitor_result, writers = process
         completed = kolejka.common.subprocess.wait(process)
         monitoring_thread.join()
-        if memory_reservation_thread:
-            memory_reservation_thread.terminate()
         for writer in writers:
             writer.join()
         result.update_memory(monitor_result.memory)
@@ -353,3 +352,4 @@ class LocalSystem(SystemBase):
         result.update_cpu_time(monitor_result.cpu_time)
         result.update_real_time(completed.time)
         result.set_returncode(completed.returncode)
+        self.release_gpu_memory()
