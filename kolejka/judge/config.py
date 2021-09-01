@@ -31,6 +31,8 @@ TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
 
+CUDA_PROFILER = TEST + '/profiler'
+
 SHARED = 'shared'
 
 MULTITEST = TEST + '/tests'

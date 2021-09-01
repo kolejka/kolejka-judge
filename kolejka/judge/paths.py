@@ -83,8 +83,9 @@ class InputPath(PathBase):
 class OutputPath(PathBase):
     def __init__(self, *args):
         self._path = pathlib.PurePath(*[ _path(arg) for arg in args ])
-        if self._path.is_absolute():
-            raise ValueError(repr(args)+" is not an output path")
+        # TODO: Rethink what should it be here
+        # if self._path.is_absolute():
+        #     raise ValueError(repr(args)+" is not an output path")
 
     def __str__(self):
         return str(_path(self))

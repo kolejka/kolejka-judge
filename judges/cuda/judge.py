@@ -48,7 +48,7 @@ def judge(args):
         limit_memory=memory_limit,
         limit_gpu_time=time_gpu_limit,
         limit_gpu_memory=memory_gpu_limit,
-#        cuda_profile=cuda_profile,
+        cuda_metrics=["gpu__time_duration.sum"]
         )
     )
     args.add_steps(logs=CollectLogsTask())
