@@ -53,8 +53,7 @@ class IOTask(TaskBase):
         if limit_real_time is not None:
             self.limit_real_time = limit_real_time
         self.limit_memory = limit_memory
-        if limit_gpu_memory:
-            self.limit_gpu_memory = limit_gpu_memory
+        self.limit_gpu_memory = limit_gpu_memory
         self.case_sensitive = case_sensitive
         self.space_sensitive = space_sensitive
         self.init_kwargs = kwargs
