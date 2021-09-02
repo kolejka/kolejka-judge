@@ -159,7 +159,6 @@ class SystemBase(AbstractSystem):
                 yield path / (cpath.relative_to(rpath))
 
     def file_contents(self, path, work_directory =None):
-        print(work_directory)
         rpath = self.resolve_path(path, work_directory=work_directory)
         if not rpath.is_file():
             return None

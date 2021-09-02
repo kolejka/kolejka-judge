@@ -2,16 +2,14 @@
 
 import io
 import csv
-import shutil
 from typing import List, Optional
+from collections import defaultdict
 
-from kolejka.judge import config
 from kolejka.judge.tasks.run import *
 from kolejka.judge.tasks.io import *
-from kolejka.judge.typing import default_kwargs
-from kolejka.judge.commands import ExecutableCommand
-from kolejka.judge.tasks.tools import ToolTask
-from kolejka.judge.result import Result
+from kolejka.judge.paths import *
+from kolejka.judge.typing import *
+from kolejka.judge.commands import *
 
 __all__ = [ 'ExecutableCudaTask', 'SolutionExecutableCudaTask', 
             'ProgramCudaTask', 'SolutionProgramCudaTask',
@@ -20,111 +18,91 @@ __all__ = [ 'ExecutableCudaTask', 'SolutionExecutableCudaTask',
 def __dir__():
     return __all__
 
-NVIDIA_NSIGHT_PATH = '/usr/local/bin/nv-nsight-cu-cli'
+NVIDIA_NSIGHT_PATH = 'nv-nsight-cu-cli'
 
 NVIDIA_NSIGHT_DEFAULT_ARGS = [
-    # '--summary', 'per-gpu',
-    '--csv',
+    '--quiet',
     '--print-units', 'base',
     '--print-fp',
     '--force-overwrite',
-    '--target-processes', 'all',
+    '--target-processes', 'all'
 ]
 
 class ExecutableCudaTask(ExecutableTask):
+    DEFAULT_CUDA_METRICS_OUTPUT = config.CUDA_METRICS
+
     @default_kwargs
     def __init__(
             self,
             cuda_metrics: Optional[List[str]] = None,
             cuda_profile_log: Optional[str] = None,
+            cuda_metrics_output: Optional[str] = None,
             **kwargs
     ):
         super().__init__(**kwargs)
 
         self._cuda_metrics = cuda_metrics
-        self._cuda_profile_log = cuda_profile_log or 'profiler_metrics.txt'
+        self._cuda_profile_log = cuda_profile_log and get_output_path(cuda_profile_log)
+        self._cuda_metrics_output = cuda_metrics_output and get_output_path(cuda_metrics_output)
 
-    def get_executable(self):
-        if self._cuda_metrics:
-            return NVIDIA_NSIGHT_PATH
+    def _aggregate_metric(self, name: str, values: list):
+        functor = name.split('.')[-1]
 
-        return super().get_executable()
+        if functor == 'sum':
+            return sum(values)
+        if functor == 'max':
+            return max(values)
+        if functor == 'min':
+            return min(values)
+        return sum(values) / len(values)
 
-    def get_executable_arguments(self):
+    def _parse_metrics(self, path):
+        stats = defaultdict(list)
+        metrics_data = str(self.file_contents(path), 'utf-8')
+
+        for row in csv.DictReader(io.StringIO(metrics_data)):
+            name, value = row['Metric Name'], row['Metric Value']
+            stats[name].append(float(value.replace(',', '')))
+
+        return {
+            f'{metric}': self._aggregate_metric(metric, value)
+            for metric, value in stats.items()
+        }
+
+    def execute(self):
         if self._cuda_metrics:
             metrics = ','.join(self._cuda_metrics)
 
-            # metrics = 'all'
+            self.run_command(
+                'run',
+                ProgramCommand,
+                program=NVIDIA_NSIGHT_PATH,
+                program_arguments=NVIDIA_NSIGHT_DEFAULT_ARGS +
+                                  ['--export', self._cuda_profile_log, '--metrics', metrics] +
+                                  [super().get_executable()] + super().get_executable_arguments()
+            )
 
-            return NVIDIA_NSIGHT_DEFAULT_ARGS + \
-                   ['--log-file', self._cuda_profile_log, '--metrics', metrics] + \
-                   [super().get_executable()] + \
-                   super().get_executable_arguments()
+            self.run_command(
+                'profiler',
+                ProgramCommand,
+                program=NVIDIA_NSIGHT_PATH,
+                program_arguments=[
+                    '--csv',
+                    '--import', self._cuda_profile_log
+                ],
+                stdout=self._cuda_metrics_output
+            )
 
-        return super().get_executable_arguments()
+            metrics = self._parse_metrics(self.commands.get('profiler').stdout_path)
 
-    def _sparse_metric(self, functor: str, values: dict):
-        print('SPARCE METRIC', values)
-        if functor == 'sum':
-            operator = sum
-        elif functor == 'max':
-            operator = max
-        elif functor == 'min':
-            operator = min
-        elif functor == 'avg':
-            operator = lambda x: sum(x)/len(x)
-        else:
-            operator = lambda x: 0
+            for metric_name, metric_value in metrics.items():
+                self.set_result(None, metric_name, f'{metric_value:.4f}')
 
-        return operator(map(float, values.values()))
+            return self.result
 
-    def _parse_metrics(self):
-        # TODO: Change to task
-        with open('RES/1/test/profiler') as handler:
-            data = handler.readlines()
+        return super().execute()
 
-        data = ''.join(list(filter(lambda line: not line.startswith('==PROF=='), data)))
-
-        print(data)
-
-        metrics_csv = io.StringIO(data)
-        data = csv.DictReader(metrics_csv)
-        from collections import defaultdict
-        stats = defaultdict(dict)
-        for row in data:
-            device, pid, name, value = row['ID'], row['Process ID'], row['Metric Name'], row['Metric Value']
-            stats[device][name] = stats.get(device, {})
-            stats[device][name].update({
-                f'{pid}': str(value)
-            })
-
-        out = {}
-
-        for gpu, metric_kv in stats.items():
-            print(gpu, metric_kv)
-            out[gpu] = {}
-            for name, values in metric_kv.items():
-                functor = name.split('.')[-1]
-                out[gpu][name] = self._sparse_metric(functor, values)
-
-        print(out)
-
-        return {}
-
-    def execute(self):
-        result = self.run_command(
-            'run',
-            ExecutableCommand,
-            executable=self.executable,
-            executable_arguments=self.executable_arguments
-        )
-
-        self._parse_metrics()
-
-        self.set_result(result)
-        return self.result
-
-class SolutionExecutableCudaTask(SolutionExecutableTask, ExecutableCudaTask):
+class SolutionExecutableCudaTask(ExecutableCudaTask, SolutionExecutableTask):
     pass
 
 class ProgramCudaTask(ProgramTask):
@@ -143,7 +121,6 @@ class SingleIOCudaTask(SingleIOTask):
             cuda_profile_log: Optional[str] = None,
             **kwargs
     ):
-        print('default = ', cuda_profile_log)
         self._cuda_metrics = cuda_metrics
         self._cuda_profile_log = cuda_profile_log
 

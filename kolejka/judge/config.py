@@ -31,7 +31,8 @@ TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
 
-CUDA_PROFILER = TEST + '/profiler'
+CUDA_PROFILER = TEST + '/profiler.ncu-rep'
+CUDA_METRICS = TEST + '/metrics.csv'
 
 SHARED = 'shared'
 
