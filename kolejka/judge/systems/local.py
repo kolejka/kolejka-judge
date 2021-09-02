@@ -314,8 +314,6 @@ class LocalSystem(SystemBase):
         if limits.gpu_memory:
             self.preserve_gpu_memory(limits.gpu_memory)
 
-        print('Command', command)
-
         process = kolejka.common.subprocess.start(
             command,
             user=change_user,
