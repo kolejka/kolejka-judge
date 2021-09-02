@@ -29,9 +29,6 @@ NVIDIA_NSIGHT_DEFAULT_ARGS = [
 ]
 
 class ExecutableCudaTask(ExecutableTask):
-    DEFAULT_CUDA_METRICS_OUTPUT = config.CUDA_METRICS
-
-    @default_kwargs
     def __init__(
             self,
             cuda_metrics: Optional[List[str]] = None,
@@ -113,16 +110,19 @@ class SolutionProgramCudaTask(SolutionProgramTask):
 
 class SingleIOCudaTask(SingleIOTask):
     DEFAULT_CUDA_PROFILE_LOG = config.CUDA_PROFILER
+    DEFAULT_CUDA_METRICS_OUTPUT = config.CUDA_METRICS
 
     @default_kwargs
     def __init__(
             self,
             cuda_metrics: Optional[List[str]] = None,
             cuda_profile_log: Optional[str] = None,
+            cuda_metrics_output: Optional[str] = None,
             **kwargs
     ):
         self._cuda_metrics = cuda_metrics
         self._cuda_profile_log = cuda_profile_log
+        self._cuda_metrics_output = cuda_metrics_output
 
         super().__init__(**kwargs)
 
@@ -130,6 +130,7 @@ class SingleIOCudaTask(SingleIOTask):
         return SolutionExecutableCudaTask(
             cuda_metrics=self._cuda_metrics,
             cuda_profile_log=self._cuda_profile_log,
+            cuda_metrics_output=self._cuda_metrics_output,
             **kwargs
         )
 
