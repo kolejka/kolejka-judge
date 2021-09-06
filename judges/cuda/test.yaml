@@ -1,5 +1,5 @@
 memory:       512MB
-memory_gpu:   256MB
+memory_gpu:   1G
 cuda_architecture: 'sm_52'
 kolejka:
     image       : 'kolejka/satori:extended'
@@ -16,13 +16,12 @@ kolejka:
         storage     : '2G'
         workspace   : '2G'
         gpus        : 1
-        memory_gpu  : '256MB'
+        memory_gpu  : '1G'
     satori:
         result:
             execute_time_real : '/io/executor/run/real_time'
             execute_time_cpu  : '/io/executor/run/cpu_time'
             execute_memory    : '/io/executor/run/memory'
-            execute_time_gpu  : '/io/executor/run/gpu_time'
             execute_memory_gpu: '/io/executor/run/gpu_memory'
             compile_log       : 'str:/builder/**/stdout,/builder/**/stderr'
             tool_log          : 'str:/io/generator/**/stderr,/io/verifier/**/stdout,/io/verifier/**/stderr,/io/hinter/**/stderr'

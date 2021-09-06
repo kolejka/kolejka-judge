@@ -12,7 +12,6 @@ import tempfile
 import time
 import threading
 import traceback
-import multiprocessing
 
 
 import kolejka.common.subprocess

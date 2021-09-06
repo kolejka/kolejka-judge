@@ -11,9 +11,8 @@ from kolejka.judge.paths import *
 from kolejka.judge.typing import *
 from kolejka.judge.commands import *
 
-__all__ = [ 'ExecutableCudaTask', 'SolutionExecutableCudaTask', 
-            'ProgramCudaTask', 'SolutionProgramCudaTask',
-            'SingleIOCudaTask', 'MultipleIOCudaTask' ]
+__all__ = [ 'ExecutableCudaTask', 'SolutionExecutableCudaTask',
+            'SingleIOCudaTask' ]
 
 def __dir__():
     return __all__
@@ -102,12 +101,6 @@ class ExecutableCudaTask(ExecutableTask):
 class SolutionExecutableCudaTask(ExecutableCudaTask, SolutionExecutableTask):
     pass
 
-class ProgramCudaTask(ProgramTask):
-    pass
-
-class SolutionProgramCudaTask(SolutionProgramTask):
-    pass
-
 class SingleIOCudaTask(SingleIOTask):
     DEFAULT_CUDA_PROFILE_LOG = config.CUDA_PROFILER
     DEFAULT_CUDA_METRICS_OUTPUT = config.CUDA_METRICS
@@ -133,6 +126,3 @@ class SingleIOCudaTask(SingleIOTask):
             cuda_metrics_output=self._cuda_metrics_output,
             **kwargs
         )
-
-class MultipleIOCudaTask(MultipleIOTask):
-    pass
