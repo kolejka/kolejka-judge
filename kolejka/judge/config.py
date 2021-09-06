@@ -24,11 +24,15 @@ TOOL_SOURCE = TOOL + '/src/{tool_name}'
 TOOL_BUILD = TOOL + '/build/{tool_name}'
 TOOL_EXEC = TOOL + '/{tool_name}'
 TOOL_BUILD_CPP_STANDARD = 'c++17' 
+TOOL_BUILD_CUDA_ARCHITECTURE = 'sm_52'
 
 TEST = 'test'
 TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
+
+CUDA_PROFILER = TEST + '/profiler.ncu-rep'
+CUDA_METRICS = TEST + '/metrics.csv'
 
 SHARED = 'shared'
 

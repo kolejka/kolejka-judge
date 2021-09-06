@@ -5,6 +5,9 @@ JUDGEPY="$(readlink -f "${OFFICE}/../judge.py")"
 for TD in $(ls -1 "${OFFICE}"); do
     if [ -f "${OFFICE}/${TD}/tests/tests.yaml" ]; then
         echo " === ${TD} === "
+        if [ -f "${OFFICE}/${TD}/tests/Makefile" ]; then
+            make -C "${OFFICE}/${TD}/tests" -f Makefile
+        fi
         for SOL in $(ls -1 "${OFFICE}/${TD}/solutions"); do
             if [ -f "${OFFICE}/${TD}/solutions/${SOL}" ]; then
                 echo "  + ${SOL}"

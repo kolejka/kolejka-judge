@@ -54,7 +54,7 @@ class SystemBase(AbstractSystem):
         return ':'.join([ path for path in [
             str(self.resolve_path(get_output_path(config.SHARED)) / 'sbin'),
             str(self.resolve_path(get_output_path(config.SHARED)) / 'bin'),
-            '/usr/local/sbin','/usr/local/bin','/usr/sbin','/usr/bin','/sbin','/bin'
+            '/usr/local/sbin','/usr/local/bin','/usr/local/cuda/bin','/usr/sbin','/usr/bin','/sbin','/bin'
         ] if os.path.isdir(path) ])
 
     @property
@@ -336,7 +336,7 @@ class SystemBase(AbstractSystem):
         return result
 
     def execute_safe_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
-        return self.execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result)
+        return self.execute_command(command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result)
 
     def execute_command(self, command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits, result):
         process = self.start_command(command, stdin_path, stdout_path, stdout_append, stdout_max_bytes, stderr_path, stderr_append, stderr_max_bytes, environment, work_path, user, group, limits)
@@ -510,7 +510,7 @@ class SystemBase(AbstractSystem):
             return path in self.system.paths or path=='/dev/null'
 
         def system_program_exists(self, path):
-            return shutil.which(path) is not None
+            return shutil.which(path, path=self.system.program_path) is not None
 
         def __getattr__(self, item):
             return self.noop_validator

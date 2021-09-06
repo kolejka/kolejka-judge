@@ -19,6 +19,7 @@ __all__ = [
         'BuildCompilerTask', 'SolutionBuildCompilerTask', 'ToolBuildCompilerTask',
         'BuildGCCTask', 'SolutionBuildGCCTask', 'ToolBuildGCCTask',
         'BuildGXXTask', 'SolutionBuildGXXTask', 'ToolBuildGXXTask',
+        'BuildNVCCTask', 'SolutionBuildNVCCTask', 'ToolBuildNVCCTask',
         ]
 def __dir__():
     return __all__
@@ -116,4 +117,24 @@ class BuildGXXTask(BuildGCCTask):
 class SolutionBuildGXXTask(SolutionBuildMixin, BuildGXXTask):
     pass
 class ToolBuildGXXTask(ToolBuildMixin, BuildGXXTask):
+    pass
+
+class BuildNVCCTask(BuildGCCTask):
+    DEFAULT_COMPILER = NVCCCommand
+    DEFAULT_SOURCE_GLOBS = [
+        '*.[Cc][Uu]',
+        ]
+    @default_kwargs
+    def __init__(self, architecture=None, **kwargs):
+        super().__init__(**kwargs)
+        self.architecture = architecture
+    def get_compiler_kwargs(self):
+        kwargs = super().get_compiler_kwargs()
+        if self.architecture is not None:
+            kwargs['architecture'] = self.architecture
+        return kwargs
+
+class SolutionBuildNVCCTask(SolutionBuildMixin, BuildNVCCTask):
+    pass
+class ToolBuildNVCCTask(ToolBuildMixin, BuildNVCCTask):
     pass

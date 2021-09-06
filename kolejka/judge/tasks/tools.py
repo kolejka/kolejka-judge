@@ -25,6 +25,7 @@ class ToolTask(TaskBase):
     DEFAULT_USER_NAME=config.USER_TEST
     DEFAULT_GROUP_NAME=config.USER_TEST
     DEFAULT_CPP_STANDARD=config.TOOL_BUILD_CPP_STANDARD
+    DEFAULT_CUDA_ARCHITECTURE=config.TOOL_BUILD_CUDA_ARCHITECTURE
     DEFAULT_PREPARE_TASK=None
     DEFAULT_BUILD_TASK=None
     DEFAULT_EXECUTE_TASK=None
@@ -34,6 +35,7 @@ class ToolTask(TaskBase):
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
             cpp_standard=None,
+            cuda_architecture=None,
             libraries=None,
             prepare_task=None,
             build_task=None,
@@ -59,6 +61,7 @@ class ToolTask(TaskBase):
         self.output_path = output_path
         self.error_path = error_path
         self.cpp_standard = cpp_standard
+        self.cuda_architecture = cuda_architecture
         self.libraries = libraries
 
         self.prepare_task = self.prepare_task_factory()
@@ -80,12 +83,17 @@ class ToolTask(TaskBase):
             sub_kwargs = { 'tool_name' : self.tool_name }
             gxx_kwargs = deepcopy(sub_kwargs)
             gcc_kwargs = deepcopy(sub_kwargs)
+            nvcc_kwargs = deepcopy(sub_kwargs)
+            nvcc_kwargs['architecture'] = self.cuda_architecture
+            nvcc_kwargs['standard'] = self.cpp_standard
+            nvcc_kwargs['libraries'] = self.libraries
             gxx_kwargs['standard'] = self.cpp_standard
             gxx_kwargs['libraries'] = self.libraries
             gcc_kwargs['libraries'] = self.libraries
             return ToolBuildAutoTask([
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],
+            [ToolBuildNVCCTask, [], nvcc_kwargs],
             [ToolBuildGXXTask, [], gxx_kwargs],
             [ToolBuildGCCTask, [], gcc_kwargs],
             [ToolBuildPython3ScriptTask, [], sub_kwargs],
