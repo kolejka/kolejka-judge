@@ -160,14 +160,16 @@ def monitor_process(process, limits, result):
         result.update_real_time(sum(real_time.values()))
         result.update_cpu_time(sum(cpu_time.values()))
 
-        if limits.gpu_memory:
-            gpu_memory = 0
-            for gpu, stats in gpu_stats().dump().get('gpus').items():
+        gpu_memory = 0
+        for gpu, stats in gpu_stats().dump().get('gpus').items():
+            usage = parse_memory(stats.get('memory_usage'))
+            if limits.gpu_memory:
                 total = parse_memory(stats.get('memory_total'))
-                usage = parse_memory(stats.get('memory_usage'))
                 gpu_memory = max(gpu_memory, limits.gpu_memory - (total - usage))
+            else:
+                gpu_memory = max(gpu_memory, usage)
 
-            result.update_gpu_memory(gpu_memory)
+        result.update_gpu_memory(gpu_memory)
 
         if limits.cpu_time and result.cpu_time > limits.cpu_time:
             end_process(process)
@@ -349,6 +351,7 @@ class LocalSystem(SystemBase):
         result.update_memory(monitor_result.memory)
         result.update_real_time(monitor_result.real_time)
         result.update_cpu_time(monitor_result.cpu_time)
+        result.update_gpu_memory(monitor_result.gpu_memory)
         result.update_real_time(completed.time)
         result.set_returncode(completed.returncode)
         self.release_gpu_memory()
