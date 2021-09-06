@@ -22,6 +22,7 @@ kolejka:
             execute_time_real : '/io/executor/run/real_time'
             execute_time_cpu  : '/io/executor/run/cpu_time'
             execute_memory    : '/io/executor/run/memory'
+            execute_time_gpu  : 'float:/io/executor/gpu__time_duration.sum'
             execute_memory_gpu: '/io/executor/run/gpu_memory'
             compile_log       : 'str:/builder/**/stdout,/builder/**/stderr'
             tool_log          : 'str:/io/generator/**/stderr,/io/verifier/**/stdout,/io/verifier/**/stderr,/io/hinter/**/stderr'
