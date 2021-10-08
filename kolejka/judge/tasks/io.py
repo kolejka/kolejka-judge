@@ -44,14 +44,8 @@ class IOTask(TaskBase):
         self.hinter_output_path = hinter_output_path
         self.checker_source = checker_source
         self.limit_cores = limit_cores
-        self.limit_cpu_time = limit_time
-        self.limit_real_time = None
-        if limit_time is not None:
-            self.limit_real_time = parse_time(limit_time) + parse_time('1s')
-        if limit_cpu_time is not None:
-            self.limit_cpu_time = limit_cpu_time
-        if limit_real_time is not None:
-            self.limit_real_time = limit_real_time
+        self.limit_cpu_time = limit_cpu_time or limit_time
+        self.limit_real_time = limit_real_time or (parse_time(limit_time) + parse_time('1s') if limit_time else None)
         self.limit_memory = limit_memory
         self.limit_gpu_memory = limit_gpu_memory
         self.case_sensitive = case_sensitive
