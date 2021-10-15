@@ -2,7 +2,7 @@ memory:       512MB
 memory_gpu:   1G
 cuda_architecture: 'sm_52'
 kolejka:
-    image       : 'kolejka/satori:extended'
+    image       : 'kolejka/satori:cuda'
     exclusive   : false
     requires    : [ 'gpu:nvidia' ]
     collect     : [ 'log.zip' ]
