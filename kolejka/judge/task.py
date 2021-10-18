@@ -58,6 +58,10 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False
             kolejka_limits['storage'] = kolejka_limits.get('storage', 0) + parse_memory(test_limits['storage'])
         if 'workspace' in test_limits:
             kolejka_limits['workspace'] = kolejka_limits.get('workspace', 0) + parse_memory(test_limits['workspace'])
+        if 'gpus' in test_limits:
+            kolejka_limits['gpus'] = int(test_limits['gpus'])
+            if 'gpu_memory' in test_limits:
+                kolejka_limits['gpu_memory'] = kolejka_limits.get('gpu_memory', 0) + parse_memory(test_limits['gpu_memory'])
 
     kolejka_image = kolejka_image or 'kolejka/satori:judge'
 

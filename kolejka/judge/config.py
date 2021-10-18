@@ -2,7 +2,7 @@
 
 
 import sys
-assert sys.version_info >= (3, 6)
+assert sys.version_info >= (3, 7)
 
 
 DISTRIBUTION_PATH = 'kolejka-judge'

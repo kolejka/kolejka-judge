@@ -16,7 +16,7 @@ kolejka:
         storage     : '2G'
         workspace   : '2G'
         gpus        : 1
-        memory_gpu  : '1G'
+        gpu_memory  : '1G'
     satori:
         result:
             execute_time_real : '/io/executor/run/real_time'
