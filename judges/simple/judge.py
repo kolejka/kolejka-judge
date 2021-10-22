@@ -23,7 +23,9 @@ def judge(args):
             limit_cores=1,
             limit_cpu_time=time_limit,
             limit_real_time=time_limit*1.5,
-            limit_memory=memory_limit
+            limit_memory=memory_limit,
+            limit_output_size=parse_memory('1G'),
+            limit_error_size=parse_memory('1M'),
         ),
         checker=AnswerHintDiffTask(hint_path=args.test['hint']),
         logs=CollectLogsTask(),

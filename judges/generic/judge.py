@@ -18,6 +18,8 @@ def judge(args):
     cpp_standard = args.test.get('cpp_standard', 'c++17')
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
+    output_size_limit = parse_memory(args.test.get('output_size', '1G'))
+    error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
         source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
@@ -44,6 +46,8 @@ def judge(args):
         limit_cores=1,
         limit_time=time_limit,
         limit_memory=memory_limit,
+        limit_output_size=output_size_limit,
+        limit_error_size=error_size_limit,
         )
     )
     args.add_steps(logs=CollectLogsTask())

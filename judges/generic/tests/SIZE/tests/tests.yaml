@@ -1,0 +1,11 @@
+ok:
+  !include :   test.yaml
+  input:       !file 1.in
+  hinter:      !file hinter.cpp
+  time:        1s
+ans:
+  !include :   test.yaml
+  input:       !file 1.in
+  hinter:      !file hinter.cpp
+  time:        1s
+  output_size: 1K

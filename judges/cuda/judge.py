@@ -18,6 +18,8 @@ def judge(args):
     cpp_standard = args.test.get('cpp_standard', 'c++17')
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
+    output_size_limit = parse_memory(args.test.get('output_size', '1G'))
+    error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
     memory_gpu_limit = parse_memory(args.test.get('memory_gpu', '1G'))
     cuda_architecture = args.test.get('cuda_architecture', 'sm_52')
     cuda_profile = parse_bool(args.test.get('cuda_profile', 'no'))
@@ -46,6 +48,8 @@ def judge(args):
         limit_cores=1,
         limit_time=time_limit,
         limit_memory=memory_limit,
+        limit_output_size=output_size_limit,
+        limit_error_size=error_size_limit,
         limit_gpu_memory=memory_gpu_limit,
         cuda_metrics=cuda_metrics,
         )

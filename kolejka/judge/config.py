@@ -46,6 +46,8 @@ MULTITEST_INPUT_CPU_TIME = (r'^(.*)[.]in$', r'\1.cpu_time')
 MULTITEST_INPUT_REAL_TIME = (r'^(.*)[.]in$', r'\1.real_time')
 MULTITEST_INPUT_MEMORY = (r'^(.*)[.]in$', r'\1.mem')
 MULTITEST_INPUT_SCORE = (r'^(.*)[.]in$', r'\1.score')
+MULTITEST_OUTPUT_SIZE = (r'^(.*)[.]in$', r'\1.out_size')
+MULTITEST_ERROR_SIZE = (r'^(.*)[.]in$', r'\1.err_size')
 
 MULTITEST_SINGLE = TEST + '/multi/{test_name}'
 MULTITEST_INPUT = MULTITEST_SINGLE + '/input'
