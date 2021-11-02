@@ -78,7 +78,14 @@ class SingleIOTask(IOTask):
         if self.verifier_source:
             verifier = VerifierTask(source=self.verifier_source, override=self.tool_override, input_path=input_path, limit_real_time=self.tool_time, cpp_standard=self.tool_cpp_standard, libraries=self.tool_libraries)
             self.steps.append(('verifier', verifier))
-        executor = self.solution_task_factory(executable=self.executable, executable_arguments=self.executable_arguments, input_path=input_path, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory, limit_gpu_memory=self.limit_gpu_memory, stdout_max_bytes=self.limit_output_size, stderr_max_bytes=self.limit_error_size)
+        executor_kwargs = dict()
+        if self.result_on_error:
+            executor_kwargs['result_on_error'] = self.result_on_error
+        if self.result_on_time:
+            executor_kwargs['result_on_time'] = self.result_on_time
+        if self.result_on_memory:
+            executor_kwargs['result_on_memory'] = self.result_on_memory
+        executor = self.solution_task_factory(executable=self.executable, executable_arguments=self.executable_arguments, input_path=input_path, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory, limit_gpu_memory=self.limit_gpu_memory, stdout_max_bytes=self.limit_output_size, stderr_max_bytes=self.limit_error_size, **executor_kwargs)
         answer_path = executor.answer_path
         self.steps.append(('executor', executor))
         if not hint_path and self.hinter_source:
