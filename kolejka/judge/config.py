@@ -13,6 +13,7 @@ SATORI_RESULT = 'satori'
 
 LOG = 'log'
 COLLECTED_LOG = 'log.zip'
+COLLECTED_DEBUG = 'debug.tar.lzma'
 
 SOLUTION = 'solution'
 SOLUTION_SOURCE = SOLUTION + '/src'

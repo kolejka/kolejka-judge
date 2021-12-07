@@ -50,6 +50,8 @@ def judge(args):
         limit_error_size=error_size_limit,
         )
     )
+    if parse_bool(args.test.get('debug', 'no')):
+        args.add_steps(debug=CollectDebugTask())
     args.add_steps(logs=CollectLogsTask())
     result = args.run()
     print('Result {} on test {}.'.format(result.status, args.id))

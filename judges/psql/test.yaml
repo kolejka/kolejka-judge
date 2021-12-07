@@ -21,3 +21,4 @@ kolejka:
             times : 'float:/io/times'
             execute_time : '/io/executor/run/real_time'
             logs         : '/logs/logs'
+            debug        : '/debug/debug'

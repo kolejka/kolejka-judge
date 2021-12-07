@@ -25,3 +25,4 @@ kolejka:
             tool_log          : 'str:/io/test_*/generator/**/stderr,/io/test_*/verifier/**/stdout,/io/test_*/verifier/**/stderr,/io/test_*/hinter/**/stderr'
             checker_log       : 'str:/io/test_*/checker/**/stdout,/io/test_*/checker/**/stderr'
             logs              : '/logs/logs'
+            debug             : '/debug/debug'

@@ -28,6 +28,10 @@ def judge(args):
             limit_error_size=parse_memory('1M'),
         ),
         checker=AnswerHintDiffTask(hint_path=args.test['hint']),
+    )
+    if parse_bool(args.test.get('debug', 'no')):
+        args.add_steps(debug=CollectDebugTask())
+    args.add_steps(
         logs=CollectLogsTask(),
     )
     result = args.run()

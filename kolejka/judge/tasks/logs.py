@@ -9,7 +9,7 @@ from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import *
 
 
-__all__ = [ 'CollectLogsTask' ]
+__all__ = [ 'CollectLogsTask', 'CollectDebugTask' ]
 def __dir__():
     return __all__
 
@@ -38,4 +38,20 @@ class CollectLogsTask(TaskBase):
         self.set_result(self.run_command('zip', ZipCommand, target=self.target, sources=self.sources, store_directories=False))
         if not self.status:
             self.set_result(name='logs', value=self.resolve_path(self.target))
+        return self.result
+
+class CollectDebugTask(TaskBase):
+    DEFAULT_SOURCE='.'
+    DEFAULT_TARGET=config.COLLECTED_DEBUG
+    DEFAULT_OBLIGATORY=True
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = get_output_path(source)
+        self.target = get_output_path(target)
+
+    def execute(self):
+        self.set_result(self.run_command('tar', ProgramCommand, program='tar', program_arguments=[ '--create', '--auto-compress', '--exclude', self.target, '--file', self.target, '--directory', self.source, '--recursion', '.' ]))
+        if not self.status:
+            self.set_result(name='debug', value=self.resolve_path(self.target))
         return self.result
