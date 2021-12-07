@@ -15,3 +15,4 @@ from kolejka.judge.tasks.run import *
 from kolejka.judge.tasks.shared import *
 from kolejka.judge.tasks.system import *
 from kolejka.judge.tasks.tools import *
+from kolejka.judge.tasks.workspace import *

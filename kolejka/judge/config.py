@@ -36,6 +36,8 @@ CUDA_METRICS = TEST + '/metrics.csv'
 
 SHARED = 'shared'
 
+WORKSPACE = 'workspace'
+
 MULTITEST = TEST + '/tests'
 MULTITEST_INPUT_GLOB = '**/*.in'
 MULTITEST_INPUT_NAME = (r'^.*/(.*)[.]in$', r'\1')

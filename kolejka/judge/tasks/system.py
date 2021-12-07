@@ -9,7 +9,7 @@ from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import *
 
 
-__all__ = [ 'SystemPrepareTask', ]
+__all__ = [ 'SystemPrepareTask', 'DirectoryAddTask', ]
 def __dir__():
     return __all__
 
@@ -96,4 +96,20 @@ class SystemPrepareTask(TaskBase):
         for directory in self.directories.values():
             cmd_name = 'dir_'+str(directory['path']).replace('/', '_')
             self.run_command(cmd_name, DirectoryAddCommand, **directory)
+        return self.result
+
+
+class DirectoryAddTask(TaskBase):
+    DEFAULT_RECORD_RESULT=False
+    @default_kwargs
+    def __init__(self, directory, user_name, group_name, mode, **kwargs):
+        super().__init__(**kwargs)
+        self.directory = get_output_path(directory)
+        self.user_name = user_name
+        self.group_name = group_name
+        self.mode = mode
+
+    def execute(self):
+        cmd_name = 'dir_'+str(self.directory).replace('/', '_')
+        self.run_command(cmd_name, DirectoryAddCommand, path=self.directory, user_name=self.user_name, group_name=self.group_name, mode=self.mode)
         return self.result
