@@ -16,7 +16,8 @@ parser.add_argument('wheel', type=Path, help='Wheel to repair')
 parser.add_argument('result', type=Path, help='Result')
 args = parser.parse_args()
 
-pip_deps = [ 'KolejkaCommon', 'KolejkaClient', 'KolejkaObserver' ]
+pip_deps = [ 'KolejkaCommon', 'KolejkaClient', 'KolejkaObserver', 'PyYAML' ]
+module_deps = [ 'kolejka', 'yaml' ]
 
 args.wheel = args.wheel.resolve()
 args.result = args.result.resolve()
@@ -31,7 +32,8 @@ with tempfile.TemporaryDirectory() as work_dir:
         subprocess.run(['pip3', 'download', pip_dep], cwd=pip_dir, check=True)
         whl = sorted(pip_dir.glob(pip_dep+'*.whl'))[-1]
         subprocess.run(['unzip', str(whl)], cwd=pip_dir, check=True)
-    subprocess.run(['rsync', '-a', str(pip_dir / 'kolejka'), './'], cwd=wheel_dir, check=True)
+    for module in module_deps:
+        subprocess.run(['rsync', '-a', str(pip_dir / module), '--exclude', '*.so', './'], cwd=wheel_dir, check=True)
 
     with ( wheel_dir / '__main__.py' ).open('w') as main_file:
         main_file.write('''
