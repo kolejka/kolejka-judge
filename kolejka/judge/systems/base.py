@@ -3,13 +3,11 @@
 
 from copy import deepcopy
 import datetime
-import grp
 import io
 import json
 import logging
 import os
 import pathlib
-import pwd
 import shutil
 import sys
 import tempfile
@@ -403,6 +401,8 @@ class SystemBase(AbstractSystem):
         return (io.FileIO(fd_write, mode='wb', closefd=True), w)
 
     def get_user_group_groups(self, user=None, group=None):
+        import pwd
+        import grp
         if not self.superuser:
             return None, None, None
         if os.getuid() != 0:
