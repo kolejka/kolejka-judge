@@ -1,11 +1,6 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 
-from copy import deepcopy
-import glob
-import shlex
-
-
 from kolejka.judge import config
 from kolejka.judge.tasks.build.base import *
 from kolejka.judge.paths import *

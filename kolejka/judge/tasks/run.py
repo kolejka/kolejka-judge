@@ -1,6 +1,4 @@
 # vim:ts=4:sts=4:sw=4:expandtab
-import glob
-import shlex
 
 
 from kolejka.judge import config

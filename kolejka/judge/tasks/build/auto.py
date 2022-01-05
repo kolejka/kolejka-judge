@@ -2,8 +2,6 @@
 
 
 from copy import deepcopy
-import glob
-import shlex
 
 
 from kolejka.judge import config
