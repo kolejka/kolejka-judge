@@ -75,6 +75,17 @@ class ParsedErrorPostcondition:
         return '{}({})'.format(self.__class__.__name__, repr(self.disallowed_lines))
 
 
+class FalsePostcondition:
+    def __init__(self):
+        pass
+
+    def __call__(self, system, result):
+        return False
+
+    def __repr__(self):
+        return '{}'.format(self.__class__.__name__)
+
+
 class FileExistsPrerequirement:
     def __init__(self, path):
         self.path = path

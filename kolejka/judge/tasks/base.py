@@ -17,7 +17,7 @@ def __dir__():
 
 
 class TaskBase(AbstractTask):
-    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_gpu_time=None, limit_gpu_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None, **kwargs):
+    def __init__(self, name=None, system=None, work_directory=None, environment=None, user=None, group=None, limits=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_gpu_time=None, limit_gpu_memory=None, limit_cores=None, limit_pids=None, verbose=None, default_logs=None, result_on_ok=None, result_on_error=None, result_on_time=None, result_on_memory=None, record_result=True, obligatory=False, safe=None, **kwargs):
         self._name = name
         self._system = system
         self._work_directory = work_directory and get_output_path(work_directory)
@@ -48,6 +48,7 @@ class TaskBase(AbstractTask):
             self._limits.update_pids(limit_pids)
         self._verbose = verbose
         self._default_logs = default_logs
+        self._result_on_ok = result_on_ok
         self._result_on_error = result_on_error
         self._result_on_time = result_on_time
         self._result_on_memory = result_on_memory
@@ -132,6 +133,12 @@ class TaskBase(AbstractTask):
         return self.get_default_logs()
     def get_default_logs(self):
         return self._default_logs
+
+    @property
+    def result_on_ok(self):
+        return self.get_result_on_ok()
+    def get_result_on_ok(self):
+        return self._result_on_ok
 
     @property
     def result_on_error(self):
@@ -250,6 +257,10 @@ class TaskBase(AbstractTask):
         if self.result_on_error is not None:
             conditions += [
                 (ReturnCodePostcondition(), self.result_on_error)
+            ]
+        if self.result_on_ok is not None:
+            conditions += [
+                (FalsePostcondition(), self.result_on_ok)
             ]
         return conditions
 
