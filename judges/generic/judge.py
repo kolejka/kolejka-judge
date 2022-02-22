@@ -20,9 +20,10 @@ def judge(args):
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
+    basename = args.test.get('basename', None)
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
-        source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
+        source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
         source_rules=SolutionSourceRulesTask(max_size=source_size_limit),
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],

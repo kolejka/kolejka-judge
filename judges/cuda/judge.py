@@ -20,13 +20,14 @@ def judge(args):
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
+    basename = args.test.get('basename', None)
     memory_gpu_limit = parse_memory(args.test.get('memory_gpu', '1G'))
     cuda_architecture = args.test.get('cuda_architecture', 'sm_52')
     cuda_profile = parse_bool(args.test.get('cuda_profile', 'no'))
     cuda_metrics = ["gpu__time_duration.sum", "dram__sectors_read.sum"] if cuda_profile else []
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
-        source=SolutionPrepareTask(source=args.solution, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
+        source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
         source_rules=SolutionSourceRulesTask(max_size=source_size_limit),
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],

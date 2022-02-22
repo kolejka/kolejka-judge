@@ -15,12 +15,13 @@ def judge(args):
     source_size_limit = parse_memory(args.test.get('source_size', '100K'))
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
+    basename = args.test.get('basename', None)
     full_output = parse_bool(args.test.get('full_output', '0'))
     regex_count=[ rule.strip() for rule in args.test.get('regex_count', '').split('\n') if rule.strip() ],
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
         postgres=PostgresPrepareTask(default_logs=True),
-        source=SolutionPrepareTask(source=args.solution, allow_extract=True, limit_real_time=prepare_time),
+        source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, limit_real_time=prepare_time),
         source_rules=SolutionSourceRulesTask(max_size=source_size_limit),
     )
     args.add_steps(io=SingleBuildIOPostgresTask(

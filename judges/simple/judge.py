@@ -12,9 +12,10 @@ from kolejka.judge.tasks import *
 def judge(args):
     time_limit = parse_time(args.test['time'])
     memory_limit = parse_memory(args.test['memory'])
+    basename = args.test.get('basename', None)
     args.add_steps(
         prepare=SystemPrepareTask(default_logs=False),
-        source=SolutionPrepareTask(source=args.solution),
+        source=SolutionPrepareTask(source=args.solution, basename=basename),
         source_rules=SolutionSourceRulesTask(max_size='10K'),
         builder=SolutionBuildGXXTask(standard='c++17'),
         build_rules=SolutionBuildRulesTask(max_size='10M'),
