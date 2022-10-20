@@ -16,6 +16,7 @@ def judge(args):
     binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
     compile_time = parse_time(args.test.get('compile_time', '30s'))
     cpp_standard = args.test.get('cpp_standard', 'c++17')
+    gcc_arguments = [ arg for arg in args.test.get('gcc_arguments', '').split() if arg ]
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
@@ -32,7 +33,7 @@ def judge(args):
         builder=SolutionBuildAutoTask([
             [SolutionBuildCMakeTask, [], {}],
             [SolutionBuildMakeTask, [], {}],
-            [SolutionBuildNVCCTask, [], {'standard': cpp_standard, 'architecture': cuda_architecture}],
+            [SolutionBuildNVCCTask, [], {'standard': cpp_standard, 'architecture': cuda_architecture, 'build_arguments': gcc_arguments}],
         ], limit_real_time=compile_time, limit_memory='2G'),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
@@ -41,6 +42,7 @@ def judge(args):
         tool_override=args.test.get('tools', None),
         tool_time=tool_time,
         tool_cpp_standard=cpp_standard,
+        tool_gcc_arguments=gcc_arguments,
         generator_source=args.test.get('generator', None),
         verifier_source=args.test.get('verifier', None),
         hint_path=args.test.get('hint', None),
