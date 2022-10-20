@@ -35,6 +35,7 @@ class ToolTask(TaskBase):
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
             cpp_standard=None,
+            gcc_arguments=None,
             cuda_architecture=None,
             libraries=None,
             prepare_task=None,
@@ -61,6 +62,7 @@ class ToolTask(TaskBase):
         self.output_path = output_path
         self.error_path = error_path
         self.cpp_standard = cpp_standard
+        self.gcc_arguments = gcc_arguments
         self.cuda_architecture = cuda_architecture
         self.libraries = libraries
 
@@ -87,9 +89,12 @@ class ToolTask(TaskBase):
             nvcc_kwargs['architecture'] = self.cuda_architecture
             nvcc_kwargs['standard'] = self.cpp_standard
             nvcc_kwargs['libraries'] = self.libraries
+            nvcc_kwargs['build_arguments'] = self.gcc_arguments
             gxx_kwargs['standard'] = self.cpp_standard
             gxx_kwargs['libraries'] = self.libraries
+            gxx_kwargs['build_arguments'] = self.gcc_arguments
             gcc_kwargs['libraries'] = self.libraries
+            gcc_kwargs['build_arguments'] = self.gcc_arguments
             return ToolBuildAutoTask([
             [ToolBuildCMakeTask, [], sub_kwargs],
             [ToolBuildMakeTask, [], sub_kwargs],

@@ -1,0 +1,7 @@
+1:
+  !include :   test.yaml
+  input:       !file 1.in
+  hinter:      !file ../solutions/solution.cpp
+  time:        1s
+  cpp_standard: c++17
+  gcc_arguments: -pthread
