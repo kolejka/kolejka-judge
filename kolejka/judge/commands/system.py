@@ -151,7 +151,7 @@ class InstallCommand(CommandBase):
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
-        command += [ '--no-target-directory', self.source, self.target ]
+        command += [ '-D', '--no-target-directory', self.source, self.target ]
         return command
     def get_prerequirements(self):
         return super().get_prerequirements() + [
