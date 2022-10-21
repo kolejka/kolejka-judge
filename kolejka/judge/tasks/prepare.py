@@ -1,6 +1,9 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 
+import pathlib
+
+
 from kolejka.judge import config
 from kolejka.judge.paths import *
 from kolejka.judge.typing import *
@@ -39,8 +42,8 @@ class PrepareTask(TaskBase):
         if allow_extract and 'tar' in sufs:
             return self.run_command(cmd_name, UntarCommand, source=source, target=self.target)
         cmd_name = '%s_install'%(name,)
-        basename = basename or source.name
-        return self.run_command(cmd_name, InstallCommand, source=source, target=self.target / basename)
+        basename = str(pathlib.Path('/', (basename or source.name).strip('/')).resolve(strict=False)).strip('/')
+        return self.run_command(cmd_name, InstallCommand, source=source, target=self.target / basename, parents=True)
 
     def execute(self):
         status = self.prepare_source('source', self.source, self.basename, self.allow_extract)

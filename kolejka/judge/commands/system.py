@@ -98,12 +98,13 @@ class UserDelCommand(ProgramCommand):
 class DirectoryAddCommand(CommandBase):
     DEFAULT_SAFE=True
     @default_kwargs
-    def __init__(self, path, user_name=None, group_name=None, mode=None, **kwargs):
+    def __init__(self, path, user_name=None, group_name=None, mode=None, parents=None, **kwargs):
         super().__init__(**kwargs)
         self.path = get_output_path(path)
         self.user_name = user_name
         self.group_name = group_name
         self.mode = mode
+        self.parents = parents
     def get_octal_mode(self):
         if self.mode is None:
             return None
@@ -118,6 +119,8 @@ class DirectoryAddCommand(CommandBase):
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
+        if self.parents:
+            command += [ '-D' ]
         command += [ '--directory', str(self.path) ]
         return command
     def get_prerequirements(self):
@@ -130,13 +133,14 @@ class DirectoryAddCommand(CommandBase):
 class InstallCommand(CommandBase):
     DEFAULT_SAFE=True
     @default_kwargs
-    def __init__(self, source, target, user_name=None, group_name=None, mode=None, **kwargs):
+    def __init__(self, source, target, user_name=None, group_name=None, mode=None, parents=None, **kwargs):
         super().__init__(**kwargs)
         self.source = get_output_path(source)
         self.target = get_output_path(target)
         self.user_name = user_name
         self.group_name = group_name
         self.mode = mode
+        self.parents = parents
     def get_octal_mode(self):
         if self.mode is None:
             return None
@@ -151,16 +155,22 @@ class InstallCommand(CommandBase):
             command += [ '--group', str(self.group_name) ]
         if self.mode is not None:
             command += [ '--mode', self.get_octal_mode() ]
-        command += [ '-D', '--no-target-directory', self.source, self.target ]
+        if self.parents:
+            command += [ '-D' ]
+        command += [ '--no-target-directory', self.source, self.target ]
         return command
     def get_prerequirements(self):
-        return super().get_prerequirements() + [
+        prerequirements = super().get_prerequirements() + [
             SystemProgramExistsPrerequirement('install'),
             FileExistsPrerequirement(self.source),
-            DirectoryExistsPrerequirement(self.target.parent),
             SystemUserExistsPrerequirement(self.user_name),
             SystemGroupExistsPrerequirement(self.group_name),
         ]
+        if not self.parents:
+            prerequirements += [
+                DirectoryExistsPrerequirement(self.target.parent),
+            ]
+        return prerequirements
 
 
 class ChownDirCommand(CommandBase):
