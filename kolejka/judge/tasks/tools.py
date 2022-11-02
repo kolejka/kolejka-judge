@@ -34,7 +34,7 @@ class ToolTask(TaskBase):
             user_name, group_name,
             source=None, override=None, source_directory=None, build_directory=None,
             arguments=None, input_path=None, output_path=None, error_path=None,
-            cpp_standard=None,
+            c_standard=None, cpp_standard=None,
             gcc_arguments=None,
             cuda_architecture=None,
             libraries=None,
@@ -61,6 +61,7 @@ class ToolTask(TaskBase):
         self.input_path = input_path
         self.output_path = output_path
         self.error_path = error_path
+        self.c_standard = c_standard
         self.cpp_standard = cpp_standard
         self.gcc_arguments = gcc_arguments
         self.cuda_architecture = cuda_architecture
@@ -85,6 +86,7 @@ class ToolTask(TaskBase):
             sub_kwargs = { 'tool_name' : self.tool_name }
             gxx_kwargs = deepcopy(sub_kwargs)
             gcc_kwargs = deepcopy(sub_kwargs)
+            gcc_kwargs['standard'] = self.c_standard
             nvcc_kwargs = deepcopy(sub_kwargs)
             nvcc_kwargs['architecture'] = self.cuda_architecture
             nvcc_kwargs['standard'] = self.cpp_standard

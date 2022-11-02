@@ -34,13 +34,13 @@ class PrepareTask(TaskBase):
         sufs = [ s.lower()[1:] for s in source.suffixes ]
         cmd_name = '%s_extract'%(name,)
         if allow_extract and sufs and sufs[-1] == 'zip':
-            return self.run_command(cmd_name, UnzipCommand, source=source, target=self.target)
+            return self.run_command(cmd_name, UnzipCommand, source=source, target=self.target) #-DD
         if allow_extract and sufs and sufs[-1] == 'rar':
             return self.run_command(cmd_name, UnrarCommand, source=source, target=self.target)
         if allow_extract and sufs and sufs[-1] == '7z':
             return self.run_command(cmd_name, Un7zCommand, source=source, target=self.target)
         if allow_extract and 'tar' in sufs:
-            return self.run_command(cmd_name, UntarCommand, source=source, target=self.target)
+            return self.run_command(cmd_name, UntarCommand, source=source, target=self.target) #--touch
         cmd_name = '%s_install'%(name,)
         basename = str(pathlib.Path('/', (basename or source.name).strip('/')).resolve(strict=False)).strip('/')
         return self.run_command(cmd_name, InstallCommand, source=source, target=self.target / basename, parents=True)
