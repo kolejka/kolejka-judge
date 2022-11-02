@@ -1,0 +1,6 @@
+1:
+  !include :   test.yaml
+  input:       !file 1.in
+  hinter:      !file Hinter.cs
+  time:        1s
+  memory:      512GB

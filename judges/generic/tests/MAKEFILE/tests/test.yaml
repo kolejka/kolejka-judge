@@ -1,0 +1,4 @@
+!include    : ../../../test.yaml
+basename    : src/Solution.cs
+environment : !file environment.zip
+tools       : !file tools.zip
