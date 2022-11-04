@@ -34,7 +34,7 @@ def judge(args):
             [SolutionBuildGXXTask, [], {'standard': cpp_standard, 'build_arguments': gcc_arguments}],
             [SolutionBuildGCCTask, [], {'standard': c_standard, 'build_arguments': gcc_arguments, 'libraries': ['m']}],
             [SolutionBuildPython3ScriptTask, [], {}],
-        ], limit_real_time=compile_time, limit_memory='512M'),
+        ], limit_real_time=compile_time, limit_memory=compile_memory),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
     args.add_steps(io=SingleIOTask(
