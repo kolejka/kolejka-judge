@@ -20,6 +20,7 @@ def judge(args):
     cpp_standard = args.test.get('cpp_standard', 'c++17')
     gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ]
     time_limit = parse_time(args.test.get('time', '10s'))
+    real_time_limit = parse_time(args.test.get('real_time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
@@ -51,6 +52,7 @@ def judge(args):
         checker_source=args.test.get('checker', None),
         limit_cores=1,
         limit_time=time_limit,
+        limit_real_time=real_time_limit,
         limit_memory=memory_limit,
         limit_output_size=output_size_limit,
         limit_error_size=error_size_limit,
