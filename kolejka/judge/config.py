@@ -1,8 +1,10 @@
 # vim:ts=4:sts=4:sw=4:expandtab
 
 
+import os
 import sys
 assert sys.version_info >= (3, 7)
+sys.path = [ path for path in sys.path if not os.path.isfile(os.path.join(path, '__nonpath__.py')) ]
 
 
 DISTRIBUTION_PATH = 'kolejka-judge'

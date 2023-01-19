@@ -9,7 +9,7 @@ def main(judge_path=None):
     try:
         import setproctitle
         setproctitle.setproctitle('kolejka-judge')
-    except:
+    except ImportError:
         pass
 
     parser = argparse.ArgumentParser(description='KOLEJKA judge')

@@ -161,10 +161,10 @@ def monitor_process(process, limits, result):
         result.update_cpu_time(sum(cpu_time.values()))
 
         gpu_memory = 0
-        for gpu, stats in gpu_stats().dump().get('gpus').items():
-            usage = parse_memory(stats.get('memory_usage'))
+        for gpu, stats in gpu_stats().gpus.items():
+            usage = stats.memory_usage
             if limits.gpu_memory:
-                total = parse_memory(stats.get('memory_total'))
+                total = stats.memory_total
                 gpu_memory = max(gpu_memory, limits.gpu_memory - (total - usage))
             else:
                 gpu_memory = max(gpu_memory, usage)
