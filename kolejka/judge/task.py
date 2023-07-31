@@ -17,7 +17,7 @@ def __dir__():
     return __all__
 
 
-def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False):
+def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False, callback_url=None):
 
     kolejka_image = None
     kolejka_requires = set()
@@ -146,6 +146,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False
                     + list(input_map.values())
                 ]),
             collect = kolejka_collect,
+            callback_url = callback_url,
             )
     task.commit()
 

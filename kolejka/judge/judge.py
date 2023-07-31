@@ -145,6 +145,7 @@ def config_parser_task(parser, judge_path=None):
     parser.add_argument('solution', action=ExistingFileAction, help='Solution')
     parser.add_argument('task', type=pathlib.Path, help='Output task directory')
     parser.add_argument('--overwrite', action='store_true', default=False, help='Overwrite output task directory')
+    parser.add_argument('--callback', help='Define callback url')
     def execute(args):
         if args.task.exists():
             if args.overwrite:
@@ -155,7 +156,7 @@ def config_parser_task(parser, judge_path=None):
             else:
                 parser.error('Task \'{}\' already exists.'.format(args.task))
         filter_tests(parser, args)
-        kolejka_task(args.task, args.tests, args.solution, args.judge, debug=args.debug)
+        kolejka_task(args.task, args.tests, args.solution, args.judge, debug=args.debug, callback_url=args.callback)
     parser.set_defaults(execute=execute)
 
 def config_parser_client(parser, judge_path=None):
@@ -168,6 +169,7 @@ def config_parser_client(parser, judge_path=None):
     parser.add_argument('solution', action=ExistingFileAction, help='Solution')
     parser.add_argument('result', type=pathlib.Path, help='Output result directory')
     parser.add_argument('--overwrite', action='store_true', default=False, help='Overwrite output result directory')
+    parser.add_argument('--callback', help='Define callback url')
     def execute(args):
         if args.result.exists():
             if args.overwrite:
@@ -179,7 +181,7 @@ def config_parser_client(parser, judge_path=None):
                 parser.error('Result \'{}\' already exists.'.format(args.result))
         filter_tests(parser, args)
         with tempfile.TemporaryDirectory() as temp_dir:
-            kolejka_task(temp_dir, args.tests, args.solution, args.judge, exist_ok=True, debug=args.debug)
+            kolejka_task(temp_dir, args.tests, args.solution, args.judge, exist_ok=True, debug=args.debug, callback_url=args.callback)
             subprocess.run(['kolejka-client', 'execute', temp_dir, args.result], check=True)
             #TODO: maybe, use kolejka.client instead?
     parser.set_defaults(execute=execute)
