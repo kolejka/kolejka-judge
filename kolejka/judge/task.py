@@ -17,7 +17,7 @@ def __dir__():
     return __all__
 
 
-def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False, callback_url=None):
+def kolejka_task(task_dir, tests, solution, judgepy, library_path=None, exist_ok=False, debug=False, callback_url=None):
 
     kolejka_image = None
     kolejka_requires = set()
@@ -96,7 +96,10 @@ def kolejka_task(task_dir, tests, solution, judgepy, exist_ok=False, debug=False
     judgepy_path = pathlib.PurePath('judge.py')
     (task_dir / judgepy_path).symlink_to(judgepy)
     lib_path = pathlib.PurePath(config.DISTRIBUTION_PATH)
-    (task_dir / lib_path).symlink_to(judgepy.parent / lib_path)
+    if library_path is None:
+        (task_dir / lib_path).symlink_to(judgepy.parent / lib_path)
+    else:
+        (task_dir / lib_path).symlink_to(pathlib.PurePath(library_path))
     if not (judgepy.parent / lib_path).is_file():
         logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
 
