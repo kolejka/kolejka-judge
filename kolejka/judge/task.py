@@ -100,7 +100,7 @@ def kolejka_task(task_dir, tests, solution, judgepy, library_path=None, exist_ok
         (task_dir / lib_path).symlink_to(judgepy.parent / lib_path)
     else:
         (task_dir / lib_path).symlink_to(pathlib.PurePath(library_path))
-    if not (judgepy.parent / lib_path).is_file():
+    if not (task_dir / lib_path).is_file():
         logging.warning('Kolejka Judge library not present in {}. Try running library update.'.format(judgepy.parent / lib_path))
 
 
