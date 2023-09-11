@@ -3,7 +3,6 @@
 
 from copy import deepcopy
 import pathlib
-import pwd
 
 
 from kolejka.judge import config

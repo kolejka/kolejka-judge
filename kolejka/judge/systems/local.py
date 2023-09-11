@@ -5,7 +5,6 @@ import datetime
 import math
 import os
 import pathlib
-import pwd
 import resource
 import signal
 import tempfile
@@ -191,6 +190,7 @@ class LocalSystem(SystemBase):
         return os.getuid() == 0
 
     def get_current_user(self):
+        import pwd
         return pwd.getpwuid(os.getuid()).pw_name
 
     def get_resources(self, limits):
