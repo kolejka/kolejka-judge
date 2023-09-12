@@ -5,7 +5,6 @@ import datetime
 import math
 import os
 import pathlib
-import resource
 import signal
 import tempfile
 import time
@@ -27,10 +26,9 @@ def __dir__():
     return __all__
 
 
-page_size = int(os.sysconf("SC_PAGE_SIZE"))
-clock_ticks = int(os.sysconf("SC_CLK_TCK"))
-
 def proc_info(pid):
+    page_size = int(os.sysconf("SC_PAGE_SIZE"))
+    clock_ticks = int(os.sysconf("SC_CLK_TCK"))
     proc = pathlib.Path('/proc/'+str(pid))
     with pathlib.Path('/proc/uptime').open() as uptime_file:
         uptime = float(uptime_file.read().strip().split()[0])
@@ -194,6 +192,7 @@ class LocalSystem(SystemBase):
         return pwd.getpwuid(os.getuid()).pw_name
 
     def get_resources(self, limits):
+        import resource
         resources = dict()
         for limit in [
                 resource.RLIMIT_CORE,
