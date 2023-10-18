@@ -220,8 +220,18 @@ class LocalSystem(SystemBase):
             resources[resource.RLIMIT_CPU] = (seconds, seconds)
 
         if limits.memory:
-            memory = int(math.ceil(limits.memory + parse_memory('1mb')))
-            resources[resource.RLIMIT_DATA] = (limits.memory,limits.memory)
+            resources[resource.RLIMIT_DATA] = (limits.memory, limits.memory)
+
+        if not self.superuser:
+            for res, (soft, hard) in resources.items():
+                usr_soft, usr_hard = resource.getrlimit(res)
+                def limit_min(a, b):
+                    if a == resource.RLIM_INFINITY:
+                        return b
+                    if b == resource.RLIM_INFINITY:
+                        return a
+                    return min(a, b)
+                resources[res] = (limit_min(soft, usr_soft), limit_min(hard, usr_hard))
 
         return resources
 
