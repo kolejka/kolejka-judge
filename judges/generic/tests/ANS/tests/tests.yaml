@@ -3,3 +3,8 @@
   input:       !file 1.in
   hint:        !file 1.out
   time:        1s
+2:
+  !include :   test.yaml
+  input:       !file 2.in
+  checker:     !file checker.cpp
+  time:        1s

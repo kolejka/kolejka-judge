@@ -97,8 +97,11 @@ class SingleIOTask(IOTask):
             hinter = HinterTask(source=self.hinter_source, output_path=self.hinter_output_path, override=self.tool_override, input_path=input_path, limit_real_time=hinter_time, c_standard=self.tool_c_standard, cpp_standard=self.tool_cpp_standard, gcc_arguments=self.tool_gcc_arguments, libraries=self.tool_libraries)
             hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
-        if self.checker_source and input_path and hint_path and answer_path:
-            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=input_path, hint_path=hint_path, answer_path=answer_path, limit_real_time=self.tool_time, c_standard=self.tool_c_standard, cpp_standard=self.tool_cpp_standard, gcc_arguments=self.tool_gcc_arguments, libraries=self.tool_libraries)
+        if self.checker_source:
+            checker_input_path = input_path or InputPath('/dev/null')
+            checker_hint_path = hint_path or InputPath('/dev/null')
+            checker_answer_path = answer_path or InputPath('/dev/null')
+            checker = CheckerTask(source=self.checker_source, override=self.tool_override, input_path=checker_input_path, hint_path=checker_hint_path, answer_path=checker_answer_path, limit_real_time=self.tool_time, c_standard=self.tool_c_standard, cpp_standard=self.tool_cpp_standard, gcc_arguments=self.tool_gcc_arguments, libraries=self.tool_libraries)
             self.steps.append(('checker', checker))
         else:
             if hint_path and answer_path:

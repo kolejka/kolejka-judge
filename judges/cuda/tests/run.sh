@@ -2,6 +2,7 @@
 OFFICE="$(readlink -f "$(dirname "$(which "$0")")")"
 JUDGEPY="$(readlink -f "${OFFICE}/../judge.py")"
 TESTS="${1:-$(ls -1 "${OFFICE}")}"
+EXECUTE="client"
 
 for TD in ${TESTS}; do
     if [ -f "${OFFICE}/${TD}/tests/tests.yaml" ]; then
@@ -13,11 +14,11 @@ for TD in ${TESTS}; do
             if [ -f "${OFFICE}/${TD}/solutions/${SOL}" ]; then
                 echo "  + ${SOL}"
                 mkdir -p "${OFFICE}/results"
-                rm -rf "${OFFICE}/results/${TD}_${SOL}_execute"
-                "${JUDGEPY}" execute "${OFFICE}/${TD}/tests/tests.yaml" "${OFFICE}/${TD}/solutions/${SOL}" "${OFFICE}/results/${TD}_${SOL}_execute"
-                if [ -f "${OFFICE}/results/${TD}_${SOL}_execute/results.yaml" ]; then
+                rm -rf "${OFFICE}/results/${TD}_${SOL}_${EXECUTE}"
+                "${JUDGEPY}" ${EXECUTE} "${OFFICE}/${TD}/tests/tests.yaml" "${OFFICE}/${TD}/solutions/${SOL}" "${OFFICE}/results/${TD}_${SOL}_${EXECUTE}"
+                if [ -f "${OFFICE}/results/${TD}_${SOL}_${EXECUTE}/results.yaml" ]; then
                     if [ -x "${OFFICE}/${TD}/check_result" ]; then
-                        if "${OFFICE}/${TD}/check_result" "${OFFICE}/results/${TD}_${SOL}_execute/results.yaml"; then
+                        if "${OFFICE}/${TD}/check_result" "${OFFICE}/results/${TD}_${SOL}_${EXECUTE}/results.yaml"; then
                             true
                         else
                             echo "   TEST !!! CHECK FAIL !!!"

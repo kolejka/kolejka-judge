@@ -16,8 +16,8 @@ parser.add_argument('wheel', type=Path, help='Wheel to repair')
 parser.add_argument('result', type=Path, help='Result')
 args = parser.parse_args()
 
-pip_deps = [ 'KolejkaCommon', 'KolejkaClient', 'KolejkaObserver', 'PyYAML' ]
-module_deps = [ 'kolejka', 'yaml' ]
+pip_deps = [ 'KolejkaCommon', 'KolejkaClient', 'KolejkaObserver', 'PyYAML', ]
+module_deps = [ 'kolejka', 'yaml', ]
 
 args.wheel = args.wheel.resolve()
 args.result = args.result.resolve()

@@ -1,5 +1,5 @@
 1:
-  !include:      test.yaml
+  !include :     test.yaml
   input:         !file 1.in
   hinter:        !file ../solutions/solution.cpp
   basename:      sol/sol.cpp
