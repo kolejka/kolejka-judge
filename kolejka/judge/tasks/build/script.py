@@ -9,7 +9,6 @@ from kolejka.judge.validators import *
 from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
-
 __all__ = [
         'BuildScriptTask', 'SolutionBuildScriptTask', 'ToolBuildScriptTask',
         'BuildBashScriptTask', 'SolutionBuildBashScriptTask', 'ToolBuildBashScriptTask',
@@ -21,10 +20,11 @@ def __dir__():
 
 class BuildScriptTask(BuildTask):
     @default_kwargs
-    def __init__(self, interpreter=None, source_globs=None, **kwargs):
+    def __init__(self, interpreter=None, source_globs=None, main_filename="main", **kwargs):
         super().__init__(**kwargs)
         self.interpreter = interpreter or 'sh'
         self.source_globs = source_globs or ['*']
+        self.main_filename = main_filename
 
     def get_source_files(self):
         result = []
@@ -36,10 +36,22 @@ class BuildScriptTask(BuildTask):
         return result
 
     def ok(self):
-        return len(self.get_source_files()) == 1
+        return True 
 
     def execute_build(self):
-        source_file = self.get_source_files()[0]
+        files = self.get_source_files()
+
+        if len(files) == 1:
+            source_file = files[0]
+        else: 
+            basenames = [f.stem for f in files]
+            executable = [(file, basename) for file, basename in zip(files, basenames) if basename == self.main_filename]
+
+            if len(executable) != 1:
+                return "CME"
+
+            source_file = executable[0][0]
+
         target_file = self.build_directory / source_file.name 
 
         return self.run_command('install', InstallCommand, source=source_file, target=target_file)
