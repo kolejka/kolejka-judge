@@ -36,7 +36,7 @@ class BuildScriptTask(BuildTask):
         return result
 
     def ok(self):
-        return True 
+        return len(self.get_source_files()) > 0
 
     def execute_build(self):
         files = self.get_source_files()
