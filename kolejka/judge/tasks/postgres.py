@@ -291,9 +291,25 @@ class GeneratorPostgresTask(ToolPostgresTask):
         super().__init__(**kwargs)
 
 
+class FinalizerPostgresTask(ToolPostgresTask):
+    DEFAULT_TOOL_NAME='finalizer'
+    DEFAULT_OUTPUT_PATH=config.TEST_FINAL_ANSWER
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
 class HinterPostgresTask(ToolPostgresTask):
     DEFAULT_TOOL_NAME='hinter'
     DEFAULT_OUTPUT_PATH=config.TEST_HINT
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class HinterFinalizerPostgresTask(ToolPostgresTask):
+    DEFAULT_TOOL_NAME='hinterfinalizer'
+    DEFAULT_OUTPUT_PATH=config.TEST_FINAL_HINT
     @default_kwargs
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -312,7 +328,9 @@ class BuildIOPostgresTask(TaskBase):
     DEFAULT_SOLUTION_BUILD=config.SOLUTION_BUILD
     DEFAULT_SOLUTION_EXEC=config.SOLUTION_EXEC
     DEFAULT_ANSWER_PATH=config.TEST_ANSWER
+    DEFAULT_FINAL_ANSWER_PATH=config.TEST_FINAL_ANSWER
     DEFAULT_HINTER_OUTPUT_PATH=config.TEST_HINT
+    DEFAULT_HINTER_FINALIZER_OUTPUT_PATH=config.TEST_FINAL_HINT
     DEFAULT_IGNORE_ERRORS=False
     DEFAULT_TUPLES_ONLY=False
     DEFAULT_ALIGN=True
@@ -325,17 +343,22 @@ class BuildIOPostgresTask(TaskBase):
     DEFAULT_COLLECT_LOGS=True
     DEFAULT_APPLICATION_NAME='kolejkasolution'
     @default_kwargs
-    def __init__(self, solution_source, solution_build, solution_exec, answer_path, hinter_output_path, ignore_errors, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, checker_ignore_errors, data_dir, collect_logs, application_name, task=None, max_size=None, regex_count=None, hint_path=None, tool_time=None, generator_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
+    def __init__(self, solution_source, solution_build, solution_exec, answer_path, final_answer_path, hinter_output_path, hinter_finalizer_output_path, ignore_errors, tuples_only, align, case_sensitive, space_sensitive, row_sort, column_sort, checker_ignore_errors, data_dir, collect_logs, application_name, task=None, max_size=None, regex_count=None, hint_path=None, final_hint_path=None, tool_time=None, generator_source=None, finalizer_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, **kwargs):
         super().__init__(**kwargs)
         self.solution_source = solution_source
         self.solution_build = solution_build
         self.solution_exec = solution_exec
         self.answer_path = answer_path
+        self.final_answer_path = final_answer_path
         self.hint_path = hint_path
+        self.final_hint_path = final_hint_path
         self.tool_time = tool_time
         self.generator_source = generator_source
+        self.finalizer_source = finalizer_source
         self.hinter_source = hinter_source
         self.hinter_output_path = hinter_output_path
+        self.hinter_finalizer_output_path = hinter_finalizer_output_path
+        self.final_hint_path = final_hint_path
         self.ignore_errors = ignore_errors
         self.checker_source = checker_source
         self.checker_ignore_errors = checker_ignore_errors
@@ -379,13 +402,21 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
             self.steps.append(('rules', SolutionBuildRulesTask(regex_count=self.regex_count, max_size=self.max_size)))
 
         hint_path = self.hint_path
+        final_hint_path = self.final_hint_path
         answer_path = None
+        final_answer_path = None
         if self.generator_source:
             generator = GeneratorPostgresTask(task=self.task, source=self.generator_source, limit_real_time=self.tool_time) #TODO:version,...
             self.steps.append(('generator', generator))
         executor = SolutionExecutableTask(executable=self.solution_exec, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory)
-        answer_path = executor.answer_path
         self.steps.append(('executor', executor))
+        answer_path = executor.answer_path
+        finalizer_time=self.tool_time
+        if self.finalizer_source:
+            finalizer = FinalizerPostgresTask(task=self.task, source=self.finalizer_source, output_path=self.final_answer_path, limit_real_time=finalizer_time, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
+            self.steps.append(('finalizer', finalizer))
+            final_answer_path = finalizer.output_path
+
         if not hint_path and self.hinter_source:
             self.steps.append(('hinterreset', PostgresResetTask())) #TODO:version,...
             if self.generator_source:
@@ -394,16 +425,21 @@ class SingleBuildIOPostgresTask(BuildIOPostgresTask):
             if hinter_time and self.limit_real_time and hinter_time < self.limit_real_time:
                 hinter_time = self.limit_real_time
             hinter = HinterPostgresTask(task=self.task, source=self.hinter_source, output_path=self.hinter_output_path, limit_real_time=hinter_time, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
-            hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
+            hint_path = hinter.output_path
+            if not final_hint_path and self.finalizer_source:
+                hintfinalizer = HinterFinalizerPostgresTask(task=self.task, source=self.finalizer_source, output_path=self.hinter_finalizer_output_path, limit_real_time=finalizer_time, tuples_only=self.tuples_only, align=self.align, ignore_errors=self.ignore_errors) #TODO:version,...
+                self.steps.append(('hintfinalizer', hintfinalizer))
+                final_hint_path = hintfinalizer.output_path
         if hint_path and answer_path:
             check = AnswerHintTableDiffTask(hint_path=hint_path, answer_path=answer_path, case_sensitive=self.case_sensitive, space_sensitive=self.space_sensitive, row_delimeter=r'\n', column_delimeter=r'\|', row_sort=self.row_sort, column_sort=self.column_sort, empty_row=False, empty_column=False)
             self.steps.append(('check', check))
+        if final_hint_path and final_answer_path:
+            check = AnswerHintTableDiffTask(hint_path=final_hint_path, answer_path=final_answer_path, case_sensitive=self.case_sensitive, space_sensitive=self.space_sensitive, row_delimeter=r'\n', column_delimeter=r'\|', row_sort=self.row_sort, column_sort=self.column_sort, empty_row=False, empty_column=False)
+            self.steps.append(('check_final', check))
         if self.checker_source:
             checker = CheckerPostgresTask(task=self.task, source=self.checker_source, limit_real_time=self.tool_time, ignore_errors=self.checker_ignore_errors) #TODO:version,...
             self.steps.append(('checker', checker))
-
-
 
     def set_system(self, system):
         super().set_system(system)

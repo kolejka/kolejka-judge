@@ -33,6 +33,8 @@ TEST = 'test'
 TEST_INPUT = TEST + '/input'
 TEST_HINT = TEST + '/hint'
 TEST_ANSWER = TEST + '/answer'
+TEST_FINAL_HINT = TEST + '/final_hint'
+TEST_FINAL_ANSWER = TEST + '/final_answer'
 
 CUDA_PROFILER = TEST + '/profiler.ncu-rep'
 CUDA_METRICS = TEST + '/metrics.csv'
