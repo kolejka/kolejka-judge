@@ -1,4 +1,5 @@
 import sys
+import numpy 
 
 count = int(sys.stdin.readline())
 

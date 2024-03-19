@@ -89,6 +89,7 @@ class BuildPython3ScriptTask(BuildScriptTask):
 class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
     def execute_build(self):
         self.run_command('venv', CreateVenvCommand, path="env")
+        self.run_command('install-numpy', InstallPackageIntoVenv, venv="env", package="numpy")
         
         return super().execute_build()
     
