@@ -95,6 +95,11 @@ class BuildTask(TaskBase):
 
     def get_execution_commands(self):
         command = self.get_execution_command()
+        
+        # todo: fixme 
+        if "python3" in command:
+            return [[".", "env/bin/activate"], command]
+        
         if command:
             return [ command ]
         return []

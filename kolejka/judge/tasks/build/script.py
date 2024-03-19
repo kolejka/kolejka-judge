@@ -85,7 +85,12 @@ class BuildPython3ScriptTask(BuildScriptTask):
     @default_kwargs
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
 class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
-    pass
+    def execute_build(self):
+        self.run_command('venv', CreateVenvCommand, path="env")
+        
+        return super().execute_build()
+    
 class ToolBuildPython3ScriptTask(ToolBuildMixin, BuildPython3ScriptTask):
     pass
