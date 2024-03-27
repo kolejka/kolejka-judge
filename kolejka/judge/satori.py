@@ -34,21 +34,24 @@ def plain_result(result, prefix='/'):
     return ret
 
 def str_operator(v):
+    if isinstance(v, list):
+        v = ' '.join([e for e in [str_operator(e) for e in v] if e])
     if isinstance(v, pathlib.Path):
         with v.open('rb') as vf:
-            content = vf.read(config.SATORI_STRING_LENGTH)
-            try:
-                content = str(content, 'utf8').rstrip()
-                if content:
-                    content += '\n'
-                return content
-            except UnicodeDecodeError:
-                return repr(content)[2:-1][:config.SATORI_STRING_LENGTH]
-    if isinstance(v, list):
-        return ' '.join([e for e in [str_operator(e) for e in v] if e])[:config.SATORI_STRING_LENGTH].rstrip('\n')
+            v = vf.read(config.SATORI_STRING_LENGTH)
     if isinstance(v, bytes):
-        return str(v, 'utf8')[:config.SATORI_STRING_LENGTH]
-    return str(v)[:config.SATORI_STRING_LENGTH]
+        try:
+            v = str(v, 'utf8')
+        except UnicodeDecodeError:
+            v = repr(v)[2:-1]
+    if not isinstance(v, str):
+        try:
+            v = str(v)
+        except UnicodeDecodeError:
+            v = repr(v)
+    v = ''.join([l for l in v if l not in '\0'])
+    v = v[:config.SATORI_STRING_LENGTH].rstrip()
+    return v
 
 def float_operator(v):
     return float(str_operator(v))
