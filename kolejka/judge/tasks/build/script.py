@@ -26,10 +26,13 @@ class BuildScriptTask(BuildTask):
         self.source_globs = source_globs or ['*']
         self.main_filename = main_filename
 
-    def get_source_files(self):
+    def get_source_files(self, globs=None):
+        if globs is None:
+            globs = self.source_globs
+
         result = []
         for f in self.find_files(self.source_directory):
-            for source_glob in self.source_globs:
+            for source_glob in globs:
                 if f.match(source_glob):
                     result += [f]
                     break
@@ -97,8 +100,21 @@ class BuildPython3ScriptTask(BuildScriptTask):
 class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
     def execute_build(self):
         self.run_command('venv', CreateVenvCommand, path="shared/env")
-        self.run_command('install-numpy', InstallPackageIntoVenv, venv="shared/env", package="tqdm")
+        #self.run_command('install-numpy', InstallPackageIntoVenv, venv="shared/env", package="tqdm")
         
+        wheel_globs = ['*.[Ww][Hh][Ll]']
+        wheels = self.get_source_files(wheel_globs)
+
+        for wheel in wheels:
+            semantic_part = str(wheel).split('/')[-1]
+            print("Installing wheel", semantic_part)
+            result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv="shared/env", package=wheel)
+
+            if result is not None:
+                return "INT"
+            
+            self.run_command(f'remove-wheel-file-{semantic_part}', RemoveWheelFile, path=wheel)
+
         return super().execute_build()
     
 class ToolBuildPython3ScriptTask(ToolBuildMixin, BuildPython3ScriptTask):

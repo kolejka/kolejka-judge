@@ -5,7 +5,7 @@ from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
 __all__ = [
-    'CreateVenvCommand', 'InstallPackageIntoVenv'
+    'CreateVenvCommand', 'InstallPackageIntoVenv', 'RemoveWheelFile'
 ]
 
 class CreateVenvCommand(ProgramCommand):
@@ -34,6 +34,18 @@ class InstallPackageIntoVenv(ProgramCommand):
 
     def get_program_arguments(self):
         args = ["-c", f". {self.venv}/bin/activate && pip3 install {self.package}"]
-        #args = ["-c", ".", f"{self.venv}/bin/activate", "&&", "echo", "leeeel", "&&", "pip3", "install", self.package]
-        #args = ["-c", ".", f"{self.venv}/bin/activate"]
+        return args
+    
+class RemoveWheelFile(ProgramCommand):
+    DEFAULT_PROGRAM='rm'
+    DEFAULT_SAFE=True
+    DEFAULT_USER=config.USER_BUILD
+    
+    @default_kwargs
+    def __init__(self, path, **kwargs):
+        super().__init__(**kwargs)
+        self.path = path
+
+    def get_program_arguments(self):
+        args = ["-rf", self.path]
         return args

@@ -11,7 +11,7 @@ from kolejka.judge.tasks import *
 
 def judge(args):
     tool_time = parse_time('60s')
-    prepare_time = parse_time('5s')
+    prepare_time = parse_time('10s')
     source_size_limit = parse_memory(args.test.get('source_size', '100K'))
     binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
@@ -20,14 +20,23 @@ def judge(args):
     cpp_standard = args.test.get('cpp_standard', 'c++17')
     gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ]
     time_limit = parse_time(args.test.get('time', '10s'))
-    memory_limit = parse_memory(args.test.get('memory', '1G'))
+    memory_limit = parse_memory(args.test.get('memory', '5G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
     basename = args.test.get('basename', None)
+    wheels = args.test.get('wheels', None)
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
         source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
-        source_rules=SolutionSourceRulesTask(max_size=source_size_limit),
+        source_rules=SolutionSourceRulesTask(max_size=source_size_limit)
+    )
+
+    if wheels is not None:
+        args.add_steps(
+            wheels=WheelUnzipTask(wheels=wheels)
+        )
+
+    args.add_steps(
         builder=SolutionBuildAutoTask([
             [SolutionBuildPython3ScriptTask, [], {}],
         ], limit_real_time=compile_time, limit_memory=compile_memory),

@@ -2,10 +2,12 @@
   !include :   test.yaml
   input:       !file 1.in
   hint:        !file 1.out
-  time:        1s
+  wheels:      !file wheels.zip
+  time:        10s
 1:
   !include :   test.yaml
   input:       !file 2.in
   hint:        !file 2.out
   checker:     !file checker.cpp
-  time:        1s
+  wheels:      !file wheels.zip
+  time:        10s
