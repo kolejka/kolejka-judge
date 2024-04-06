@@ -85,11 +85,19 @@ class BuildPython3ScriptTask(BuildScriptTask):
     @default_kwargs
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def get_execution_commands(self):
+        base_commands = super().get_execution_commands()
+        env_commands = [".", "shared/env/bin/activate"]
         
+        result = [env_commands] + base_commands
+
+        return result
+
 class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
     def execute_build(self):
-        self.run_command('venv', CreateVenvCommand, path="env")
-        self.run_command('install-numpy', InstallPackageIntoVenv, venv="env", package="numpy")
+        self.run_command('venv', CreateVenvCommand, path="shared/env")
+        self.run_command('install-numpy', InstallPackageIntoVenv, venv="shared/env", package="tqdm")
         
         return super().execute_build()
     

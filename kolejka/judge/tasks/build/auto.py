@@ -61,6 +61,11 @@ class BuildAutoTask(BuildTask):
         task = self.build_task
         if task:
             return task.get_execution_command()
+        
+    def get_execution_commands(self):
+        task = self.build_task
+        if task:
+            return task.get_execution_commands()
 
     def execute_build(self):
         task = self.build_task

@@ -1,5 +1,5 @@
 import sys
-import numpy 
+import tqdm 
 
 count = int(sys.stdin.readline())
 
