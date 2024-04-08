@@ -18,7 +18,7 @@ def judge(args):
     compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
     c_standard = args.test.get('c_standard', 'c11')
     cpp_standard = args.test.get('cpp_standard', 'c++17')
-    gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ]
+    gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ] or None
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))

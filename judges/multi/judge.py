@@ -15,8 +15,10 @@ def judge(args):
     source_size_limit = parse_memory(args.test.get('source_size', '100K'))
     binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
+    compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
+    c_standard = args.test.get('c_standard', 'c11')
     cpp_standard = args.test.get('cpp_standard', 'c++17')
-    gcc_arguments = [ arg for arg in args.test.get('gcc_arguments', '').split() if arg ]
+    gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ] or None
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
@@ -30,15 +32,16 @@ def judge(args):
             [SolutionBuildCMakeTask, [], {}],
             [SolutionBuildMakeTask, [], {}],
             [SolutionBuildGXXTask, [], {'standard': cpp_standard, 'build_arguments': gcc_arguments}],
-            [SolutionBuildGCCTask, [], {'build_arguments': gcc_arguments}],
+            [SolutionBuildGCCTask, [], {'standard': c_standard, 'build_arguments': gcc_arguments, 'libraries': ['m']}],
             [SolutionBuildPython3ScriptTask, [], {}],
-        ], limit_real_time=compile_time, limit_memory='512M'),
+        ], limit_real_time=compile_time, limit_memory=compile_memory),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
     args.add_steps(io=MultipleIOTask(
         input_path=args.test.get('io', None),
         tool_override=args.test.get('tools', None),
         tool_time=tool_time,
+        tool_c_standard=c_standard,
         tool_cpp_standard=cpp_standard,
         tool_gcc_arguments=gcc_arguments,
         generator_source=args.test.get('generator', None),
