@@ -91,24 +91,25 @@ class BuildPython3ScriptTask(BuildScriptTask):
 
     def get_execution_commands(self):
         base_commands = super().get_execution_commands()
-        env_commands = [".", "shared/env/bin/activate"]
+        #if exists:
+        env_commands = [".", self.build_directory/"venv"]
         
         result = [env_commands] + base_commands
 
         return result
 
-class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
     def execute_build(self):
-        self.run_command('venv', CreateVenvCommand, path="shared/env")
         #self.run_command('install-numpy', InstallPackageIntoVenv, venv="shared/env", package="tqdm")
         
         wheel_globs = ['*.[Ww][Hh][Ll]']
         wheels = self.get_source_files(wheel_globs)
 
+        if wheels:
+            self.run_command('venv', CreateVenvCommand, path=self.build_directory/"venv")
         for wheel in wheels:
             semantic_part = str(wheel).split('/')[-1]
             print("Installing wheel", semantic_part)
-            result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv="shared/env", package=wheel)
+            result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv=self.build_directory/"venv", package=wheel)
 
             if result is not None:
                 return "INT"
@@ -116,6 +117,9 @@ class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask)
             self.run_command(f'remove-wheel-file-{semantic_part}', RemoveWheelFile, path=wheel)
 
         return super().execute_build()
+
+class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
+    pass
     
 class ToolBuildPython3ScriptTask(ToolBuildMixin, BuildPython3ScriptTask):
     pass

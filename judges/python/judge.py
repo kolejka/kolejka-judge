@@ -12,8 +12,8 @@ from kolejka.judge.tasks import *
 def judge(args):
     tool_time = parse_time('60s')
     prepare_time = parse_time('10s')
-    source_size_limit = parse_memory(args.test.get('source_size', '100K'))
-    binary_size_limit = parse_memory(args.test.get('binary_size', '10M'))
+    source_size_limit = parse_memory(args.test.get('source_size', '128M'))
+    binary_size_limit = parse_memory(args.test.get('binary_size', '128M'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
     compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
     c_standard = args.test.get('c_standard', 'c11')
@@ -30,11 +30,6 @@ def judge(args):
         source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
         source_rules=SolutionSourceRulesTask(max_size=source_size_limit)
     )
-
-    if wheels is not None:
-        args.add_steps(
-            wheels=WheelUnzipTask(wheels=wheels)
-        )
 
     args.add_steps(
         builder=SolutionBuildAutoTask([
