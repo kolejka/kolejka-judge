@@ -166,3 +166,5 @@ POSTGRES_DIRECTORIES = [
         'mode': 0o2750,
     }
 ]
+
+PYTHON_VENV_NAME = 'venv'

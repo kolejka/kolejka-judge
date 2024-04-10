@@ -26,14 +26,24 @@ class BuildPython3ScriptTask(BuildScriptTask):
         '*.[Pp][Yy]'
     ]
     @default_kwargs
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, packages=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.venv_required = False
+        
+        if(type(packages) is str):
+            packages = [packages]
+        
+        self.packages = packages
 
     def get_wheel_files(self):
         wheel_globs = ['*.[Ww][Hh][Ll]']
         
         return self.get_source_files(wheel_globs)
+    
+    def get_packages_to_download(self):
+        if self.packages:
+            return self.packages
+        return []
 
     def get_execution_commands(self):
         base_commands = super().get_execution_commands()
@@ -44,24 +54,32 @@ class BuildPython3ScriptTask(BuildScriptTask):
         env_commands = [".", self.build_directory/f"{config.PYTHON_VENV_NAME}/bin/activate"]
         return [env_commands] + base_commands
 
-    def execute_build(self):
-        #self.run_command('install-numpy', InstallPackageIntoVenv, venv="shared/env", package="tqdm")
-               
+    def execute_build(self):             
         wheels = self.get_wheel_files()
-                
-        if wheels:
+        to_download = self.get_packages_to_download()
+        
+        packages = wheels + to_download  
+        
+        if packages:
             self.run_command('venv', CreateVenvCommand, path=self.build_directory/"venv")
             self.venv_required = True
                 
         for wheel in wheels:
             semantic_part = str(wheel).split('/')[-1]
             print("Installing wheel", semantic_part)
-            result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv=self.build_directory/"venv", package=wheel)
+            result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv=self.build_directory/config.PYTHON_VENV_NAME, package=wheel)
 
             if result is not None:
                 return "INT"
             
             self.run_command(f'remove-wheel-file-{semantic_part}', RemoveWheelFile, path=wheel)
+
+        for package in to_download:
+            print("Downloading package", package)
+            result = self.run_command(f"install-{package}", InstallPackageIntoVenv, venv=self.build_directory/config.PYTHON_VENV_NAME, package=package)
+        
+            if result is not None:
+                return "INT"
 
         return super().execute_build()
 

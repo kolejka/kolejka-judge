@@ -12,8 +12,8 @@ from kolejka.judge.tasks import *
 def judge(args):
     tool_time = parse_time('60s')
     prepare_time = parse_time('10s')
-    source_size_limit = parse_memory(args.test.get('source_size', '128M'))
-    binary_size_limit = parse_memory(args.test.get('binary_size', '128M'))
+    source_size_limit = parse_memory(args.test.get('source_size', '1G'))
+    binary_size_limit = parse_memory(args.test.get('binary_size', '1G'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
     compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
     c_standard = args.test.get('c_standard', 'c11')
@@ -33,7 +33,7 @@ def judge(args):
 
     args.add_steps(
         builder=SolutionBuildAutoTask([
-            [SolutionBuildPython3ScriptTask, [], {}],
+            [SolutionBuildPython3ScriptTask, [], {"packages": ["matplotlib"]}],
         ], limit_real_time=compile_time, limit_memory=compile_memory),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )
@@ -51,7 +51,7 @@ def judge(args):
         checker_source=args.test.get('checker', None),
         limit_cores=1,
         limit_time=time_limit,
-        limit_memory=memory_limit,
+        #limit_memory=memory_limit,
         limit_output_size=output_size_limit,
         limit_error_size=error_size_limit,
         )
