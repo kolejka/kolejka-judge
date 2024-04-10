@@ -7,3 +7,4 @@ from kolejka.judge.tasks.build.auto import *
 from kolejka.judge.tasks.build.make import *
 from kolejka.judge.tasks.build.compile import *
 from kolejka.judge.tasks.build.script import *
+from kolejka.judge.tasks.build.build_python import *
