@@ -92,7 +92,7 @@ class BuildPython3ScriptTask(BuildScriptTask):
     def get_execution_commands(self):
         base_commands = super().get_execution_commands()
         #if exists:
-        env_commands = [".", self.build_directory/"venv"]
+        env_commands = [".", self.build_directory/"venv/bin/activate"]
         
         result = [env_commands] + base_commands
 
