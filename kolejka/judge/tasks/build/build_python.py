@@ -61,7 +61,7 @@ class BuildPython3ScriptTask(BuildScriptTask):
         packages = wheels + to_download  
         
         if packages:
-            self.run_command('venv', CreateVenvCommand, path=self.build_directory/"venv")
+            self.run_command('venv', CreateVenvCommand, path=self.build_directory/config.PYTHON_VENV_NAME)
             self.venv_required = True
                 
         for wheel in wheels:
@@ -70,16 +70,14 @@ class BuildPython3ScriptTask(BuildScriptTask):
             result = self.run_command(f'install-{semantic_part}', InstallPackageIntoVenv, venv=self.build_directory/config.PYTHON_VENV_NAME, package=wheel)
 
             if result is not None:
-                return "INT"
-            
-            self.run_command(f'remove-wheel-file-{semantic_part}', RemoveWheelFile, path=wheel)
+                return self.result_on_error
 
         for package in to_download:
             print("Downloading package", package)
             result = self.run_command(f"install-{package}", InstallPackageIntoVenv, venv=self.build_directory/config.PYTHON_VENV_NAME, package=package)
         
             if result is not None:
-                return "INT"
+                return self.result_on_error
 
         return super().execute_build()
 

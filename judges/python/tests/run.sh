@@ -3,6 +3,7 @@ OFFICE="$(readlink -f "$(dirname "$(which "$0")")")"
 JUDGEPY="$(readlink -f "${OFFICE}/../judge.py")"
 TESTS="${1:-$(ls -1 "${OFFICE}")}"
 EXECUTE="execute"
+#EXECUTE="client"
 
 for TD in ${TESTS}; do
     if [ -f "${OFFICE}/${TD}/tests/tests.yaml" ]; then

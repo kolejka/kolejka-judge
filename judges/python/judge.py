@@ -14,7 +14,7 @@ def judge(args):
     prepare_time = parse_time('10s')
     source_size_limit = parse_memory(args.test.get('source_size', '1G'))
     binary_size_limit = parse_memory(args.test.get('binary_size', '1G'))
-    compile_time = parse_time(args.test.get('compile_time', '10s'))
+    compile_time = parse_time(args.test.get('compile_time', '30s'))
     compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
     c_standard = args.test.get('c_standard', 'c11')
     cpp_standard = args.test.get('cpp_standard', 'c++17')
@@ -24,7 +24,7 @@ def judge(args):
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
     basename = args.test.get('basename', None)
-    wheels = args.test.get('wheels', None)
+    packages = [ arg.strip() for arg in args.test.get('packages', '').split() if arg.strip() ]
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
         source=SolutionPrepareTask(source=args.solution, basename=basename, allow_extract=True, override=args.test.get('environment', None), limit_real_time=prepare_time),
@@ -33,7 +33,7 @@ def judge(args):
 
     args.add_steps(
         builder=SolutionBuildAutoTask([
-            [SolutionBuildPython3ScriptTask, [], {"packages": ["matplotlib"]}],
+            [SolutionBuildPython3ScriptTask, [], {"packages": packages}],
         ], limit_real_time=compile_time, limit_memory=compile_memory),
         build_rules=SolutionBuildRulesTask(max_size=binary_size_limit),
     )

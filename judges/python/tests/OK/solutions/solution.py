@@ -3,7 +3,7 @@ import sys
 import numpy
 import tqdm 
 
-import matplotlib
+import bitarray
 
 count = int(sys.stdin.readline())
 
