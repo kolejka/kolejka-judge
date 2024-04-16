@@ -167,4 +167,4 @@ POSTGRES_DIRECTORIES = [
     }
 ]
 
-PYTHON_VENV_NAME = 'venv'
+PYTHON_VENV_NAME = '.venv'
