@@ -222,6 +222,9 @@ class LocalSystem(SystemBase):
         if limits.memory:
             resources[resource.RLIMIT_DATA] = (limits.memory, limits.memory)
 
+        if limits.stack_memory:
+            resources[resource.RLIMIT_STACK] = (limits.stack_memory, limits.stack_memory)
+
         if not self.superuser:
             for res, (soft, hard) in resources.items():
                 usr_soft, usr_hard = resource.getrlimit(res)

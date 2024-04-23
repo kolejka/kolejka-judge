@@ -17,13 +17,15 @@ def __dir__():
 
 class Limits(AbstractLimits):
 
-    def __init__(self, cpu_time=None, real_time=None, memory=None, gpu_time=None, gpu_memory=None, cores=None, pids=None):
+    def __init__(self, cpu_time=None, real_time=None, memory=None, stack_memory=None, gpu_time=None, gpu_memory=None, cores=None, pids=None):
         self._cpu_time = None
         self.set_cpu_time(cpu_time)
         self._real_time = None
         self.set_real_time(real_time)
         self._memory = None
         self.set_memory(memory)
+        self._stack_memory = None
+        self.set_stack_memory(stack_memory)
         self._gpu_time = None
         self.set_gpu_time(gpu_time)
         self._gpu_memory = None
@@ -57,6 +59,7 @@ class Limits(AbstractLimits):
         yaml['cpu_time'] = unparse_time(self.cpu_time)
         yaml['real_time'] = unparse_time(self.real_time)
         yaml['memory'] = unparse_memory(self.memory)
+        yaml['stack_memory'] = unparse_memory(self.stack_memory)
         yaml['gpu_time'] = unparse_time(self.gpu_time)
         yaml['gpu_memory'] = unparse_memory(self.gpu_memory)
         yaml['cores'] = self.cores
@@ -101,6 +104,19 @@ class Limits(AbstractLimits):
             self.set_memory(memory)
         elif memory is not None:
             self._memory = min(self._memory, parse_memory(memory))
+
+    @property
+    def stack_memory(self):
+        return self.get_stack_memory()
+    def get_stack_memory(self):
+        return self._stack_memory
+    def set_stack_memory(self, stack_memory):
+        self._stack_memory = None if stack_memory is None else parse_memory(stack_memory)
+    def update_stack_memory(self, stack_memory):
+        if self.stack_memory is None:
+            self.set_stack_memory(stack_memory)
+        elif stack_memory is not None:
+            self._stack_memory = min(self._stack_memory, parse_memory(stack_memory))
 
     @property
     def gpu_time(self):

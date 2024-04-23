@@ -26,7 +26,7 @@ class IOTask(TaskBase):
     DEFAULT_SPACE_SENSITIVE=False
     DEFAULT_TOOL_CPP_STANDARD=config.TOOL_BUILD_CPP_STANDARD
     @default_kwargs
-    def __init__(self, executable, answer_path, generator_output_path, hinter_output_path, case_sensitive, space_sensitive, executable_arguments=None, input_path=None, hint_path=None, tool_override=None, tool_time=None, tool_c_standard=None, tool_cpp_standard=None, tool_gcc_arguments=None, tool_libraries=None, generator_source=None, verifier_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_gpu_memory=None, limit_output_size=None, limit_error_size=None, **kwargs):
+    def __init__(self, executable, answer_path, generator_output_path, hinter_output_path, case_sensitive, space_sensitive, executable_arguments=None, input_path=None, hint_path=None, tool_override=None, tool_time=None, tool_c_standard=None, tool_cpp_standard=None, tool_gcc_arguments=None, tool_libraries=None, generator_source=None, verifier_source=None, hinter_source=None, checker_source=None, limit_cores=1, limit_time=None, limit_cpu_time=None, limit_real_time=None, limit_memory=None, limit_stack=None, limit_gpu_memory=None, limit_output_size=None, limit_error_size=None, **kwargs):
         super().__init__(**kwargs)
         self.executable = executable
         self.executable_arguments = executable_arguments
@@ -55,6 +55,7 @@ class IOTask(TaskBase):
         if limit_real_time is not None:
             self.limit_real_time = limit_real_time
         self.limit_memory = limit_memory
+        self.limit_stack = limit_stack
         self.limit_gpu_memory = limit_gpu_memory
         self.case_sensitive = case_sensitive
         self.space_sensitive = space_sensitive
@@ -87,7 +88,7 @@ class SingleIOTask(IOTask):
             executor_kwargs['result_on_time'] = self.result_on_time
         if self.result_on_memory:
             executor_kwargs['result_on_memory'] = self.result_on_memory
-        executor = self.solution_task_factory(executable=self.executable, executable_arguments=self.executable_arguments, input_path=input_path, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory, limit_gpu_memory=self.limit_gpu_memory, stdout_max_bytes=self.limit_output_size, stderr_max_bytes=self.limit_error_size, **executor_kwargs)
+        executor = self.solution_task_factory(executable=self.executable, executable_arguments=self.executable_arguments, input_path=input_path, answer_path=self.answer_path, limit_cores=self.limit_cores, limit_cpu_time=self.limit_cpu_time, limit_real_time=self.limit_real_time, limit_memory=self.limit_memory, limit_stack=self.limit_stack, limit_gpu_memory=self.limit_gpu_memory, stdout_max_bytes=self.limit_output_size, stderr_max_bytes=self.limit_error_size, **executor_kwargs)
         answer_path = executor.answer_path
         self.steps.append(('executor', executor))
         if not hint_path and self.hinter_source:
@@ -176,6 +177,9 @@ class MultipleIOTask(IOTask):
         limit_memory = self.file_contents(self.alter_input_path(config.MULTITEST_INPUT_MEMORY, input_path))
         limit_memory = limit_memory and parse_memory(str(limit_memory, 'utf8').strip())
         limit_memory = limit_memory or self.limit_memory
+        limit_stack = self.file_contents(self.alter_input_path(config.MULTITEST_INPUT_STACK, input_path))
+        limit_stack = limit_stack and parse_memory(str(limit_stack, 'utf8').strip())
+        limit_stack = limit_stack or self.limit_stack
         limit_output_size = self.file_contents(self.alter_input_path(config.MULTITEST_OUTPUT_SIZE, input_path))
         limit_output_size = limit_output_size and parse_memory(str(limit_output_size, 'utf8').strip())
         limit_output_size = limit_output_size or self.limit_output_size
@@ -205,6 +209,7 @@ class MultipleIOTask(IOTask):
                 limit_cpu_time=limit_cpu_time,
                 limit_real_time=limit_real_time,
                 limit_memory=limit_memory,
+                limit_stack=limit_stack,
                 limit_output_size=limit_output_size,
                 limit_error_size=limit_error_size,
                 case_sensitive=self.case_sensitive,
