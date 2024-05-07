@@ -14,7 +14,7 @@ __all__ = [
         'BuildCompilerTask', 'SolutionBuildCompilerTask', 'ToolBuildCompilerTask',
         'BuildGCCTask', 'SolutionBuildGCCTask', 'ToolBuildGCCTask',
         'BuildGXXTask', 'SolutionBuildGXXTask', 'ToolBuildGXXTask',
-        'BuildNVCCTask', 'SolutionBuildNVCCTask', 'ToolBuildNVCCTask',
+        'BuildNVCCTask', 'SolutionBuildNVCCTask', 'ToolBuildNVCCTask', 'SolutionBuildRustTask'
         ]
 def __dir__():
     return __all__
@@ -95,6 +95,16 @@ class BuildGCCTask(BuildCompilerTask):
             kwargs['static'] = self.static
         return kwargs
 
+class BuildRustTask(BuildCompilerTask):
+    DEFAULT_COMPILER = RustcCommand
+    DEFAULT_SOURCE_GLOBS = [
+        '*.[Rr][Ss]',
+    ]
+    
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass
 class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):
@@ -111,6 +121,8 @@ class BuildGXXTask(BuildGCCTask):
         super().__init__(**kwargs)
 class SolutionBuildGXXTask(SolutionBuildMixin, BuildGXXTask):
     pass
+class SolutionBuildRustTask(SolutionBuildMixin, BuildRustTask):
+    pass 
 class ToolBuildGXXTask(ToolBuildMixin, BuildGXXTask):
     pass
 
