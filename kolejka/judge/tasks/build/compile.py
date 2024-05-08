@@ -105,10 +105,13 @@ class BuildRustTask(BuildCompilerTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
     def execute_build(self):
         self.run_command("cargo_new", CargoNewCommand, path="rust_project")
+        
+        # FIXME: This works only unders assumption that source directory is /src/
+        self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target="rust_project")
         return super().execute_build()
+
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass
 class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):

@@ -6,7 +6,7 @@ from kolejka.judge.validators import *
 from kolejka.judge.commands.base import *
 
 
-__all__ = ['RustcCommand', 'CargoNewCommand']
+__all__ = ['RustcCommand', 'CargoNewCommand', 'CopySourceCommand']
 def __dir__():
     return __all__
     
@@ -34,12 +34,28 @@ class CargoNewCommand(ProgramCommand):
         print("environment", super_result)
         
         return super_result
+
+class CopySourceCommand(ProgramCommand):
+    DEFAULT_PROGRAM='cp'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = source
+        self.target = target
+        
+    def get_program_arguments(self):
+        args = ["-r", self.source, self.target]
+        return args
         
 class RustcCommand(CompileCommand):
     DEFAULT_PROGRAM='rustc'
     
     @default_kwargs
     def __init__(self, **kwargs):
+        print("RUSTC COMMAND")
+        print(kwargs)
         super().__init__(**kwargs)
 
     def get_environment(self):
