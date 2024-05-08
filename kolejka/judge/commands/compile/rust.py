@@ -6,7 +6,7 @@ from kolejka.judge.validators import *
 from kolejka.judge.commands.base import *
 
 
-__all__ = ['RustcCommand', 'CargoNewCommand', 'CopySourceCommand']
+__all__ = ['RustcCommand', 'CargoNewCommand', 'CopySourceCommand', 'CargoBuildCommand']
 def __dir__():
     return __all__
     
@@ -48,6 +48,32 @@ class CopySourceCommand(ProgramCommand):
     def get_program_arguments(self):
         args = ["-r", self.source, self.target]
         return args
+    
+class CargoBuildCommand(ProgramCommand):
+    DEFAULT_PROGRAM='cargo'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, target, **kwargs):
+        super().__init__(**kwargs)
+        self.target = target
+
+    def get_environment(self):
+        #FIXME: this is bad. 
+        print("GET ENVIRONMENT")
+        super_result = super().get_environment()
+        
+        super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
+        super_result['CARGO_HOME'] = '/home/dominik/.cargo'
+        
+        print("environment", super_result)
+        
+        return super_result
+    
+    def get_program_arguments(self):
+        args = ["build", "--manifest-path", self.target]
+        return args
+        
         
 class RustcCommand(CompileCommand):
     DEFAULT_PROGRAM='rustc'

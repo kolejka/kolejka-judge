@@ -110,6 +110,8 @@ class BuildRustTask(BuildCompilerTask):
         
         # FIXME: This works only unders assumption that source directory is /src/
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target="rust_project")
+        
+        self.run_command("cargo_build", CargoBuildCommand, target="rust_project/Cargo.toml")
         return super().execute_build()
 
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
