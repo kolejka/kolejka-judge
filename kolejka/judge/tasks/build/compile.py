@@ -112,6 +112,11 @@ class BuildRustTask(BuildCompilerTask):
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target="rust_project")
         
         self.run_command("cargo_build", CargoBuildCommand, target="rust_project/Cargo.toml")
+        
+        self.run_command("copy_executable", CopyExecutableCommand, source="rust_project/target/debug/rust_project", target=self.build_directory)
+        
+        self.run_command("rename_executable", RenameExecutableCommand, source="solution/build/rust_project", target="solution/build/a.out")
+        
         return super().execute_build()
 
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):

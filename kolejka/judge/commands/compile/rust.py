@@ -6,7 +6,9 @@ from kolejka.judge.validators import *
 from kolejka.judge.commands.base import *
 
 
-__all__ = ['RustcCommand', 'CargoNewCommand', 'CopySourceCommand', 'CargoBuildCommand']
+__all__ = [
+    'RustcCommand', 'CargoNewCommand', 'CopySourceCommand',
+    'CargoBuildCommand', 'CopyExecutableCommand', 'RenameExecutableCommand']
 def __dir__():
     return __all__
     
@@ -48,6 +50,20 @@ class CopySourceCommand(ProgramCommand):
     def get_program_arguments(self):
         args = ["-r", self.source, self.target]
         return args
+
+class CopyExecutableCommand(ProgramCommand):
+    DEFAULT_PROGRAM='cp'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = source
+        self.target = target
+        
+    def get_program_arguments(self):
+        args = [self.source, self.target]
+        return args
     
 class CargoBuildCommand(ProgramCommand):
     DEFAULT_PROGRAM='cargo'
@@ -73,10 +89,23 @@ class CargoBuildCommand(ProgramCommand):
     def get_program_arguments(self):
         args = ["build", "--manifest-path", self.target]
         return args
+
+class RenameExecutableCommand(ProgramCommand):
+    DEFAULT_PROGRAM='mv'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = source
+        self.target = target
         
+    def get_program_arguments(self):
+        args = [self.source, self.target]
+        return args        
         
 class RustcCommand(CompileCommand):
-    DEFAULT_PROGRAM='rustc'
+    DEFAULT_PROGRAM='true' # FIXME: haha
     
     @default_kwargs
     def __init__(self, **kwargs):
