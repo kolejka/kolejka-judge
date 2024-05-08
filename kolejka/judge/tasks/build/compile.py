@@ -105,6 +105,10 @@ class BuildRustTask(BuildCompilerTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+
+    def execute_build(self):
+        self.run_command("cargo_new", CargoNewCommand, path="rust_project")
+        return super().execute_build()
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass
 class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):
