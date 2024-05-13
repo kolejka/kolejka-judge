@@ -8,9 +8,36 @@ from kolejka.judge.commands.base import *
 
 __all__ = [
     'RustcCommand', 'CargoNewCommand', 'CopySourceCommand',
-    'CargoBuildCommand', 'CopyExecutableCommand', 'RenameExecutableCommand']
+    'CargoBuildCommand', 'CopyExecutableCommand', 'RenameExecutableCommand',
+    'MoveLibraryCommand', 'CreateDirectoryCommand', 'AddOfflineDependency']
 def __dir__():
     return __all__
+
+class AddOfflineDependency(ProgramCommand):
+    DEFAULT_PROGRAM='cargo'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, project_path, dep_path, **kwargs):
+        super().__init__(**kwargs)
+        self.project_path = project_path
+        self.dep_path = dep_path
+
+    def get_program_arguments(self):
+        args = ["add", "--offline", "--manifest-path", self.project_path, "--path", self.dep_path]
+        return args 
+    
+    def get_environment(self):
+        #FIXME: this is bad. 
+        print("GET ENVIRONMENT")
+        super_result = super().get_environment()
+        
+        super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
+        super_result['CARGO_HOME'] = '/home/dominik/.cargo'
+        
+        print("environment", super_result)
+        
+        return super_result
     
 class CargoNewCommand(ProgramCommand):
     DEFAULT_PROGRAM='cargo'
@@ -36,6 +63,33 @@ class CargoNewCommand(ProgramCommand):
         print("environment", super_result)
         
         return super_result
+
+class CreateDirectoryCommand(ProgramCommand):
+    DEFAULT_PROGRAM='mkdir'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, path, **kwargs):
+        super().__init__(**kwargs)
+        self.path = path 
+
+    def get_program_arguments(self):
+        args = ["-p", self.path]
+        return args
+
+class MoveLibraryCommand(ProgramCommand):
+    DEFAULT_PROGRAM='mv'
+    DEFAULT_SAFE=True
+    
+    @default_kwargs
+    def __init__(self, source, target, **kwargs):
+        super().__init__(**kwargs)
+        self.source = source
+        self.target = target
+        
+    def get_program_arguments(self):
+        args = [self.source, self.target]
+        return args
 
 class CopySourceCommand(ProgramCommand):
     DEFAULT_PROGRAM='cp'

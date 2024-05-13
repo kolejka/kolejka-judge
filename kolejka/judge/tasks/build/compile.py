@@ -106,10 +106,14 @@ class BuildRustTask(BuildCompilerTask):
         super().__init__(**kwargs)
 
     def execute_build(self):
+        self.run_command("create_dir", CreateDirectoryCommand, path="libs")
+        self.run_command("move_libraries", MoveLibraryCommand, source="solution/src/rand/", target="libs/")
+        
         self.run_command("cargo_new", CargoNewCommand, path="rust_project")
         
         # FIXME: This works only unders assumption that source directory is /src/
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target="rust_project")
+        self.run_command("add_offline_dependency", AddOfflineDependency, project_path="rust_project/Cargo.toml", dep_path="libs/rand")
         
         self.run_command("cargo_build", CargoBuildCommand, target="rust_project/Cargo.toml")
         

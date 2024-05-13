@@ -12,8 +12,8 @@ from kolejka.judge.tasks import *
 def judge(args):
     tool_time = parse_time('60s')
     prepare_time = parse_time('5s')
-    source_size_limit = parse_memory(args.test.get('source_size', '100K'))
-    binary_size_limit = parse_memory(args.test.get('binary_size', '20M'))
+    source_size_limit = parse_memory(args.test.get('source_size', '1G'))
+    binary_size_limit = parse_memory(args.test.get('binary_size', '1G'))
     compile_time = parse_time(args.test.get('compile_time', '10s'))
     compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
     c_standard = args.test.get('c_standard', 'c11')
