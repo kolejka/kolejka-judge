@@ -166,15 +166,17 @@ class PostgresResetTask(PostgresTask):
 
 
 class BuildPostgresTask(PostgresTask, BuildTask):
+    DEFAULT_TASK_REQUIRED=False
     DEFAULT_QUIET=True
     DEFAULT_TUPLES_ONLY=False
     DEFAULT_ALIGN=True
     DEFAULT_IGNORE_ERRORS=False
     DEFAULT_APPLICATION_NAME='psql'
     @default_kwargs
-    def __init__(self, task=None, quiet=None, tuples_only=None, align=None, ignore_errors=None, application_name=None, **kwargs):
+    def __init__(self, task=None, task_required=None, quiet=None, tuples_only=None, align=None, ignore_errors=None, application_name=None, **kwargs):
         super().__init__(**kwargs)
         self.task = task
+        self.task_required = task_required
         self.sql_script = self.build_directory / 'exec.sql'
         self.quiet = quiet
         self.tuples_only = tuples_only
@@ -223,6 +225,8 @@ class BuildPostgresTask(PostgresTask, BuildTask):
                         active = False
                 if new_body:
                     sql_script_body = ''.join(new_body)
+                elif self.task_required:
+                    return 'TSK'
             exec_path = self.resolve_path(self.sql_script)
             with exec_path.open('w') as exec_file:
                 exec_file.write(sql_script_body)
@@ -231,8 +235,11 @@ class BuildPostgresTask(PostgresTask, BuildTask):
             exec_path.chmod(0o644)
 
 class SolutionBuildPostgresTask(SolutionBuildMixin, BuildPostgresTask):
+    DEFAULT_TASK_REQUIRED=True
     DEFAULT_EXPLAIN=True
-    pass
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 class ToolBuildPostgresTask(ToolBuildMixin, BuildPostgresTask):
     pass
 
@@ -293,6 +300,7 @@ class GeneratorPostgresTask(ToolPostgresTask):
 
 class FinalizerPostgresTask(ToolPostgresTask):
     DEFAULT_TOOL_NAME='finalizer'
+    DEFAULT_RESULT_ON_ERROR='ANS'
     DEFAULT_OUTPUT_PATH=config.TEST_FINAL_ANSWER
     @default_kwargs
     def __init__(self, **kwargs):
