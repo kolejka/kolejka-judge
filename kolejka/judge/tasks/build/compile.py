@@ -107,18 +107,43 @@ class BuildRustTask(BuildCompilerTask):
 
     def execute_build(self):     
         env = self.get_rust_envs()
-                   
-        self.run_command("move_libraries", MoveCommand, environment=env, source=self.source_directory/config.CARGO_DEPENDENCIES_DIR, target=self.build_directory/config.CARGO_DEPENDENCIES_DIR)
-        self.run_command("cargo_new", CargoNewCommand, environment=env, path=self.build_directory/config.CARGO_PROJECT_NAME)
-        self.run_command("copy_source", CopySourceCommand, environment=env, source=self.source_directory, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_SOURCE_DIR)
+        
+        cargo_project_path = self.build_directory/config.CARGO_PROJECT_NAME
+        project_config_path = cargo_project_path/config.CARGO_CONFIG_FILE
+
+        self.run_command(
+            "move_libraries",
+            MoveCommand,
+            environment=env,
+            source=self.source_directory/config.CARGO_DEPENDENCIES_DIR,
+            target=self.build_directory/config.CARGO_DEPENDENCIES_DIR)
+        
+        self.run_command(
+            "cargo_new",
+            CargoNewCommand,
+            environment=env,
+            path=cargo_project_path
+        )
+        
+        self.run_command(
+            "copy_source",
+            CopySourceCommand,
+            environment=env,
+            source=self.source_directory,
+            target=cargo_project_path/config.CARGO_SOURCE_DIR
+        )
         
         dependency_directories = self.find_directories(self.build_directory/config.CARGO_DEPENDENCIES_DIR)
         
         for dep_dir in dependency_directories:
             effective_name = str(dep_dir).split("/")[-1]
-            project_path = self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE
-            
-            self.run_command(f"install_{effective_name}", AddOfflineDependency, environment=env, project_path=project_path, dep_path=dep_dir)
+            self.run_command(
+                f"install_{effective_name}",
+                AddOfflineDependency,
+                environment=env,
+                project_path=project_config_path,
+                dep_path=dep_dir
+            )
 
         return super().execute_build() 
     
