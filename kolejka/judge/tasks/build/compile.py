@@ -105,13 +105,18 @@ class BuildRustTask(BuildCompilerTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def execute_build(self):        
-        print(self.find_directories(self.source_directory/config.CARGO_DEPENDENCIES_DIR))
-        
+    def execute_build(self):                
         self.run_command("move_libraries", MoveCommand, source=self.source_directory/config.CARGO_DEPENDENCIES_DIR, target=self.build_directory/config.CARGO_DEPENDENCIES_DIR)
         self.run_command("cargo_new", CargoNewCommand, path=self.build_directory/config.CARGO_PROJECT_NAME)
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_SOURCE_DIR)
-        self.run_command("add_dependency", AddOfflineDependency, project_path=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE, dep_path=self.build_directory/config.CARGO_DEPENDENCIES_DIR/"rand")
+        
+        dependency_directories = self.find_directories(self.build_directory/config.CARGO_DEPENDENCIES_DIR)
+        
+        for dep_dir in dependency_directories:
+            effective_name = str(dep_dir).split("/")[-1]
+            project_path = self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE
+            
+            self.run_command(f"install_{effective_name}", AddOfflineDependency, project_path=project_path, dep_path=dep_dir)
 
         return super().execute_build() 
     
