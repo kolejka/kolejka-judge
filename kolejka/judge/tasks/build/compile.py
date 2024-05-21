@@ -134,8 +134,8 @@ class BuildRustTask(BuildCompilerTask):
     
     def get_rust_envs(self):
         return {
-            'RUSTUP_HOME': '/home/dominik/.rustup',
-            'CARGO_HOME': '/home/dominik/.cargo'
+            'RUSTUP_HOME': config.RUSTUP_HOME,
+            'CARGO_HOME': config.CARGO_HOME
         }
     
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
