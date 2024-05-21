@@ -158,10 +158,13 @@ class BuildRustTask(BuildCompilerTask):
         return kwargs
     
     def get_rust_envs(self):
-        return {
-            'RUSTUP_HOME': config.RUSTUP_HOME,
-            'CARGO_HOME': config.CARGO_HOME
-        }
+        if config.RUSTUP_HOME and config.CARGO_HOME:
+            return {
+                'RUSTUP_HOME': config.RUSTUP_HOME,
+                'CARGO_HOME': config.CARGO_HOME
+            }
+        else: 
+            return {}
     
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass
