@@ -140,6 +140,7 @@ class SystemBase(AbstractSystem):
         return pathlib.Path(path)
 
     def find_files(self, path, work_directory =None):
+        print(f"CALL FOR {path}")
         rpath = self.resolve_path(path, work_directory=work_directory)
         if not rpath.exists():
             return

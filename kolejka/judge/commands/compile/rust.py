@@ -8,8 +8,7 @@ from kolejka.judge.commands.base import *
 
 __all__ = [
     'RustcCommand', 'CargoNewCommand', 'CopySourceCommand',
-    'CargoBuildCommand', 'CopyExecutableCommand', 'RenameExecutableCommand',
-    'MoveLibraryCommand', 'CreateDirectoryCommand', 'AddOfflineDependency']
+    'CargoBuildCommand', 'MoveCommand', 'CreateDirectoryCommand', 'AddOfflineDependency']
 def __dir__():
     return __all__
 
@@ -29,13 +28,11 @@ class AddOfflineDependency(ProgramCommand):
     
     def get_environment(self):
         #FIXME: this is bad. 
-        print("GET ENVIRONMENT")
         super_result = super().get_environment()
         
         super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
         super_result['CARGO_HOME'] = '/home/dominik/.cargo'
         
-        print("environment", super_result)
         
         return super_result
     
@@ -54,14 +51,11 @@ class CargoNewCommand(ProgramCommand):
     
     def get_environment(self):
         #FIXME: this is bad. 
-        print("GET ENVIRONMENT")
         super_result = super().get_environment()
         
         super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
         super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-        
-        print("environment", super_result)
-        
+                
         return super_result
 
 class CreateDirectoryCommand(ProgramCommand):
@@ -77,7 +71,7 @@ class CreateDirectoryCommand(ProgramCommand):
         args = ["-p", self.path]
         return args
 
-class MoveLibraryCommand(ProgramCommand):
+class MoveCommand(ProgramCommand):
     DEFAULT_PROGRAM='mv'
     DEFAULT_SAFE=True
     
@@ -102,24 +96,10 @@ class CopySourceCommand(ProgramCommand):
         self.target = target
         
     def get_program_arguments(self):
-        args = ["-r", self.source, self.target]
-        return args
-
-class CopyExecutableCommand(ProgramCommand):
-    DEFAULT_PROGRAM='cp'
-    DEFAULT_SAFE=True
-    
-    @default_kwargs
-    def __init__(self, source, target, **kwargs):
-        super().__init__(**kwargs)
-        self.source = source
-        self.target = target
-        
-    def get_program_arguments(self):
-        args = [self.source, self.target]
+        args = ["-rf", f"{self.source}/.", self.target]
         return args
     
-class CargoBuildCommand(ProgramCommand):
+class CargoBuildCommand(CompileCommand):
     DEFAULT_PROGRAM='cargo'
     DEFAULT_SAFE=True
     
@@ -130,34 +110,17 @@ class CargoBuildCommand(ProgramCommand):
 
     def get_environment(self):
         #FIXME: this is bad. 
-        print("GET ENVIRONMENT")
         super_result = super().get_environment()
         
         super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
         super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-        
-        print("environment", super_result)
-        
+                
         return super_result
     
     def get_program_arguments(self):
         args = ["build", "--manifest-path", self.target]
         return args
 
-class RenameExecutableCommand(ProgramCommand):
-    DEFAULT_PROGRAM='mv'
-    DEFAULT_SAFE=True
-    
-    @default_kwargs
-    def __init__(self, source, target, **kwargs):
-        super().__init__(**kwargs)
-        self.source = source
-        self.target = target
-        
-    def get_program_arguments(self):
-        args = [self.source, self.target]
-        return args        
-        
 class RustcCommand(CompileCommand):
     DEFAULT_PROGRAM='true' # FIXME: haha
     
@@ -169,14 +132,11 @@ class RustcCommand(CompileCommand):
 
     def get_environment(self):
         #FIXME: this is bad. 
-        print("GET ENVIRONMENT")
         super_result = super().get_environment()
         
         super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
         super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-        
-        print("environment", super_result)
-        
+                
         return super_result
 
     @property

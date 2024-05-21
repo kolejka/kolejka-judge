@@ -105,24 +105,16 @@ class BuildRustTask(BuildCompilerTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def execute_build(self):
-        self.run_command("create_dir", CreateDirectoryCommand, path="libs")
-        self.run_command("move_libraries", MoveLibraryCommand, source="solution/src/rand/", target="libs/")
-        
-        self.run_command("cargo_new", CargoNewCommand, path="rust_project")
-        
-        # FIXME: This works only unders assumption that source directory is /src/
-        self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target="rust_project")
-        self.run_command("add_offline_dependency", AddOfflineDependency, project_path="rust_project/Cargo.toml", dep_path="libs/rand")
-        
-        self.run_command("cargo_build", CargoBuildCommand, target="rust_project/Cargo.toml")
-        
-        self.run_command("copy_executable", CopyExecutableCommand, source="rust_project/target/debug/rust_project", target=self.build_directory)
-        
-        self.run_command("rename_executable", RenameExecutableCommand, source="solution/build/rust_project", target="solution/build/a.out")
-        
-        return super().execute_build()
+    def execute_build(self):        
+        self.run_command("move_libraries", MoveCommand, source=self.source_directory/config.CARGO_DEPENDENCIES_DIR, target=self.build_directory/config.CARGO_DEPENDENCIES_DIR)
+        self.run_command("cargo_new", CargoNewCommand, path=self.build_directory/config.CARGO_PROJECT_NAME)
+        self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_SOURCE_DIR)
+        self.run_command("add_dependency", AddOfflineDependency, project_path=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE, dep_path=self.build_directory/config.CARGO_DEPENDENCIES_DIR/"rand")
+        self.run_command("cargo_build", CargoBuildCommand, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE)                
+        self.run_command("move_executable", MoveCommand, source=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_BUILD_DIR, target=self.build_directory/"a.out")
 
+        return super().execute_build() 
+    
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass
 class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):

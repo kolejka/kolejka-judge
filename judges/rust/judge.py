@@ -11,18 +11,18 @@ from kolejka.judge.tasks import *
 
 def judge(args):
     tool_time = parse_time('60s')
-    prepare_time = parse_time('5s')
-    source_size_limit = parse_memory(args.test.get('source_size', '1G'))
-    binary_size_limit = parse_memory(args.test.get('binary_size', '1G'))
-    compile_time = parse_time(args.test.get('compile_time', '10s'))
-    compile_memory = parse_memory(args.test.get('compile_memory', '1G'))
+    prepare_time = parse_time('20s')
+    source_size_limit = parse_memory(args.test.get('source_size', '3G'))
+    binary_size_limit = parse_memory(args.test.get('binary_size', '3G'))
+    compile_time = parse_time(args.test.get('compile_time', '50s'))
+    compile_memory = parse_memory(args.test.get('compile_memory', '5G'))
     c_standard = args.test.get('c_standard', 'c11')
     cpp_standard = args.test.get('cpp_standard', 'c++17')
     gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ]
     time_limit = parse_time(args.test.get('time', '10s'))
-    memory_limit = parse_memory(args.test.get('memory', '1G'))
-    output_size_limit = parse_memory(args.test.get('output_size', '1G'))
-    error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
+    memory_limit = parse_memory(args.test.get('memory', '5G'))
+    output_size_limit = parse_memory(args.test.get('output_size', '5G'))
+    error_size_limit  = parse_memory(args.test.get('error_size', '100M'))
     basename = args.test.get('basename', None)
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
