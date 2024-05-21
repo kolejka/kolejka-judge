@@ -13,6 +13,7 @@ __all__ = [
 def __dir__():
     return __all__
 
+
 class AddOfflineDependency(ProgramCommand):
     DEFAULT_PROGRAM='cargo'
     DEFAULT_SAFE=True
@@ -27,16 +28,6 @@ class AddOfflineDependency(ProgramCommand):
         args = ["add", "--offline", "--manifest-path", self.project_path, "--path", self.dep_path]
         return args 
     
-    def get_environment(self):
-        #FIXME: this is bad. 
-        super_result = super().get_environment()
-        
-        super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
-        super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-        
-        
-        return super_result
-    
 class CargoNewCommand(ProgramCommand):
     DEFAULT_PROGRAM='cargo'
     DEFAULT_SAFE=True
@@ -49,15 +40,6 @@ class CargoNewCommand(ProgramCommand):
     def get_program_arguments(self):
         args = ["new", self.path]
         return args 
-    
-    def get_environment(self):
-        #FIXME: this is bad. 
-        super_result = super().get_environment()
-        
-        super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
-        super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-                
-        return super_result
 
 class MoveCommand(ProgramCommand):
     DEFAULT_PROGRAM='mv'
@@ -95,15 +77,6 @@ class CargoBuildCommand(CompileCommand):
     def __init__(self, cargo_config_file, **kwargs):
         super().__init__(**kwargs)
         self.cargo_config_file = cargo_config_file
-
-    def get_environment(self):
-        #FIXME: this is bad. 
-        super_result = super().get_environment()
-        
-        super_result['RUSTUP_HOME'] = '/home/dominik/.rustup'
-        super_result['CARGO_HOME'] = '/home/dominik/.cargo'
-                
-        return super_result
     
     def get_program_arguments(self):
         args = ["build", "--manifest-path", self.cargo_config_file]
