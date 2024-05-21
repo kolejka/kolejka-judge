@@ -96,7 +96,7 @@ class BuildGCCTask(BuildCompilerTask):
         return kwargs
 
 class BuildRustTask(BuildCompilerTask):
-    DEFAULT_COMPILER = RustcCommand
+    DEFAULT_COMPILER = CargoBuildCommand
     DEFAULT_SOURCE_GLOBS = [
         '*.[Rr][Ss]',
     ]
@@ -110,10 +110,16 @@ class BuildRustTask(BuildCompilerTask):
         self.run_command("cargo_new", CargoNewCommand, path=self.build_directory/config.CARGO_PROJECT_NAME)
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_SOURCE_DIR)
         self.run_command("add_dependency", AddOfflineDependency, project_path=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE, dep_path=self.build_directory/config.CARGO_DEPENDENCIES_DIR/"rand")
-        self.run_command("cargo_build", CargoBuildCommand, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE)                
-        self.run_command("move_executable", MoveCommand, source=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_BUILD_DIR, target=self.build_directory/"a.out")
 
         return super().execute_build() 
+    
+    def get_compiler_kwargs(self):
+        kwargs = super().get_compiler_kwargs()
+                
+        kwargs["cargo_config_file"] = self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_CONFIG_FILE
+        kwargs['build_target'] = get_relative_path(config.CARGO_PROJECT_NAME)/config.CARGO_BUILD_DIR
+
+        return kwargs
     
 class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
     pass

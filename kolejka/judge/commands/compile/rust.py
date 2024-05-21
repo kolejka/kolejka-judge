@@ -104,9 +104,9 @@ class CargoBuildCommand(CompileCommand):
     DEFAULT_SAFE=True
     
     @default_kwargs
-    def __init__(self, target, **kwargs):
+    def __init__(self, cargo_config_file, **kwargs):
         super().__init__(**kwargs)
-        self.target = target
+        self.cargo_config_file = cargo_config_file
 
     def get_environment(self):
         #FIXME: this is bad. 
@@ -118,14 +118,56 @@ class CargoBuildCommand(CompileCommand):
         return super_result
     
     def get_program_arguments(self):
-        args = ["build", "--manifest-path", self.target]
+        args = ["build", "--manifest-path", self.cargo_config_file]
         return args
+    
+    
+    @property
+    def static(self):
+        return False 
+    
+    def get_static(self):
+        return False 
+    
+    @property
+    def version(self):
+        return self.get_version()
+    
+    def get_version(self):
+        return None
+    
+    @property
+    def standard(self):
+        return self.get_standard()
+    
+    def get_standard(self):
+        return self._standard
+    
+    def get_program(self):
+        program = super().get_program()
+        if self.version:
+            program = program+'-'+str(self.version)
+        return program
+
+    def get_build_arguments(self):
+        args = []
+        return args + super().get_build_arguments()
+    
+    def get_library_arguments(self, library):
+        return []
+    
+    def get_target_arguments(self, target):
+        return [ '-o', target, ]
+    
+    def get_build_target(self):
+        return super().get_build_target() or get_relative_path('a.out')
 
 class RustcCommand(CompileCommand):
     DEFAULT_PROGRAM='true' # FIXME: haha
     
     @default_kwargs
     def __init__(self, **kwargs):
+        del kwargs["cargo_config_file"]
         print("RUSTC COMMAND")
         print(kwargs)
         super().__init__(**kwargs)
