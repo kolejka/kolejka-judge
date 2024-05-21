@@ -106,6 +106,8 @@ class BuildRustTask(BuildCompilerTask):
         super().__init__(**kwargs)
 
     def execute_build(self):        
+        print(self.find_directories(self.source_directory/config.CARGO_DEPENDENCIES_DIR))
+        
         self.run_command("move_libraries", MoveCommand, source=self.source_directory/config.CARGO_DEPENDENCIES_DIR, target=self.build_directory/config.CARGO_DEPENDENCIES_DIR)
         self.run_command("cargo_new", CargoNewCommand, path=self.build_directory/config.CARGO_PROJECT_NAME)
         self.run_command("copy_source", CopySourceCommand, source=self.source_directory, target=self.build_directory/config.CARGO_PROJECT_NAME/config.CARGO_SOURCE_DIR)

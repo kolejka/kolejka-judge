@@ -304,6 +304,9 @@ class TaskBase(AbstractTask):
     def resolve_path(self, path):
         return self.system.resolve_path(path, work_directory=self.work_directory)
 
+    def find_directories(self, path):
+        return self.system.find_directories(path, work_directory=self.work_directory)
+
     def find_files(self, path):
         return self.system.find_files(path, work_directory=self.work_directory)
 

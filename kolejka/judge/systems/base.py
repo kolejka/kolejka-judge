@@ -139,6 +139,19 @@ class SystemBase(AbstractSystem):
             return self.output_directory / work_directory.path / path.path
         return pathlib.Path(path)
 
+    def find_directories(self, path, work_directory=None):
+        rpath = self.resolve_path(path, work_directory=work_directory)
+        
+        dirs = []
+        
+        for entry in os.listdir(rpath):
+            resolved = rpath/entry 
+            
+            if(os.path.isdir(resolved)): 
+                dirs.append(path/entry)
+            
+        return dirs 
+
     def find_files(self, path, work_directory =None):
         print(f"CALL FOR {path}")
         rpath = self.resolve_path(path, work_directory=work_directory)
