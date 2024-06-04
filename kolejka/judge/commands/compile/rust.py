@@ -79,7 +79,7 @@ class CargoBuildCommand(CompileCommand):
         self.cargo_config_file = cargo_config_file
     
     def get_program_arguments(self):
-        args = ["build", "--manifest-path", self.cargo_config_file]
+        args = ["build", "--manifest-path", self.cargo_config_file, "--release"]
         return args
     
     def get_program(self):

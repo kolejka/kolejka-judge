@@ -173,7 +173,7 @@ CARGO_PROJECT_NAME = 'rust-project'
 CARGO_DEPENDENCIES_DIR = 'deps'
 CARGO_SOURCE_DIR = "src"
 CARGO_CONFIG_FILE = "Cargo.toml"
-CARGO_BUILD_DIR = f"target/debug/{CARGO_PROJECT_NAME}"
+CARGO_BUILD_DIR = f"target/release/{CARGO_PROJECT_NAME}"
 
 # Update these to point at your Rust installation (or you can just set None if you're using Docker)
 RUSTUP_HOME="/home/dominik/.rustup"
