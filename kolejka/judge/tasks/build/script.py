@@ -9,11 +9,9 @@ from kolejka.judge.validators import *
 from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import TaskBase
 
-
 __all__ = [
         'BuildScriptTask', 'SolutionBuildScriptTask', 'ToolBuildScriptTask',
         'BuildBashScriptTask', 'SolutionBuildBashScriptTask', 'ToolBuildBashScriptTask',
-        'BuildPython3ScriptTask', 'SolutionBuildPython3ScriptTask', 'ToolBuildPython3ScriptTask',
         ]
 def __dir__():
     return __all__
@@ -21,25 +19,41 @@ def __dir__():
 
 class BuildScriptTask(BuildTask):
     @default_kwargs
-    def __init__(self, interpreter=None, source_globs=None, **kwargs):
+    def __init__(self, interpreter=None, source_globs=None, main_filename="main", **kwargs):
         super().__init__(**kwargs)
         self.interpreter = interpreter or 'sh'
         self.source_globs = source_globs or ['*']
+        self.main_filename = main_filename
 
-    def get_source_files(self):
+    def get_source_files(self, globs=None):
+        if globs is None:
+            globs = self.source_globs
+
         result = []
         for f in self.find_files(self.source_directory):
-            for source_glob in self.source_globs:
+            for source_glob in globs:
                 if f.match(source_glob):
                     result += [f]
                     break
         return result
 
     def ok(self):
-        return len(self.get_source_files()) == 1
+        return len(self.get_source_files()) > 0
 
     def execute_build(self):
-        source_file = self.get_source_files()[0]
+        files = self.get_source_files()
+
+        if len(files) == 1:
+            source_file = files[0]
+        else: 
+            basenames = [f.stem for f in files]
+            executable = [(file, basename) for file, basename in zip(files, basenames) if basename == self.main_filename]
+
+            if len(executable) != 1:
+                return "CME"
+
+            source_file = executable[0][0]
+
         target_file = self.build_directory / source_file.name 
 
         return self.run_command('install', InstallCommand, source=source_file, target=target_file)
@@ -63,17 +77,4 @@ class BuildBashScriptTask(BuildScriptTask):
 class SolutionBuildBashScriptTask(SolutionBuildMixin, BuildBashScriptTask):
     pass
 class ToolBuildBashScriptTask(ToolBuildMixin, BuildBashScriptTask):
-    pass
-
-class BuildPython3ScriptTask(BuildScriptTask): 
-    DEFAULT_INTERPRETER = 'python3'
-    DEFAULT_SOURCE_GLOBS = [
-        '*.[Pp][Yy]'
-    ]
-    @default_kwargs
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-class SolutionBuildPython3ScriptTask(SolutionBuildMixin, BuildPython3ScriptTask):
-    pass
-class ToolBuildPython3ScriptTask(ToolBuildMixin, BuildPython3ScriptTask):
     pass

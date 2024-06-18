@@ -95,6 +95,7 @@ class BuildTask(TaskBase):
 
     def get_execution_commands(self):
         command = self.get_execution_command()
+                
         if command:
             return [ command ]
         return []
