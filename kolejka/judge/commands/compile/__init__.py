@@ -8,3 +8,4 @@ from kolejka.judge.commands.compile.ghc import *
 from kolejka.judge.commands.compile.mono import *
 from kolejka.judge.commands.compile.nasm import *
 from kolejka.judge.commands.compile.nvcc import *
+from kolejka.judge.commands.compile.rust import *

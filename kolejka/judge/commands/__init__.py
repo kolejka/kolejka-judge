@@ -10,3 +10,4 @@ from kolejka.judge.commands.extract import *
 from kolejka.judge.commands.make import *
 from kolejka.judge.commands.postgres import *
 from kolejka.judge.commands.system import *
+from kolejka.judge.commands.prepare_venv import *

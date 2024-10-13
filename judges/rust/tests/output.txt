@@ -1,0 +1,6 @@
+ === OK === 
+  + main.rs
+CALL FOR solution/src
+CALL FOR solution/src
+CALL FOR solution/src
+   TEST !!! NO RESULT FAIL !!!

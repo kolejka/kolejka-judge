@@ -8,10 +8,9 @@ from kolejka.judge.typing import *
 from kolejka.judge.validators import *
 
 
-__all__ = [ 'GCCCommand', 'LDCommand', 'GXXCommand', 'GCCGoCommand', ]
+__all__ = [ 'GCCCommand', 'LDCommand', 'GXXCommand', 'GCCGoCommand']
 def __dir__():
     return __all__
-
 
 class GCCCommand(CompileCommand):
     DEFAULT_PROGRAM='gcc'

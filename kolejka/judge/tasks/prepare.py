@@ -12,7 +12,7 @@ from kolejka.judge.commands import *
 from kolejka.judge.tasks.base import *
 
 
-__all__ = [ 'PrepareTask', 'SolutionPrepareTask', 'ToolPrepareTask', 'ExecPrepareTask' ]
+__all__ = [ 'PrepareTask', 'SolutionPrepareTask', 'ToolPrepareTask', 'ExecPrepareTask', 'WheelUnzipTask' ]
 def __dir__():
     return __all__
 
@@ -67,6 +67,21 @@ class SolutionPrepareTask(PrepareTask):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+
+class WheelUnzipTask(TaskBase):
+    DEFAULT_TARGET=config.SOLUTION_SOURCE 
+
+    @default_kwargs
+    def __init__(self, wheels, target, **kwargs):
+        super().__init__(**kwargs)
+
+        self.wheels = wheels
+        self.target = target 
+
+    def execute(self):
+        status = self.run_command('unzip', UnzipCommand, source=self.wheels, target=self.target)
+        self.set_result(status)
+        return self.result
 
 class ToolPrepareTask(PrepareTask):
     DEFAULT_TARGET=config.TOOL_SOURCE
