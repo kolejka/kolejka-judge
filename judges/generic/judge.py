@@ -21,8 +21,10 @@ def judge(args):
     gcc_arguments = [ arg.strip() for arg in args.test.get('gcc_arguments', '').split() if arg.strip() ] or None
     time_limit = parse_time(args.test.get('time', '10s'))
     memory_limit = parse_memory(args.test.get('memory', '1G'))
+    stack_limit = parse_memory(args.test.get('stack', None))
     output_size_limit = parse_memory(args.test.get('output_size', '1G'))
     error_size_limit  = parse_memory(args.test.get('error_size', '1M'))
+    exec_args = [ arg.strip() for arg in args.test.get('args', '').split() if arg.strip() ] or None
     basename = args.test.get('basename', None)
     args.add_steps(
         system=SystemPrepareTask(default_logs=False),
@@ -52,8 +54,10 @@ def judge(args):
         limit_cores=1,
         limit_time=time_limit,
         limit_memory=memory_limit,
+        limit_stack=stack_limit,
         limit_output_size=output_size_limit,
         limit_error_size=error_size_limit,
+        executable_arguments=exec_args,
         )
     )
     if parse_bool(args.test.get('debug', 'no')):

@@ -95,7 +95,7 @@ class SingleIOTask(IOTask):
             hinter_time=self.tool_time
             if hinter_time and self.limit_real_time and hinter_time < self.limit_real_time:
                 hinter_time = self.limit_real_time
-            hinter = HinterTask(source=self.hinter_source, output_path=self.hinter_output_path, override=self.tool_override, input_path=input_path, limit_real_time=hinter_time, c_standard=self.tool_c_standard, cpp_standard=self.tool_cpp_standard, gcc_arguments=self.tool_gcc_arguments, libraries=self.tool_libraries)
+            hinter = HinterTask(source=self.hinter_source, output_path=self.hinter_output_path, override=self.tool_override, input_path=input_path, arguments=self.executable_arguments, limit_real_time=hinter_time, c_standard=self.tool_c_standard, cpp_standard=self.tool_cpp_standard, gcc_arguments=self.tool_gcc_arguments, libraries=self.tool_libraries)
             hint_path = hinter.output_path
             self.steps.append(('hinter', hinter))
         if self.checker_source:
