@@ -214,7 +214,7 @@ class BuildPostgresTask(PostgresTask, BuildTask):
             if self.task:
                 new_body = []
                 active = False
-                starter = re.compile(r'\s*--\s*'+re.escape(self.task)+'\s*', flags=re.IGNORECASE)
+                starter = re.compile(r'\s*--\s*'+re.escape(self.task)+r'\s*', flags=re.IGNORECASE)
                 stoper = re.compile(r'\s*----\s*')
                 for line in sql_script_body.splitlines(keepends=True):
                     if not active and starter.fullmatch(line):
