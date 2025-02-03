@@ -78,7 +78,11 @@ def ctxyaml_load(path, root=None):
     if root is None:
         root = path.resolve().parent
     else:
-        root - pathlib.Path(root)
+        root = pathlib.Path(root)
+    if not path.is_file():
+        raise ValueError(f'Path {path} is not a file.')
+    if not root.is_dir():
+        raise ValueError(f'Path {root} is not a directory.')
     value = None
     with path.open() as ctxyaml_file:
         value = yaml.load(ctxyaml_file, Loader=Loader)
