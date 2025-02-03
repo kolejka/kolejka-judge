@@ -14,7 +14,9 @@ __all__ = [
         'BuildCompilerTask', 'SolutionBuildCompilerTask', 'ToolBuildCompilerTask',
         'BuildGCCTask', 'SolutionBuildGCCTask', 'ToolBuildGCCTask',
         'BuildGXXTask', 'SolutionBuildGXXTask', 'ToolBuildGXXTask',
-        'BuildNVCCTask', 'SolutionBuildNVCCTask', 'ToolBuildNVCCTask', 'SolutionBuildRustTask'
+        'BuildGHCTask', 'SolutionBuildGHCTask', 'ToolBuildGHCTask',
+        'BuildNVCCTask', 'SolutionBuildNVCCTask', 'ToolBuildNVCCTask',
+        'BuildRustTask', 'SolutionBuildRustTask', 'ToolBuildRustTask',
         ]
 def __dir__():
     return __all__
@@ -95,6 +97,31 @@ class BuildGCCTask(BuildCompilerTask):
             kwargs['static'] = self.static
         return kwargs
 
+class BuildGXXTask(BuildGCCTask):
+    DEFAULT_COMPILER = GXXCommand
+    DEFAULT_SOURCE_GLOBS = [
+        '*.[Cc][Pp][Pp]',
+        '*.[Cc][Cc]',
+        ]
+    @default_kwargs
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+class BuildGHCTask(BuildCompilerTask):
+    DEFAULT_COMPILER = GHCCommand
+    DEFAULT_SOURCE_GLOBS = [
+        '*.[Hh][Ss]',
+        ]
+    @default_kwargs
+    def __init__(self, static=None, **kwargs):
+        super().__init__(**kwargs)
+        self.static = static
+    def get_compiler_kwargs(self):
+        kwargs = super().get_compiler_kwargs()
+        if self.static is not None:
+            kwargs['static'] = self.static
+        return kwargs
+
 class BuildRustTask(BuildCompilerTask):
     DEFAULT_COMPILER = CargoBuildCommand
     DEFAULT_SOURCE_GLOBS = [
@@ -165,27 +192,6 @@ class BuildRustTask(BuildCompilerTask):
             }
         else: 
             return {}
-    
-class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
-    pass
-class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):
-    pass
-
-class BuildGXXTask(BuildGCCTask):
-    DEFAULT_COMPILER = GXXCommand
-    DEFAULT_SOURCE_GLOBS = [
-        '*.[Cc][Pp][Pp]',
-        '*.[Cc][Cc]',
-        ]
-    @default_kwargs
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-class SolutionBuildGXXTask(SolutionBuildMixin, BuildGXXTask):
-    pass
-class SolutionBuildRustTask(SolutionBuildMixin, BuildRustTask):
-    pass 
-class ToolBuildGXXTask(ToolBuildMixin, BuildGXXTask):
-    pass
 
 class BuildNVCCTask(BuildGCCTask):
     DEFAULT_COMPILER = NVCCCommand
@@ -202,6 +208,22 @@ class BuildNVCCTask(BuildGCCTask):
             kwargs['architecture'] = self.architecture
         return kwargs
 
+class SolutionBuildGCCTask(SolutionBuildMixin, BuildGCCTask):
+    pass
+class ToolBuildGCCTask(ToolBuildMixin, BuildGCCTask):
+    pass
+class SolutionBuildGXXTask(SolutionBuildMixin, BuildGXXTask):
+    pass
+class ToolBuildGXXTask(ToolBuildMixin, BuildGXXTask):
+    pass
+class SolutionBuildGHCTask(SolutionBuildMixin, BuildGHCTask):
+    pass
+class ToolBuildGHCTask(ToolBuildMixin, BuildGHCTask):
+    pass
+class SolutionBuildRustTask(SolutionBuildMixin, BuildRustTask):
+    pass 
+class ToolBuildRustTask(ToolBuildMixin, BuildRustTask):
+    pass 
 class SolutionBuildNVCCTask(SolutionBuildMixin, BuildNVCCTask):
     pass
 class ToolBuildNVCCTask(ToolBuildMixin, BuildNVCCTask):

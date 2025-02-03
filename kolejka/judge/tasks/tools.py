@@ -103,6 +103,7 @@ class ToolTask(TaskBase):
             [ToolBuildNVCCTask, [], nvcc_kwargs],
             [ToolBuildGXXTask, [], gxx_kwargs],
             [ToolBuildGCCTask, [], gcc_kwargs],
+            [ToolBuildGHCTask, [], gcc_kwargs],
             [ToolBuildPython3ScriptTask, [], sub_kwargs],
             [ToolBuildBashScriptTask, [], sub_kwargs],
             ], **self.build_kwargs)
