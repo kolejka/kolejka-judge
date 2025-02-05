@@ -33,6 +33,6 @@ class GHCCommand(CompileCommand):
     def get_library_arguments(self, library):
         return [ '-l' + library, ]
     def get_target_arguments(self, target):
-        return [ '-o', target, ]
+        return [ '-outputdir', self.build_directory, '-o', target, ]
     def get_build_target(self):
         return super().get_build_target() or get_relative_path('a.out')
