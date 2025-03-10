@@ -138,7 +138,7 @@ SYSTEM_DIRECTORIES = [
     } ,
 ]
 
-POSTGRES_VERSION = 12
+POSTGRES_VERSION = 16
 POSTGRES_LOCALE = 'en_US.UTF-8'
 POSTGRES_DATA_DIR = 'postgresdata'
 POSTGRES_SOCKET_DIR = 'postgressocket'
@@ -179,5 +179,5 @@ CARGO_CONFIG_FILE = "Cargo.toml"
 CARGO_BUILD_DIR = f"target/release/{CARGO_PROJECT_NAME}"
 
 # Update these to point at your Rust installation (or you can just set None if you're using Docker)
-RUSTUP_HOME="/home/dominik/.rustup"
-CARGO_HOME="/home/dominik/.cargo"
+RUSTUP_HOME = None
+CARGO_HOME = None
