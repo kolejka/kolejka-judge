@@ -39,7 +39,7 @@ class PrepareTask(TaskBase):
             return self.run_command(cmd_name, UnrarCommand, source=source, target=self.target)
         if allow_extract and sufs and sufs[-1] == '7z':
             return self.run_command(cmd_name, Un7zCommand, source=source, target=self.target)
-        if allow_extract and 'tar' in sufs:
+        if allow_extract and ( (sufs[-1] in [ 'tb2', 'tbz', 'tbz2', 'tz2', 'taz', 'tgz', 'tlz', 'txz', 'tz', 'taz', 'tzst' ]) or ('tar' in sufs) ):
             return self.run_command(cmd_name, UntarCommand, source=source, target=self.target) #--touch
         cmd_name = '%s_install'%(name,)
         basename = str(pathlib.Path('/', (basename or source.name).strip('/')).resolve(strict=False)).strip('/')
